@@ -2,6 +2,7 @@ package com.comp2850.goodfood.common.exception
 
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.server.ResponseStatusException
@@ -9,6 +10,25 @@ import java.time.Instant
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidationException(
+        ex: MethodArgumentNotValidException,
+        request: HttpServletRequest
+    ): ResponseEntity<Map<String, Any?>> {
+        val firstErrorMessage = ex.bindingResult.fieldErrors.firstOrNull()?.defaultMessage
+            ?: "validation failed"
+
+        val body = mapOf(
+            "timestamp" to Instant.now().toString(),
+            "status" to 400,
+            "error" to "Bad Request",
+            "message" to firstErrorMessage,
+            "path" to request.requestURI
+        )
+
+        return ResponseEntity.badRequest().body(body)
+    }
 
     @ExceptionHandler(ResponseStatusException::class)
     fun handleResponseStatusException(

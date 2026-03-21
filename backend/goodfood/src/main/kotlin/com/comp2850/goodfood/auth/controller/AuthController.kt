@@ -3,6 +3,7 @@ package com.comp2850.goodfood.auth.controller
 import com.comp2850.goodfood.auth.dto.LoginRequest
 import com.comp2850.goodfood.auth.dto.RegisterRequest
 import com.comp2850.goodfood.auth.service.AuthService
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -12,17 +13,22 @@ class AuthController(
 ) {
 
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): Map<String, Any> {
+    fun register(@Valid @RequestBody request: RegisterRequest): Map<String, Any> {
         return authService.register(request)
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody request: LoginRequest): Map<String, Any> {
+    fun login(@Valid @RequestBody request: LoginRequest): Map<String, Any> {
         return authService.login(request)
     }
 
     @GetMapping("/users")
     fun getAllUsers(): List<Map<String, Any>> {
         return authService.getAllUsers()
+    }
+
+    @GetMapping("/me")
+    fun getCurrentUser(@RequestParam email: String): Map<String, Any> {
+        return authService.getCurrentUser(email)
     }
 }

@@ -18,18 +18,6 @@ class AuthService(
 ) {
 
     fun register(request: RegisterRequest): Map<String, Any> {
-        if (request.name.isBlank()) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "name cannot be blank")
-        }
-
-        if (request.email.isBlank()) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "email cannot be blank")
-        }
-
-        if (request.password.isBlank()) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "password cannot be blank")
-        }
-
         val role = parseRole(request.role)
 
         val existingUser = userRepository.findByEmail(request.email)
@@ -62,14 +50,6 @@ class AuthService(
     }
 
     fun login(request: LoginRequest): Map<String, Any> {
-        if (request.email.isBlank()) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "email cannot be blank")
-        }
-
-        if (request.password.isBlank()) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "password cannot be blank")
-        }
-
         val user = userRepository.findByEmail(request.email)
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid email or password")
 
@@ -106,4 +86,16 @@ class AuthService(
             else -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid role")
         }
     }
+
+    fun getCurrentUser(email: String): Map<String, Any> {
+        val user = userRepository.findByEmail(email)
+        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "user not found")
+
+        return mapOf(
+        "id" to user.id,
+        "name" to user.name,
+        "email" to user.email,
+        "role" to user.role.name
+        )
+    }   
 }
