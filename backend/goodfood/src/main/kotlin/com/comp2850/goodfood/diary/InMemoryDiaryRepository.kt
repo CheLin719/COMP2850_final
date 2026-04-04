@@ -1,6 +1,7 @@
 package com.comp2850.goodfood.diary
 
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicLong
 
 @Repository
@@ -30,7 +31,7 @@ class InMemoryDiaryRepository {
         return entries.filter { it.userEmail == userEmail }
     }
 
-    fun findByUserEmailAndDate(userEmail: String, diaryDate: String): List<DiaryEntry> {
+    fun findByUserEmailAndDate(userEmail: String, diaryDate: LocalDate): List<DiaryEntry> {
         return entries.filter {
             it.userEmail == userEmail && it.diaryDate == diaryDate
         }

@@ -1,6 +1,9 @@
 package com.comp2850.goodfood.diary
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import java.time.LocalDate
 
 data class CreateDiaryRequest(
     @field:NotBlank(message = "foodName cannot be blank")
@@ -9,9 +12,10 @@ data class CreateDiaryRequest(
     @field:NotBlank(message = "quantity cannot be blank")
     val quantity: String,
 
-    @field:NotBlank(message = "mealType cannot be blank")
-    val mealType: String,
+    @field:NotNull(message = "mealType is required")
+    val mealType: MealType?,
 
-    @field:NotBlank(message = "diaryDate cannot be blank")
-    val diaryDate: String
+    @field:NotNull(message = "diaryDate is required")
+    @field:JsonFormat(pattern = "yyyy-MM-dd")
+    val diaryDate: LocalDate?
 )

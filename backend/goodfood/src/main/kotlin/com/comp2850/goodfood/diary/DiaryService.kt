@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDate
 
 @Service
 class DiaryService(
@@ -18,17 +19,17 @@ class DiaryService(
             userEmail = userEmail,
             foodName = request.foodName,
             quantity = request.quantity,
-            mealType = request.mealType,
-            diaryDate = request.diaryDate
+            mealType = request.mealType!!,
+            diaryDate = request.diaryDate!!
         )
 
         return diaryRepository.save(entry)
     }
 
-    fun getMyDiaryEntries(authentication: Authentication, date: String?): List<DiaryEntry> {
+    fun getMyDiaryEntries(authentication: Authentication, date: LocalDate?): List<DiaryEntry> {
         val userEmail = authentication.name
 
-        return if (date.isNullOrBlank()) {
+        return if (date == null) {
             diaryRepository.findByUserEmail(userEmail)
         } else {
             diaryRepository.findByUserEmailAndDate(userEmail, date)
@@ -63,8 +64,8 @@ class DiaryService(
         val updatedEntry = existingEntry.copy(
             foodName = request.foodName,
             quantity = request.quantity,
-            mealType = request.mealType,
-            diaryDate = request.diaryDate
+            mealType = request.mealType!!,
+            diaryDate = request.diaryDate!!
         )
 
         return diaryRepository.update(updatedEntry)

@@ -1,6 +1,7 @@
 package com.comp2850.goodfood.diary
 
 import jakarta.validation.Valid
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("/diary")
@@ -29,7 +31,9 @@ class DiaryController(
     @GetMapping
     fun getMyDiaryEntries(
         authentication: Authentication,
-        @RequestParam(required = false) date: String?
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        date: LocalDate?
     ): List<DiaryEntry> {
         return diaryService.getMyDiaryEntries(authentication, date)
     }
