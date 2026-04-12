@@ -811,6 +811,8 @@ body.show-auth #page-auth { display: block; }
 </head>
 <body>
 
+
+
 <div id="page-landing">
 <!-- Custom cursor -->
 <!-- NAV -->
@@ -1239,11 +1241,14 @@ function showLanding() {
     if (!ok) return;
     const btn = document.getElementById('login-btn');
     btn.textContent = 'Signing in…'; btn.classList.add('loading');
+    // Demo: route by role selection or backdoor accounts
+    const isPro = email === 'test@pro.com' || currentRole === 'professional';
+    window._redirectTo = isPro ? 'pro_dashboard.html' : 'dashboard.html';
     setTimeout(() => {
       btn.textContent = 'Sign in →'; btn.classList.remove('loading');
       document.getElementById('login-form-wrap').style.display = 'none';
       document.getElementById('login-success').classList.add('show');
-    }, 1400);
+    }, 1000);
   }
 
   /**
@@ -1272,11 +1277,12 @@ function showLanding() {
     if (!ok) return;
     const btn = document.getElementById('register-btn');
     document.getElementById('reg-btn-text').textContent = 'Creating account…'; btn.classList.add('loading');
+    window._redirectTo = currentRole === 'professional' ? 'pro_dashboard.html' : 'dashboard.html';
     setTimeout(() => {
       document.getElementById('reg-btn-text').textContent = 'Create account →'; btn.classList.remove('loading');
       document.getElementById('register-form-wrap').style.display = 'none';
       document.getElementById('register-success').classList.add('show');
-    }, 1600);
+    }, 1200);
   }
 
   /**
@@ -1284,7 +1290,7 @@ function showLanding() {
    * @description Placeholder function. Currently returns to landing page.
    *              占位函数。当前返回着陆页。
    */
-  function goToDashboard() { alert('Would navigate to /dashboard'); }
+  function goToDashboard() { window.location.href = window._redirectTo || 'dashboard.html'; }
 
   /**
    * Keyboard event listener / 键盘事件监听
@@ -1303,7 +1309,7 @@ function showLanding() {
  * @description In demo mode, returns to landing page instead of navigating to dashboard.
  *              演示模式下，返回着陆页而非跳转到仪表盘。
  */
-function goToDashboard() { showLanding(); }
+function goToDashboard() { window.location.href = window._redirectTo || 'dashboard.html'; }
 </script>
 </body>
 </html>
