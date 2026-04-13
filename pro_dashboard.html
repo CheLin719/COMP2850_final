@@ -280,7 +280,9 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
         <div class="tn-avatar-pic">DR</div>
         <span class="tn-avatar-name">Dr. Rivera</span>
       </div>
-      <div id="proAvatarMenu" style="display:none;position:absolute;top:50px;right:0;background:#fff;border:1px solid #d4dfd8;border-radius:10px;min-width:160px;box-shadow:0 12px 40px rgba(10,20,16,0.12);overflow:hidden;z-index:100">
+      <div id="proAvatarMenu" style="display:none;position:absolute;top:50px;right:0;background:#fff;border:1px solid #d4dfd8;border-radius:10px;min-width:180px;box-shadow:0 12px 40px rgba(10,20,16,0.12);overflow:hidden;z-index:100">
+        <a href="#" onclick="event.stopPropagation();openProSettings('personal')" style="display:block;padding:11px 16px;font-size:13px;color:#0a1410;text-decoration:none;border-bottom:1px solid #f5f7f5">Personal Details</a>
+        <a href="#" onclick="event.stopPropagation();openProSettings('preferences')" style="display:block;padding:11px 16px;font-size:13px;color:#0a1410;text-decoration:none;border-bottom:1px solid #f5f7f5">Preferences</a>
         <a href="#" onclick="event.stopPropagation();event.preventDefault();window.location.replace('index.html')" style="display:block;padding:11px 16px;font-size:13px;color:#c0392b;text-decoration:none">Log Out</a>
       </div>
     </div>
@@ -1450,5 +1452,198 @@ function renderScoreRing(c) {
 <!-- Toast -->
 <div id="proToast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;font-family:'Bricolage Grotesque',sans-serif"></div>
 
+<!-- ── Pro Settings Overlays ─────────────────────────────────────────────── -->
+<div id="proSettingsOverlay" style="display:none;position:fixed;inset:0;background:var(--paper);z-index:1500;overflow-y:auto">
+  <div style="max-width:900px;margin:0 auto;padding:32px 40px">
+
+    <!-- Back button -->
+    <div style="margin-bottom:24px">
+      <button onclick="closeProSettings()" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">← Back to Dashboard</button>
+    </div>
+
+    <!-- Personal Details panel -->
+    <div id="proPanel-personal" style="display:none">
+      <div style="margin-bottom:28px">
+        <div style="font-family:'Instrument Serif',serif;font-size:28px;font-style:italic;color:var(--ink)">Personal <em>Details</em></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Manage your professional account</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <!-- Left: account info -->
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+          <div style="display:flex;align-items:center;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--fog)">
+            <div style="width:64px;height:64px;border-radius:50%;background:var(--pro);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700">DR</div>
+            <div>
+              <div style="font-size:18px;font-weight:700;color:var(--ink)">Dr. Rivera</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Health Professional</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">First Name</div>
+              <input type="text" value="Dr." style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Last Name</div>
+              <input type="text" value="Rivera" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Email Address</div>
+              <input type="email" value="rivera@nourishwell.com" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Licence Number</div>
+              <input type="text" value="NW-PRO-2024-0042" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+          </div>
+          <button onclick="proSettingsSaved(this)" style="margin-top:20px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Save Changes</button>
+        </div>
+        <!-- Right: professional info + password -->
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+            <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:18px">Professional Profile</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Specialisation</div>
+                <select style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)">
+                  <option>Dietitian</option>
+                  <option selected>Nutritionist</option>
+                  <option>Sports Nutritionist</option>
+                  <option>Wellness Coach</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Years of Experience</div>
+                <input type="number" value="12" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none">
+              </div>
+              <div style="grid-column:1/-1">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Max Clients</div>
+                <input type="number" value="20" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none">
+              </div>
+            </div>
+            <button onclick="proSettingsSaved(this)" style="margin-top:16px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Update Profile</button>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+            <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:18px">Change Password</div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Current Password</div>
+                <input type="password" placeholder="Enter current password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              </div>
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">New Password</div>
+                <input type="password" placeholder="Min. 8 characters" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              </div>
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Confirm New Password</div>
+                <input type="password" placeholder="Re-enter new password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              </div>
+            </div>
+            <button onclick="proSettingsSaved(this)" style="margin-top:16px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Update Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences panel -->
+    <div id="proPanel-preferences" style="display:none">
+      <div style="margin-bottom:28px">
+        <div style="font-family:'Instrument Serif',serif;font-size:28px;font-style:italic;color:var(--ink)">My <em>Preferences</em></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Customise your NourishWell Pro experience</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+            <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">Notifications</div>
+            <div style="font-size:11px;color:var(--ink-f);margin-bottom:16px">Choose what alerts you receive</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--fog)">
+                <div><div style="font-size:12px;font-weight:600;color:var(--ink)">Client log reminders</div><div style="font-size:10px;color:var(--ink-f);margin-top:2px">Alert when a client hasn't logged in 2+ days</div></div>
+                <input type="checkbox" checked style="accent-color:var(--teal);width:18px;height:18px">
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--fog)">
+                <div><div style="font-size:12px;font-weight:600;color:var(--ink)">Weekly client summary</div><div style="font-size:10px;color:var(--ink-f);margin-top:2px">Weekly report of all client progress</div></div>
+                <input type="checkbox" checked style="accent-color:var(--teal);width:18px;height:18px">
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--fog)">
+                <div><div style="font-size:12px;font-weight:600;color:var(--ink)">Appointment reminders</div><div style="font-size:10px;color:var(--ink-f);margin-top:2px">Reminder 1 hour before scheduled appointments</div></div>
+                <input type="checkbox" checked style="accent-color:var(--teal);width:18px;height:18px">
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+                <div><div style="font-size:12px;font-weight:600;color:var(--ink)">New client messages</div><div style="font-size:10px;color:var(--ink-f);margin-top:2px">Notify when a client sends a message</div></div>
+                <input type="checkbox" checked style="accent-color:var(--teal);width:18px;height:18px">
+              </label>
+            </div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+            <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">Client Alerts</div>
+            <div style="font-size:11px;color:var(--ink-f);margin-bottom:16px">Set thresholds for automatic flagging</div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);text-transform:uppercase;letter-spacing:.08em">Flag if calories below (%)</span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);font-weight:600">70%</span></div>
+                <input type="range" min="50" max="90" value="70" style="width:100%;accent-color:var(--teal)">
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);text-transform:uppercase;letter-spacing:.08em">Missed log days before alert</span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);font-weight:600">2 days</span></div>
+                <input type="range" min="1" max="7" value="2" style="width:100%;accent-color:var(--teal)">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+            <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">Display Settings</div>
+            <div style="font-size:11px;color:var(--ink-f);margin-bottom:16px">Customise how data is shown</div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Units</div>
+                <select style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)">
+                  <option selected>Metric (kg, cm)</option>
+                  <option>Imperial (lbs, ft)</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Currency</div>
+                <select style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)">
+                  <option selected>GBP (£)</option>
+                  <option>EUR (€)</option>
+                  <option>USD ($)</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Default Chart View</div>
+                <select style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)">
+                  <option selected>30 days</option>
+                  <option>7 days</option>
+                  <option>90 days</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button onclick="proSettingsSaved(this)" style="padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Save All Preferences</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function openProSettings(panel) {
+  document.getElementById('proAvatarMenu').style.display = 'none';
+  document.getElementById('proSettingsOverlay').style.display = 'block';
+  document.getElementById('proPanel-personal').style.display = 'none';
+  document.getElementById('proPanel-preferences').style.display = 'none';
+  document.getElementById('proPanel-' + panel).style.display = 'block';
+}
+function closeProSettings() {
+  document.getElementById('proSettingsOverlay').style.display = 'none';
+}
+function proSettingsSaved(btn) {
+  const orig = btn.textContent;
+  btn.textContent = '✓ Saved!';
+  btn.style.background = 'var(--teal)';
+  setTimeout(() => { btn.textContent = orig; btn.style.background = 'var(--ink)'; }, 2000);
+}
+</script>
 </body>
 </html>
