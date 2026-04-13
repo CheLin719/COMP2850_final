@@ -174,7 +174,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 </style>
 </head>
 <body>
-<nav class="top-nav"><div class="top-nav-left"><a href="#" class="tn-logo"><div class="tn-logo-mark">🌿</div><span class="tn-logo-text">NourishWell</span></a></div><div class="top-nav-right"><a href="#" id="proSwitchNavBtn" onclick="switchBackToPro();return false" class="tn-link" style="display:none;align-items:center;gap:6px;border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.9)"><svg width="13" height="13" viewBox="0 0 15 15" fill="none"><path d="M1 4.5h10M8 1.5l3 3-3 3M14 10.5H4M7 7.5l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Switch to Pro</a><a href="#" class="tn-link">Q&A</a><div class="tn-icon">📩</div><div class="tn-avatar-wrap"><div class="tn-avatar" onclick="toggleAvatarMenu(event)"><div class="tn-avatar-pic">RC</div><span class="tn-avatar-name">Rose C.</span></div><div class="tn-dropdown" id="avatarMenu"><a href="#" onclick="showSettingsPage('personal');return false">Personal Details</a><a href="#" onclick="showSettingsPage('preferences');return false">Preferences</a><a href="#" class="logout" onclick="event.stopPropagation();event.preventDefault();window.location.replace('index.html')">Log Out</a></div></div></div></nav>
+<nav class="top-nav"><div class="top-nav-left"><a href="#" class="tn-logo"><div class="tn-logo-mark">🌿</div><span class="tn-logo-text">NourishWell</span></a></div><div class="top-nav-right"><a href="#" id="proSwitchNavBtn" onclick="switchBackToPro();return false" class="tn-link" style="display:none;align-items:center;gap:6px;border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.9)"><svg width="13" height="13" viewBox="0 0 15 15" fill="none"><path d="M1 4.5h10M8 1.5l3 3-3 3M14 10.5H4M7 7.5l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Switch to Pro</a><a href="#" class="tn-link">Q&A</a><div class="tn-icon">📩</div><div class="tn-avatar-wrap"><div class="tn-avatar" onclick="toggleAvatarMenu(event)"><div class="tn-avatar-pic" id="navInitials">RC</div><span class="tn-avatar-name" id="navName">Rose C.</span></div><div class="tn-dropdown" id="avatarMenu"><a href="#" onclick="showSettingsPage('personal');return false">Personal Details</a><a href="#" onclick="showSettingsPage('preferences');return false">Preferences</a><a href="#" class="logout" onclick="event.stopPropagation();event.preventDefault();window.location.replace('index.html')">Log Out</a></div></div></div></nav>
 
 <aside class="side-nav">
 <a class="sn-item active" onclick="switchPage('record',this)" href="#"><span class="sn-icon">📋</span> <span class="sn-text">Record Today</span></a>
@@ -194,7 +194,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 <div class="right-panel"><div class="chart-card"><div class="cc-header"><span class="cc-title">Exercise Activity</span><div style="display:flex;align-items:center;gap:14px"><div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#1e6b5e"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b8878">Actual</span></div><div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#dce6e0"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b8878">Target</span></div><div class="cc-tabs"><button class="cc-tab active" onclick="switchChartTab(this)">Week</button><button class="cc-tab" onclick="switchChartTab(this)">Month</button><button class="cc-tab" onclick="switchChartTab(this)">Year</button></div></div></div>
 <div style="position:relative;width:100%;height:148px"><canvas id="exerciseChart"></canvas></div>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--fog)">
-  <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f)">Daily target based on your profile · <span style="color:var(--teal);font-weight:600">62 kg · Moderately Active</span></div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f)">Daily target based on your profile · <span style="color:var(--teal);font-weight:600" id="profileSummary">62 kg · Moderately Active</span></div>
   <div id="weekSummary" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f)"></div>
 </div>
 </div>
@@ -302,17 +302,17 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 <div style="margin-bottom:28px"><div class="page-title">Personal <em>Details</em></div><div class="page-date">Manage your account information</div></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
 <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
-<div style="display:flex;align-items:center;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--fog)"><div style="width:64px;height:64px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700">RC</div><div><div style="font-size:18px;font-weight:700;color:var(--ink)">Rose Campbell</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);margin-top:3px">Subscriber · Member since March 2026</div></div></div>
+<div style="display:flex;align-items:center;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--fog)"><div style="width:64px;height:64px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700" id="settingsInitials">RC</div><div><div style="font-size:18px;font-weight:700;color:var(--ink)" id="settingsFullName">Rose Campbell</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);margin-top:3px" id="settingsRole">Subscriber · Member since March 2026</div></div></div>
 <div style="display:flex;flex-direction:column;gap:16px">
-<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">First Name</div><input type="text" value="Rose" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
-<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Last Name</div><input type="text" value="Campbell" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
-<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Email Address</div><input type="email" value="rose.campbell@example.com" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
-<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Date of Birth</div><input type="date" value="1995-06-14" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
+<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">First Name</div><input type="text" id="inputFirstName" value="Rose" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
+<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Last Name</div><input type="text" id="inputLastName" value="Campbell" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
+<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Email Address</div><input type="email" id="inputEmail" value="rose.campbell@example.com" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
+<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Date of Birth</div><input type="date" id="inputDob" value="1995-06-14" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
 </div>
 <button style="margin-top:20px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Save Changes</button>
 </div>
 <div style="display:flex;flex-direction:column;gap:20px">
-<div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)"><div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:18px">Health Profile</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Height (cm)</div><input type="number" value="165" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Weight (kg)</div><input type="number" value="62" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Activity Level</div><select style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)"><option>Sedentary</option><option>Lightly Active</option><option selected>Moderately Active</option><option>Very Active</option></select></div><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Daily Calorie Target</div><input type="number" value="2400" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div></div><button style="margin-top:16px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Update Profile</button></div>
+<div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)"><div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:18px">Health Profile</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Height (cm)</div><input id="inputHeight" type="number" value="165" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Weight (kg)</div><input id="inputWeight" type="number" value="62" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Activity Level</div><select style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);id="inputActivity" outline:none;background:var(--white)"><option>Sedentary</option><option>Lightly Active</option><option>Moderately Active</option><option>Very Active</option></select></div><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Daily Calorie Target</div><input id="inputTarget" type="number" value="2400" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div></div><button style="margin-top:16px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Update Profile</button></div>
 <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)"><div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:18px">Change Password</div><div style="display:flex;flex-direction:column;gap:14px"><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Current Password</div><input type="password" placeholder="Enter current password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">New Password</div><input type="password" placeholder="Min. 8 characters" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div><div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Confirm New Password</div><input type="password" placeholder="Re-enter new password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none"></div></div><button style="margin-top:16px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Update Password</button></div>
 </div>
 </div>
@@ -585,7 +585,83 @@ const d=new Date(),days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Fri
 document.getElementById('today-date').textContent=days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
 
 // ── State ─────────────────────────────────────────────────────────────────────
-const DAILY_TARGET=2400;
+// ── User profiles ─────────────────────────────────────────────────────────────
+// Demo: two preset users. When backend is ready, replace with:
+//   const currentUser = await fetch('/api/user/profile').then(r => r.json())
+const USERS = {
+  subscriber: {
+    initials: 'RC',
+    navName: 'Rose C.',
+    firstName: 'Rose',
+    lastName: 'Campbell',
+    email: 'rose.campbell@example.com',
+    dob: '1995-06-14',
+    height: 165,
+    weight: 62,
+    targetKcal: 2400,
+    activity: 'Moderately Active',
+    role: 'subscriber',
+    roleLabel: 'Subscriber · Member since March 2026',
+  },
+  professional: {
+    initials: 'DR',
+    navName: 'Dr. Rivera',
+    firstName: 'Dr.',
+    lastName: 'Rivera',
+    email: 'rivera@nourishwell.com',
+    dob: '1980-03-22',
+    height: 178,
+    weight: 80,
+    targetKcal: 2800,
+    activity: 'Very Active',
+    role: 'professional',
+    roleLabel: 'Professional · Member since January 2024',
+  }
+};
+
+// Detect which user to load: URL param ?user=professional, else subscriber
+const urlRole = new URLSearchParams(window.location.search).get('user');
+const currentUser = USERS[urlRole] || USERS.subscriber;
+
+function applyUser(u) {
+  // Nav
+  const ni = document.getElementById('navInitials');
+  const nn = document.getElementById('navName');
+  if(ni) ni.textContent = u.initials;
+  if(nn) nn.textContent = u.navName;
+  // Exercise chart profile line
+  const ps = document.getElementById('profileSummary');
+  if(ps) ps.textContent = u.weight + ' kg · ' + u.activity;
+  // Settings personal details
+  const si = document.getElementById('settingsInitials');
+  const sn = document.getElementById('settingsFullName');
+  const sr = document.getElementById('settingsRole');
+  if(si) si.textContent = u.initials;
+  if(sn) sn.textContent = u.firstName + ' ' + u.lastName;
+  if(sr) sr.textContent = u.roleLabel;
+  // Settings form inputs
+  const fn = document.getElementById('inputFirstName');
+  const ln = document.getElementById('inputLastName');
+  const em = document.getElementById('inputEmail');
+  const db = document.getElementById('inputDob');
+  const ht = document.getElementById('inputHeight');
+  const wt = document.getElementById('inputWeight');
+  const tg = document.getElementById('inputTarget');
+  if(fn) fn.value = u.firstName;
+  if(ln) ln.value = u.lastName;
+  if(em) em.value = u.email;
+  if(db) db.value = u.dob;
+  if(ht) ht.value = u.height;
+  if(wt) wt.value = u.weight;
+  if(tg) tg.value = u.targetKcal;
+  // Activity level select
+  const actSel = document.getElementById('inputActivity');
+  if(actSel) {
+    Array.from(actSel.options).forEach(o => o.selected = o.text === u.activity);
+  }
+}
+
+const DAILY_TARGET = currentUser.targetKcal;
 let foodAdded=[];
 let favourites=new Set(['shakshuka','avocado-toast','lentil-soup']);
 let compareSelected=new Set(['shakshuka','avocado-toast','lentil-soup']);
@@ -916,6 +992,11 @@ function initCompareModal(){
   });
 }
 
+// ── Pro switch back ───────────────────────────────────────────────────────────
+function switchBackToPro(){
+  window.location.replace('pro_dashboard.html');
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   initExerciseChart();
@@ -927,8 +1008,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderComparePage();
   initMacroSliders();
   initSaveBtns();
+  // Apply user profile data
+  applyUser(currentUser);
   // Show pro switch button if coming from pro dashboard
-  if(new URLSearchParams(window.location.search).get('from')==='pro'){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('from')==='pro' || params.get('user')==='professional'){
     const btn = document.getElementById('proSwitchNavBtn');
     if(btn) btn.style.display='flex';
   }
