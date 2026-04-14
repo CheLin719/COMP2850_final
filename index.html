@@ -878,31 +878,39 @@ body.show-auth #page-auth { display: block; }
     <!-- Hero right: preview cards matching wireframe layout -->
     <div class="hero-app-panel" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;width:500px;gap:14px;padding-bottom:0;align-self:center;">
 
-      <!-- Top-left: Trend chart -->
+      <!-- Top-left: Exercise activity chart -->
       <div class="preview-card" style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 6px 24px rgba(10,20,16,0.06);">
-        <div class="preview-img-slot" style="width:100%;height:120px;background:var(--teal-lll);display:flex;align-items:center;justify-content:center;">
-          <!-- TODO: Replace with trend chart screenshot -->
-          <svg width="120" height="60" viewBox="0 0 120 60" fill="none">
-            <polyline points="5,50 25,35 45,40 65,20 85,25 115,8" stroke="var(--teal)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <polyline points="5,55 25,48 45,50 65,42 85,44 115,38" stroke="var(--amber-l)" stroke-width="1.5" fill="none" stroke-dasharray="4 3" stroke-linecap="round"/>
-          </svg>
+        <div style="width:100%;height:120px;background:var(--teal-lll);display:flex;flex-direction:column;justify-content:flex-end;padding:12px 14px;gap:4px;">
+          <div style="display:flex;align-items:flex-end;gap:5px;height:70px;">
+            <div style="flex:1;background:var(--teal);border-radius:3px 3px 0 0;height:55%"></div>
+            <div style="flex:1;background:var(--teal);border-radius:3px 3px 0 0;height:75%"></div>
+            <div style="flex:1;background:var(--fog);border-radius:3px 3px 0 0;height:30%"></div>
+            <div style="flex:1;background:var(--teal);border-radius:3px 3px 0 0;height:85%"></div>
+            <div style="flex:1;background:var(--teal);border-radius:3px 3px 0 0;height:65%"></div>
+            <div style="flex:1;background:var(--teal-l);border-radius:3px 3px 0 0;height:95%"></div>
+            <div style="flex:1;background:var(--teal-ll);border-radius:3px 3px 0 0;height:40%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal)">
+            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+          </div>
         </div>
         <div style="padding:10px 14px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Trends</div>
-          <div style="font-size:11px;font-weight:700;color:var(--ink);">Weekly overview</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Exercise</div>
+          <div style="font-size:11px;font-weight:700;color:var(--ink);">Weekly activity</div>
         </div>
       </div>
 
-      <!-- Top-right: Food photo card -->
+      <!-- Top-right: Meal log entry -->
       <div class="preview-card" style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 6px 24px rgba(10,20,16,0.06);">
-        <div class="preview-img-slot" style="width:100%;height:80px;background:var(--fog);display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);">
-          <!-- TODO: Replace with food photo -->
-          <span style="font-size:28px;">🥗</span>
+        <div style="width:100%;height:80px;background:var(--amber-ll);display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);">
+          <span style="font-size:32px;">🍳</span>
         </div>
         <div style="padding:10px 14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:4px;">Chicken Caesar</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);">Calories: 520 kcal</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);margin-top:2px;">Time: 12:30 PM</div>
+          <div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:3px;">Shakshuka</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);">380 kcal · Breakfast</div>
+          <div style="display:flex;gap:3px;margin-top:4px;">
+            <span style="font-size:10px;color:var(--amber)">★★★★★</span>
+          </div>
         </div>
       </div>
 
@@ -935,23 +943,41 @@ body.show-auth #page-auth { display: block; }
         </div>
       </div>
 
-      <!-- Bottom-left: Feature preview 1 -->
+      <!-- Bottom-left: Meal planner -->
       <div class="preview-card" style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 6px 24px rgba(10,20,16,0.06);">
-        <div class="preview-img-slot" style="width:100%;height:100px;background:var(--amber-ll);display:flex;align-items:center;justify-content:center;">
-          <!-- TODO: Replace with feature screenshot -->
-          <span style="font-size:28px;">🍳</span>
+        <div style="width:100%;height:100px;background:var(--teal-lll);padding:12px;display:flex;flex-direction:column;gap:6px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);text-transform:uppercase;letter-spacing:.08em">Today's Plan</div>
+          <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:8px;padding:5px 8px;border:1px solid var(--teal-ll)">
+            <span style="font-size:14px">🥑</span>
+            <div style="flex:1"><div style="font-size:9px;font-weight:700;color:var(--ink)">Avocado Toast</div><div style="font-size:8px;color:var(--ink-f)">290 kcal</div></div>
+            <div style="font-size:8px;color:var(--teal);font-weight:700">🔒</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.6);border-radius:8px;padding:5px 8px;border:1px dashed var(--teal-ll)">
+            <span style="font-size:14px">🐟</span>
+            <div style="flex:1"><div style="font-size:9px;font-weight:700;color:var(--ink)">Grilled Salmon</div><div style="font-size:8px;color:var(--ink-f)">510 kcal</div></div>
+            <div style="font-size:8px;color:var(--amber)">✨</div>
+          </div>
         </div>
         <div style="padding:10px 14px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--amber);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Recipes</div>
-          <div style="font-size:11px;font-weight:700;color:var(--ink);">Discover meals</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Meal Planner</div>
+          <div style="font-size:11px;font-weight:700;color:var(--ink);">Plan your day</div>
         </div>
       </div>
 
-      <!-- Bottom-right: Feature preview 2 -->
+      <!-- Bottom-right: Pro client dashboard -->
       <div class="preview-card" style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 6px 24px rgba(10,20,16,0.06);">
-        <div class="preview-img-slot" style="width:100%;height:100px;background:var(--teal-lll);display:flex;align-items:center;justify-content:center;">
-          <!-- TODO: Replace with feature screenshot -->
-          <span style="font-size:28px;">👨‍⚕️</span>
+        <div style="width:100%;height:100px;background:var(--ink);padding:12px;display:flex;flex-direction:column;gap:5px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.08em">5 Active Clients</div>
+          <div style="display:flex;gap:4px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff">RC</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#7aaad4;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff">JT</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#e07b78;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff">SL</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#b8621f;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff">MW</div>
+          </div>
+          <div style="display:flex;gap:4px;">
+            <span style="font-size:8px;padding:2px 6px;border-radius:6px;background:rgba(47,143,127,0.2);color:#2f8f7f">✓ On track ×3</span>
+            <span style="font-size:8px;padding:2px 6px;border-radius:6px;background:rgba(220,38,38,0.15);color:#ef4444">! Alert ×1</span>
+          </div>
         </div>
         <div style="padding:10px 14px;">
           <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Professional</div>
@@ -964,6 +990,185 @@ body.show-auth #page-auth { display: block; }
 </section>
 
 </div>
+
+<!-- ── Features Section ──────────────────────────────────────────────────── -->
+<section style="background:var(--white);padding:96px 40px;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:64px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;">What NourishWell does</div>
+      <h2 style="font-family:'Instrument Serif',serif;font-size:clamp(32px,4vw,48px);font-style:italic;color:var(--ink);margin-bottom:16px;letter-spacing:-0.02em">Everything you need to eat <em style="color:var(--teal)">better</em></h2>
+      <p style="font-size:16px;color:var(--ink-f);max-width:540px;margin:0 auto;line-height:1.7">From logging your first meal to getting personalised advice from a health professional — NourishWell covers the full journey.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+      <!-- Feature 1 -->
+      <div style="padding:28px;border:1px solid var(--border);border-radius:20px;background:var(--paper);transition:all .2s" onmouseover="this.style.boxShadow='0 12px 40px rgba(10,20,16,0.08)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'">
+        <div style="width:48px;height:48px;border-radius:14px;background:var(--teal-lll);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;">📋</div>
+        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px;">Food Diary</div>
+        <p style="font-size:13px;color:var(--ink-f);line-height:1.6;margin-bottom:14px;">Log every meal across 6 time slots — breakfast, snacks, lunch, dinner. See your daily calorie and macro totals update in real time.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:var(--teal-lll);color:var(--teal)">Real-time totals</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:var(--teal-lll);color:var(--teal)">6 meal slots</span>
+        </div>
+      </div>
+      <!-- Feature 2 -->
+      <div style="padding:28px;border:1px solid var(--border);border-radius:20px;background:var(--paper);transition:all .2s" onmouseover="this.style.boxShadow='0 12px 40px rgba(10,20,16,0.08)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'">
+        <div style="width:48px;height:48px;border-radius:14px;background:var(--amber-ll);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;">🥗</div>
+        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px;">Recipe Library</div>
+        <p style="font-size:13px;color:var(--ink-f);line-height:1.6;margin-bottom:14px;">Browse nutritious recipes, save favourites, rate and review meals, and add your own creations. Filter by tag, ingredient, or prep time.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:var(--amber-ll);color:var(--amber)">Star ratings</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:var(--amber-ll);color:var(--amber)">Add your own</span>
+        </div>
+      </div>
+      <!-- Feature 3 -->
+      <div style="padding:28px;border:1px solid var(--border);border-radius:20px;background:var(--paper);transition:all .2s" onmouseover="this.style.boxShadow='0 12px 40px rgba(10,20,16,0.08)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'">
+        <div style="width:48px;height:48px;border-radius:14px;background:var(--teal-lll);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;">🧠</div>
+        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px;">Meal Planner</div>
+        <p style="font-size:13px;color:var(--ink-f);line-height:1.6;margin-bottom:14px;">Plan your meals for the day with your calorie budget in mind. Lock dishes you love, swap the rest, and confirm a plan that fits your goals.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:var(--teal-lll);color:var(--teal)">Calorie budget</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:var(--teal-lll);color:var(--teal)">Lock & swap</span>
+        </div>
+      </div>
+      <!-- Feature 4 -->
+      <div style="padding:28px;border:1px solid var(--border);border-radius:20px;background:var(--paper);transition:all .2s" onmouseover="this.style.boxShadow='0 12px 40px rgba(10,20,16,0.08)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(122,170,212,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;">📊</div>
+        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px;">Nutrition Charts</div>
+        <p style="font-size:13px;color:var(--ink-f);line-height:1.6;margin-bottom:14px;">Visual donut charts show your macro split at a glance. Compare up to 4 recipes side by side to make smarter food choices.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(122,170,212,0.15);color:var(--blue)">Donut chart</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(122,170,212,0.15);color:var(--blue)">Recipe compare</span>
+        </div>
+      </div>
+      <!-- Feature 5 -->
+      <div style="padding:28px;border:1px solid var(--border);border-radius:20px;background:var(--paper);transition:all .2s" onmouseover="this.style.boxShadow='0 12px 40px rgba(10,20,16,0.08)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(224,123,120,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;">🏃</div>
+        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px;">Exercise Tracking</div>
+        <p style="font-size:13px;color:var(--ink-f);line-height:1.6;margin-bottom:14px;">Log workouts and see calories burned alongside your intake. Weekly activity bar chart shows your consistency over time.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(224,123,120,0.1);color:var(--pink)">Calories burned</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(224,123,120,0.1);color:var(--pink)">Weekly chart</span>
+        </div>
+      </div>
+      <!-- Feature 6 -->
+      <div style="padding:28px;border:1px solid var(--ink);border-radius:20px;background:var(--ink);transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;">👨‍⚕️</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;">Professional Tools</div>
+        <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;margin-bottom:14px;">Health professionals get a full client dashboard — monitor progress, send personalised advice, book appointments, and edit meal plans.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(47,143,127,0.25);color:#2f8f7f">Client analytics</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(47,143,127,0.25);color:#2f8f7f">Messaging</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ────────────────────────────────────────────────────────── -->
+<section style="background:var(--paper);padding:96px 40px;">
+  <div style="max-width:900px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:64px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;">Get started in minutes</div>
+      <h2 style="font-family:'Instrument Serif',serif;font-size:clamp(28px,3.5vw,42px);font-style:italic;color:var(--ink);letter-spacing:-0.02em">How it <em style="color:var(--teal)">works</em></h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:48px;">
+      <!-- Step 1 -->
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:32px;align-items:start;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:28px;font-style:italic;color:#fff;flex-shrink:0;">1</div>
+        <div style="padding-top:12px;">
+          <div style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;">Create your account & set up your profile</div>
+          <p style="font-size:14px;color:var(--ink-f);line-height:1.7;max-width:560px;">Sign up as a subscriber or health professional. Enter your height, weight, and daily calorie target — our onboarding guide walks you through everything in under 2 minutes.</p>
+        </div>
+      </div>
+      <!-- Step 2 -->
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:32px;align-items:start;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:28px;font-style:italic;color:#fff;flex-shrink:0;">2</div>
+        <div style="padding-top:12px;">
+          <div style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;">Log your meals and exercise daily</div>
+          <p style="font-size:14px;color:var(--ink-f);line-height:1.7;max-width:560px;">Use the food diary to record what you eat across breakfast, lunch, dinner and snacks. Log workouts to see your calories in vs. out. Your nutrition donut updates with every entry.</p>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:32px;align-items:start;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:28px;font-style:italic;color:#fff;flex-shrink:0;">3</div>
+        <div style="padding-top:12px;">
+          <div style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;">Discover recipes and plan ahead</div>
+          <p style="font-size:14px;color:var(--ink-f);line-height:1.7;max-width:560px;">Browse the recipe library, save favourites, and use the meal planner to build a day that fits your calorie budget. Compare dishes side by side to make smarter choices.</p>
+        </div>
+      </div>
+      <!-- Step 4 -->
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:32px;align-items:start;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:28px;font-style:italic;color:#fff;flex-shrink:0;">4</div>
+        <div style="padding-top:12px;">
+          <div style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;">Get support from a health professional</div>
+          <p style="font-size:14px;color:var(--ink-f);line-height:1.7;max-width:560px;">Your assigned professional monitors your progress, sends personalised advice through the messaging system, and adjusts your meal and training plan as you improve.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Who it's for ───────────────────────────────────────────────────────── -->
+<section style="background:var(--white);padding:96px 40px;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:64px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;">Made for two kinds of people</div>
+      <h2 style="font-family:'Instrument Serif',serif;font-size:clamp(28px,3.5vw,42px);font-style:italic;color:var(--ink);letter-spacing:-0.02em">Who uses <em style="color:var(--teal)">NourishWell</em></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <!-- Subscriber card -->
+      <div style="border:1px solid var(--border);border-radius:24px;overflow:hidden;">
+        <div style="background:var(--teal-lll);padding:32px 32px 24px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px;">🧑‍💼</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Subscriber</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:24px;font-style:italic;color:var(--ink);">The health-conscious individual</div>
+        </div>
+        <div style="padding:28px 32px;">
+          <p style="font-size:14px;color:var(--ink-f);line-height:1.7;margin-bottom:20px;">You want to eat better but don't know where to start. NourishWell gives you a clear picture of your diet without overwhelming spreadsheets or expensive apps.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> Log meals in seconds</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> See your macro breakdown visually</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> Discover and save nutritious recipes</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> Plan your meals to hit your daily targets</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> Receive guidance from your professional</div>
+          </div>
+        </div>
+      </div>
+      <!-- Professional card -->
+      <div style="border:1px solid var(--border);border-radius:24px;overflow:hidden;">
+        <div style="background:var(--ink);padding:32px 32px 24px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px;">👨‍⚕️</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal-l);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Professional</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:24px;font-style:italic;color:#fff;">The health & nutrition expert</div>
+        </div>
+        <div style="padding:28px 32px;">
+          <p style="font-size:14px;color:var(--ink-f);line-height:1.7;margin-bottom:20px;">You work with clients to improve their diet and lifestyle. NourishWell gives you a professional dashboard to monitor progress, send advice, and manage appointments — all in one place.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> Monitor all clients from one overview</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> View BMI, macros, calories & health scores</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> Send messages and nutritional advice</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> Edit personalised meal & training plans</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)"><span style="color:var(--teal);font-weight:700">✓</span> Book and manage client appointments</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────────────── -->
+<section style="background:var(--ink);padding:96px 40px;">
+  <div style="max-width:700px;margin:0 auto;text-align:center;">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;">Start today — it's free</div>
+    <h2 style="font-family:'Instrument Serif',serif;font-size:clamp(32px,4vw,52px);font-style:italic;color:#fff;margin-bottom:16px;letter-spacing:-0.02em;">Ready to eat <em style="color:var(--teal-l)">smarter?</em></h2>
+    <p style="font-size:16px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto;">Join NourishWell today and take the first step towards a healthier relationship with food. No calorie obsession — just clear, actionable insights.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="#" onclick="showAuth('register');return false" style="display:inline-flex;align-items:center;gap:8px;padding:16px 36px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s" onmouseover="this.style.background='var(--teal-l)'" onmouseout="this.style.background='var(--teal)'">Get started free →</a>
+      <a href="#" onclick="showAuth('login');return false" style="display:inline-flex;align-items:center;gap:8px;padding:16px 32px;background:transparent;color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2);border-radius:10px;font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.5)';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.7)'">Sign in</a>
+    </div>
+    <div style="margin-top:32px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:.06em;">University of Leeds · COMP2850 · 2026</div>
+  </div>
+</section>
 
 <!-- 
   Authentication Pages / 认证页面
