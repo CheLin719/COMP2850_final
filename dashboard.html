@@ -171,10 +171,29 @@ body{font-family:Bricolage Grotesque,sans-serif;background:var(--paper);color:va
 .pc-legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
 .pc-leg-item{display:flex;align-items:center;gap:4px;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--ink-f)}
 .pc-leg-dot{width:6px;height:6px;border-radius:50%}
+
+/* ── Guided Tour ──────────────────────────────────────────────────────────── */
+.tour-overlay{position:fixed;inset:0;z-index:9000;pointer-events:none;display:none}
+.tour-overlay.active{display:block}
+.tour-backdrop{position:absolute;inset:0;background:rgba(10,20,16,0.82);pointer-events:all}
+.tour-spotlight{position:absolute;border-radius:12px;box-shadow:0 0 0 9999px rgba(10,20,16,0.82);pointer-events:none;transition:all .4s cubic-bezier(.4,0,.2,1);border:2px solid rgba(47,143,127,0.6)}
+.tour-card{position:absolute;width:340px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(10,20,16,0.3);padding:24px 26px;pointer-events:all;transition:all .4s cubic-bezier(.4,0,.2,1)}
+.tour-step-badge{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.tour-card-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.tour-card-body{font-size:13px;color:var(--ink-m);line-height:1.6;margin-bottom:18px}
+.tour-card-footer{display:flex;align-items:center;justify-content:space-between}
+.tour-dots{display:flex;gap:5px}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:var(--fog);transition:background .2s}
+.tour-dot.active{background:var(--teal)}
+.tour-nav{display:flex;gap:8px}
+.tour-skip{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);cursor:pointer;padding:6px 12px;border-radius:6px;border:none;background:var(--paper);transition:all .2s}
+.tour-skip:hover{color:var(--ink)}
+.tour-next{font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;padding:8px 20px;border-radius:8px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .2s}
+.tour-next:hover{background:var(--teal)}
 </style>
 </head>
 <body>
-<nav class="top-nav"><div class="top-nav-left"><a href="#" class="tn-logo"><div class="tn-logo-mark">🌿</div><span class="tn-logo-text">NourishWell</span></a></div><div class="top-nav-right"><a href="#" id="proSwitchNavBtn" onclick="switchBackToPro();return false" class="tn-link" style="display:none;align-items:center;gap:6px;border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.9)"><svg width="13" height="13" viewBox="0 0 15 15" fill="none"><path d="M1 4.5h10M8 1.5l3 3-3 3M14 10.5H4M7 7.5l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Switch to Pro</a><a href="qa_subscriber.html" class="tn-link">Q&A</a><div class="tn-icon" id="userMailIcon" onclick="openUserMessages()" style="position:relative"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><rect x="1" y="1" width="18" height="14" rx="2" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/><path d="M1 4l9 6 9-6" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg><div id="userMailDot" style="display:none;width:7px;height:7px;border-radius:50%;background:#dc2626;position:absolute;top:4px;right:4px;border:1.5px solid var(--ink)"></div></div><div class="tn-avatar-wrap"><div class="tn-avatar" onclick="toggleAvatarMenu(event)"><div class="tn-avatar-pic" id="navInitials">RC</div><span class="tn-avatar-name" id="navName">Rose C.</span></div><div class="tn-dropdown" id="avatarMenu"><a href="#" onclick="showSettingsPage('personal');return false">Personal Details</a><a href="#" onclick="showSettingsPage('preferences');return false">Preferences</a><a href="#" class="logout" onclick="event.stopPropagation();event.preventDefault();window.location.replace('index.html')">Log Out</a></div></div></div></nav>
+<nav class="top-nav"><div class="top-nav-left"><a href="#" class="tn-logo"><div class="tn-logo-mark">🌿</div><span class="tn-logo-text">NourishWell</span></a></div><div class="top-nav-right"><a href="#" id="proSwitchNavBtn" onclick="switchBackToPro();return false" class="tn-link" style="display:none;align-items:center;gap:6px;border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.9)"><svg width="13" height="13" viewBox="0 0 15 15" fill="none"><path d="M1 4.5h10M8 1.5l3 3-3 3M14 10.5H4M7 7.5l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Switch to Pro</a><a href="qa_subscriber.html" class="tn-link">Q&A</a><button onclick="startTour()" style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:13px;font-family:JetBrains Mono,monospace;transition:all .2s" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.6)';this.style.borderColor='rgba(255,255,255,0.2)'" title="Guided tour">?</button><div class="tn-icon" id="userMailIcon" onclick="openUserMessages()" style="position:relative"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><rect x="1" y="1" width="18" height="14" rx="2" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/><path d="M1 4l9 6 9-6" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg><div id="userMailDot" style="display:none;width:7px;height:7px;border-radius:50%;background:#dc2626;position:absolute;top:4px;right:4px;border:1.5px solid var(--ink)"></div></div><div class="tn-avatar-wrap"><div class="tn-avatar" onclick="toggleAvatarMenu(event)"><div class="tn-avatar-pic" id="navInitials">RC</div><span class="tn-avatar-name" id="navName">Rose C.</span></div><div class="tn-dropdown" id="avatarMenu"><a href="#" onclick="showSettingsPage('personal');return false">Personal Details</a><a href="#" onclick="showSettingsPage('preferences');return false">Preferences</a><a href="#" class="logout" onclick="event.stopPropagation();event.preventDefault();window.location.replace('index.html')">Log Out</a></div></div></div></nav>
 
 <aside class="side-nav">
 <a class="sn-item active" onclick="switchPage('record',this)" href="#"><span class="sn-icon">📋</span> <span class="sn-text">Record Today</span></a>
@@ -456,6 +475,25 @@ body{font-family:Bricolage Grotesque,sans-serif;background:var(--paper);color:va
 .finf{flex:1;font-size:12px;color:#0a1410;line-height:1.5}
 .fadd{width:28px;height:28px;border-radius:7px;border:1px solid #d4dfd8;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;color:#1e6b5e;flex-shrink:0;transition:all .15s}
 .frow:hover .fadd{background:#1e6b5e;color:#fff;border-color:#1e6b5e}
+
+/* ── Guided Tour ──────────────────────────────────────────────────────────── */
+.tour-overlay{position:fixed;inset:0;z-index:9000;pointer-events:none;display:none}
+.tour-overlay.active{display:block}
+.tour-backdrop{position:absolute;inset:0;background:rgba(10,20,16,0.82);pointer-events:all}
+.tour-spotlight{position:absolute;border-radius:12px;box-shadow:0 0 0 9999px rgba(10,20,16,0.82);pointer-events:none;transition:all .4s cubic-bezier(.4,0,.2,1);border:2px solid rgba(47,143,127,0.6)}
+.tour-card{position:absolute;width:340px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(10,20,16,0.3);padding:24px 26px;pointer-events:all;transition:all .4s cubic-bezier(.4,0,.2,1)}
+.tour-step-badge{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.tour-card-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.tour-card-body{font-size:13px;color:var(--ink-m);line-height:1.6;margin-bottom:18px}
+.tour-card-footer{display:flex;align-items:center;justify-content:space-between}
+.tour-dots{display:flex;gap:5px}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:var(--fog);transition:background .2s}
+.tour-dot.active{background:var(--teal)}
+.tour-nav{display:flex;gap:8px}
+.tour-skip{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);cursor:pointer;padding:6px 12px;border-radius:6px;border:none;background:var(--paper);transition:all .2s}
+.tour-skip:hover{color:var(--ink)}
+.tour-next{font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;padding:8px 20px;border-radius:8px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .2s}
+.tour-next:hover{background:var(--teal)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
@@ -1283,6 +1321,106 @@ document.addEventListener('DOMContentLoaded', () => {
   const hasUnread = userMessages.some(m => !m.read);
   if (hasUnread) document.getElementById('userMailDot').style.display = 'block';
 });
+</script>
+
+
+<!-- ── Guided Tour ──────────────────────────────────────────────────────────── -->
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-backdrop" onclick="endTour()"></div>
+  <div class="tour-spotlight" id="tourSpotlight"></div>
+  <div class="tour-card" id="tourCard">
+    <div class="tour-step-badge" id="tourStepBadge">Step 1 of 5</div>
+    <div class="tour-card-title" id="tourCardTitle">Welcome to NourishWell</div>
+    <div class="tour-card-body" id="tourCardBody">Let's take a quick tour of your dashboard.</div>
+    <div class="tour-card-footer">
+      <div class="tour-dots" id="tourDots"></div>
+      <div class="tour-nav">
+        <button class="tour-skip" onclick="endTour()">Skip tour</button>
+        <button class="tour-next" id="tourNextBtn" onclick="tourNext()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const tourSteps = [
+  {
+    title: 'Welcome to NourishWell 🌿',
+    body: "Your personal health dashboard. Let's take a quick tour of what you can do here.",
+    target: null,
+    cardPos: { bottom: '48px', left: '50%', transform: 'translateX(-50%)' }
+  },
+  {
+    title: 'Record Today',
+    body: 'Log every meal and exercise session here. Your nutrition donut and calorie total update in real time as you add entries.',
+    target: '#page-record .donut-card',
+    cardPos: { top: '120px', left: '360px' }
+  },
+  {
+    title: 'Discover Recipes',
+    body: 'Browse nutritious recipes, save your favourites, rate and review meals, and even add your own custom recipes.',
+    target: null,
+    cardPos: { bottom: '48px', left: '50%', transform: 'translateX(-50%)' }
+  },
+  {
+    title: 'Meal Planner',
+    body: 'Plan your full day of meals within your calorie budget. Lock dishes you like, swap ones you don't, and confirm your plan.',
+    target: null,
+    cardPos: { bottom: '48px', left: '50%', transform: 'translateX(-50%)' }
+  },
+  {
+    title: 'Messages from your Professional',
+    body: 'The envelope icon in the top bar shows messages from your health professional. A red dot means you have unread advice.',
+    target: '#userMailIcon',
+    cardPos: { top: '80px', right: '24px' }
+  }
+];
+let tourStep = 0;
+
+function startTour() {
+  tourStep = 0;
+  document.getElementById('tourOverlay').classList.add('active');
+  renderTourStep();
+}
+
+function renderTourStep() {
+  const step = tourSteps[tourStep];
+  document.getElementById('tourStepBadge').textContent = 'Step ' + (tourStep + 1) + ' of ' + tourSteps.length;
+  document.getElementById('tourCardTitle').textContent = step.title;
+  document.getElementById('tourCardBody').textContent = step.body;
+  document.getElementById('tourNextBtn').textContent = tourStep === tourSteps.length - 1 ? 'Done ✓' : 'Next →';
+  document.getElementById('tourDots').innerHTML = tourSteps.map((_, i) =>
+    '<div class="tour-dot' + (i === tourStep ? ' active' : '') + '"></div>'
+  ).join('');
+
+  const card = document.getElementById('tourCard');
+  Object.assign(card.style, { top:'', left:'', right:'', bottom:'', transform:'' });
+  Object.assign(card.style, step.cardPos);
+
+  const spot = document.getElementById('tourSpotlight');
+  if (step.target) {
+    const el = document.querySelector(step.target);
+    if (el) {
+      const r = el.getBoundingClientRect();
+      spot.style.cssText = 'left:' + (r.left - 6) + 'px;top:' + (r.top - 6) + 'px;width:' + (r.width + 12) + 'px;height:' + (r.height + 12) + 'px;box-shadow:0 0 0 9999px rgba(10,20,16,0.82);border:2px solid rgba(47,143,127,0.6);border-radius:12px';
+    }
+  } else {
+    spot.style.cssText = 'display:none';
+  }
+}
+
+function tourNext() {
+  if (tourStep < tourSteps.length - 1) {
+    tourStep++;
+    renderTourStep();
+  } else {
+    endTour();
+  }
+}
+
+function endTour() {
+  document.getElementById('tourOverlay').classList.remove('active');
+}
 </script>
 
 </body></html>

@@ -189,8 +189,8 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 /* ── ONBOARDING TOUR ── */
 .tour-overlay{position:fixed;inset:0;z-index:2000;pointer-events:none;display:none}
 .tour-overlay.active{display:block}
-.tour-backdrop{position:absolute;inset:0;background:rgba(10,20,16,0.55);pointer-events:all}
-.tour-spotlight{position:absolute;border-radius:12px;box-shadow:0 0 0 9999px rgba(10,20,16,0.55);pointer-events:none;transition:all .4s cubic-bezier(.4,0,.2,1)}
+.tour-backdrop{position:absolute;inset:0;background:rgba(10,20,16,0.82);pointer-events:all}
+.tour-spotlight{position:absolute;border-radius:12px;box-shadow:0 0 0 9999px rgba(10,20,16,0.82);pointer-events:none;transition:all .4s cubic-bezier(.4,0,.2,1);border:2px solid rgba(47,143,127,0.6)}
 .tour-card{position:absolute;width:320px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(10,20,16,0.25);padding:22px 24px;pointer-events:all;transition:all .4s cubic-bezier(.4,0,.2,1)}
 .tour-step-badge{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
 .tour-card-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px}
@@ -268,7 +268,6 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0"><path d="M1 4h9M7 1l3 3-3 3M13 10H4M7 7l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Switch to User View
     </button>
-    <a href="qa_pro.html" class="switch-btn" style="text-decoration:none">Q&A</a>
     <button class="switch-btn" onclick="startTour()" style="border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);padding:8px 12px;min-width:unset" title="Guided tour">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/><text x="7" y="11" text-anchor="middle" font-size="9" fill="currentColor" font-family="JetBrains Mono,monospace">?</text></svg>
     </button>
@@ -1038,31 +1037,31 @@ const tourSteps = [
     title: 'Welcome to NourishWell Pro 🌿',
     body: "You're now in your professional dashboard. Let's take a 60-second tour of the key features.",
     target: null,
-    cardPos: { top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }
+    cardPos: { bottom: '48px', left: '50%', transform: 'translateX(-50%)' }
   },
   {
     title: 'Your Client List',
-    body: 'All your clients are listed in the sidebar with colour-coded status indicators. Red = urgent attention needed.',
+    body: 'All your clients are listed in the sidebar with colour-coded status indicators. Click a name to open their full profile.',
     target: '.side-nav',
-    cardPos: { top: '120px', left: '240px' }
+    cardPos: { top: '80px', left: '240px' }
   },
   {
     title: 'Switch to User View',
-    body: 'Click this button to see exactly what any of your clients sees — useful for providing precise guidance.',
-    target: '.switch-btn',
-    cardPos: { top: '80px', right: '24px' }
+    body: 'Click this button to switch to your own personal health dashboard — log meals, track exercise, and plan your day.',
+    target: null,
+    cardPos: { bottom: '48px', right: '24px' }
   },
   {
     title: 'Client Analytics',
-    body: 'Click any client to view their nutrition data, BMI, macro breakdown, calorie trends, and exercise frequency.',
-    target: '.overview-grid',
-    cardPos: { top: '200px', left: '50%', transform: 'translateX(-50%)' }
+    body: 'Click any client row to see their BMI, macro breakdown, calorie trend chart, and overall health score.',
+    target: null,
+    cardPos: { bottom: '48px', left: '50%', transform: 'translateX(-50%)' }
   },
   {
-    title: 'Messages & Plans',
-    body: "Inside each client's page, use the tabs to send messages, assign meal plans, and schedule appointments.",
+    title: 'Messages, Plans & Appointments',
+    body: "Inside each client's profile, use the tabs to send advice, edit their meal and training plan, and manage appointments.",
     target: null,
-    cardPos: { top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }
+    cardPos: { bottom: '48px', left: '50%', transform: 'translate(-50%)' }
   }
 ];
 let tourStep = 0;
