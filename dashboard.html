@@ -494,7 +494,7 @@ body{font-family:Bricolage Grotesque,sans-serif;background:var(--paper);color:va
 .tour-next-btn{font-size:12px;font-weight:600;padding:8px 18px;border-radius:8px;border:none;background:var(--teal);color:#fff;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
 .tour-next-btn:hover{background:var(--teal-l)}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" onload="if(typeof initExerciseChart==='function')try{initExerciseChart();}catch(e){}"></script>
 <script>
 /* Exercise Chart */
 const EX_TARGET = 350;
@@ -503,6 +503,7 @@ const exChartData = [280, 420, 0, 310, 390, 500, 180];
 let exChartInstance = null;
 
 function initExerciseChart(){
+  if(typeof Chart === 'undefined') return;
   const ctx = document.getElementById('exerciseChart').getContext('2d');
   const daysHit = exChartData.filter((v,i)=>i<6&&v>=EX_TARGET).length;
   document.getElementById('weekSummary').textContent = daysHit+'/6 days on target this week';
@@ -1232,7 +1233,7 @@ function switchBackToPro(){
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
-  initExerciseChart();
+  try { initExerciseChart(); } catch(e) { console.warn('Chart init deferred:', e.message); window.addEventListener('load', ()=>{ try{initExerciseChart();}catch(e2){} }); }
   renderMealLog();
   updateDonut();
   renderExerciseLog();
