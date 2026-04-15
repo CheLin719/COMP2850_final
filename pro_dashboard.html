@@ -264,11 +264,11 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0"><path d="M1 4h9M7 1l3 3-3 3M13 10H4M7 7l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Switch to User View
     </button>
-    <div id="helpMailGroup" style="display:flex;align-items:center;gap:0">
-    <a href="qa_pro.html" class="switch-btn" style="border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:8px 14px;min-width:unset;display:flex;align-items:center;gap:5px;text-decoration:none"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.3"/><text x="7" y="10.5" text-anchor="middle" font-size="8.5" fill="currentColor" font-weight="600" font-family="JetBrains Mono,monospace">?</text></svg> Help</a>
     <button class="tour-trigger-btn" onclick="startTour()" title="Guided tour">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M9 4.5l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="3" cy="7.5" r="1.5" fill="currentColor"/></svg> Tour
     </button>
+    <div id="helpMailGroup" style="display:flex;align-items:center;gap:12px">
+    <a href="qa_pro.html" class="switch-btn" style="border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:8px 14px;min-width:unset;display:flex;align-items:center;gap:5px;text-decoration:none"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.3"/><text x="7" y="10.5" text-anchor="middle" font-size="8.5" fill="currentColor" font-weight="600" font-family="JetBrains Mono,monospace">?</text></svg> Help</a>
     <div class="tn-icon" id="mailIcon" onclick="openMailPanel()" style="position:relative;cursor:pointer">
       <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><rect x="1" y="1" width="18" height="14" rx="2" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/><path d="M1 4l9 6 9-6" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg>
       <div id="mailDot" style="width:7px;height:7px;border-radius:50%;background:#dc2626;position:absolute;top:4px;right:4px;border:1.5px solid var(--ink)"></div>
@@ -1566,68 +1566,40 @@ function proSettingsSaved(btn) {
   </div>
 </div>
 <script>
-const tSteps=[
-  // ── Overview page ──
+var tSteps=[
   {title:'Welcome to NourishWell Pro 🌿',body:"You're in the professional dashboard — manage clients, track their progress, and provide personalised guidance. Let's take a quick tour.",sel:null,pos:'center',onEnter:null},
   {title:'Your Client List',body:'All your clients are listed here with colour-coded status badges. You can search and click any name to open their full profile.',sel:'.side-nav',pos:'right',onEnter:null},
   {title:'Client Snapshot',body:'This table gives you an at-a-glance overview — goals, average calories, protein intake, exercise frequency, and current status. Click any row to open that client.',sel:'.overview-grid',pos:'top',onEnter:null},
-
-  // ── Navigate into Rose Campbell's profile ──
-  {title:'Client Profile',body:"We've opened Rose Campbell's profile. You can see her weight, height, goal, and age at a glance. Use the Message and Edit Plan buttons for quick actions.",sel:'#clientHeader',pos:'bottom',onEnter:function(){selectClientFromTable('rose');window.scrollTo({top:0,behavior:'smooth'});}},
-  {title:'Data Analysis',body:"The Data Analysis tab shows calorie trends, BMI gauge, macro breakdown, exercise frequency, and an overall health score — everything you need to monitor progress.",sel:'.tab-item:nth-child(1)',pos:'bottom',onEnter:function(){var tabs=document.querySelectorAll('.tab-item');switchTab('analytics',tabs[0]);window.scrollTo({top:0,behavior:'smooth'});}},
-  {title:'Messages & Quick Tags',body:"The Messages tab lets you send advice directly. Use quick-tag buttons like 'Great progress' or 'Protein reminder' — you can edit before sending.",sel:'.tab-item:nth-child(2)',pos:'bottom',onEnter:function(){var tabs=document.querySelectorAll('.tab-item');switchTab('chat',tabs[1]);window.scrollTo({top:0,behavior:'smooth'});}},
-  {title:'Fitness Plan',body:'The Fitness Plan tab lets you set personalised meal and training plans — calorie targets, exercise schedules, and dietary notes for each client.',sel:'.tab-item:nth-child(3)',pos:'bottom',onEnter:function(){var tabs=document.querySelectorAll('.tab-item');switchTab('plan',tabs[2]);window.scrollTo({top:0,behavior:'smooth'});}},
-  {title:'Appointments',body:'The Appointments tab lets you book and manage consultation sessions — upcoming, completed, and cancelled appointments are all tracked here.',sel:'.tab-item:nth-child(4)',pos:'bottom',onEnter:function(){var tabs=document.querySelectorAll('.tab-item');switchTab('appointments',tabs[3]);window.scrollTo({top:0,behavior:'smooth'});}},
-
-  // ── Return to overview, highlight nav ──
-  {title:'Switch to User View',body:'Click here to switch to your own subscriber dashboard — see your personal food diary, nutritional trends, and meal plans as a regular user.',sel:'.switch-btn',pos:'bottom',onEnter:function(){selectClient('overview',document.querySelector('.sn-item'));window.scrollTo({top:0,behavior:'smooth'});}},
+  {title:'Client Profile',body:"We've opened Rose Campbell's profile. You can see her weight, height, goal, and age at a glance. Use the Message and Edit Plan buttons for quick actions.",sel:'#clientHeader',pos:'bottom',onEnter:function(){selectClientFromTable('rose');}},
+  {title:'Data Analysis',body:"The Data Analysis tab shows calorie trends, BMI gauge, macro breakdown, exercise frequency, and an overall health score — everything you need to monitor progress.",sel:'.tab-item:nth-child(1)',pos:'bottom',onEnter:function(){var t=document.querySelectorAll('.tab-item');switchTab('analytics',t[0]);}},
+  {title:'Messages & Quick Tags',body:"The Messages tab lets you send advice directly. Use quick-tag buttons like 'Great progress' or 'Protein reminder' — you can edit before sending.",sel:'.tab-item:nth-child(2)',pos:'bottom',onEnter:function(){var t=document.querySelectorAll('.tab-item');switchTab('chat',t[1]);}},
+  {title:'Fitness Plan',body:'The Fitness Plan tab lets you set personalised meal and training plans — calorie targets, exercise schedules, and dietary notes for each client.',sel:'.tab-item:nth-child(3)',pos:'bottom',onEnter:function(){var t=document.querySelectorAll('.tab-item');switchTab('plan',t[2]);}},
+  {title:'Appointments',body:'The Appointments tab lets you book and manage consultation sessions — upcoming, completed, and cancelled appointments are all tracked here.',sel:'.tab-item:nth-child(4)',pos:'bottom',onEnter:function(){var t=document.querySelectorAll('.tab-item');switchTab('appointments',t[3]);}},
+  {title:'Switch to User View',body:'Click here to switch to your own subscriber dashboard — see your personal food diary, nutritional trends, and meal plans as a regular user.',sel:'.switch-btn',pos:'bottom',onEnter:function(){selectClient('overview',document.querySelector('.sn-item'));}},
   {title:'Help & Messages',body:"The Help button opens the full Q&A page. The envelope icon shows unread client messages. Replay this tour any time with the Tour button. You're all set!",sel:'#helpMailGroup',pos:'bottom',onEnter:null}
 ];
-let tI=0;
-function tHideVisuals(){
-  var hl=document.getElementById('tHL');
+var tI=0,tBusy=false;
+
+function tClear(){
   var hole=document.getElementById('tHole');
+  var hl=document.getElementById('tHL');
   hole.setAttribute('width',0);hole.setAttribute('height',0);
   hl.classList.remove('on');hl.style.display='none';
 }
-function startTour(){
-  tI=0;
-  var card=document.getElementById('tCard');
-  var hl=document.getElementById('tHL');
-  // Hide everything first to prevent flash
-  card.classList.remove('on');
-  card.style.opacity='0';
-  tHideVisuals();
-  // Reset to overview
-  selectClient('overview',document.querySelector('.sn-item'));
-  window.scrollTo({top:0,behavior:'smooth'});
-  // Show overlay
-  document.getElementById('tSvg').style.display='block';
-  document.body.style.overflow='hidden';
-  // Render first step after DOM settles
-  requestAnimationFrame(function(){
-    tRenderImmediate();
-    card.classList.add('on');
-    requestAnimationFrame(function(){card.style.opacity='1';});
-  });
-}
-function tRenderImmediate(){
+
+function tPlace(){
   var s=tSteps[tI];
-  // Run onEnter synchronously
-  if(s.onEnter) s.onEnter();
-  // Update text content immediately
+  var hl=document.getElementById('tHL');
+  var card=document.getElementById('tCard');
+  var hole=document.getElementById('tHole');
+
+  // Update text
   document.getElementById('tLabel').textContent='Step '+(tI+1)+' of '+tSteps.length;
   document.getElementById('tTitle').textContent=s.title;
   document.getElementById('tBody').textContent=s.body;
   document.getElementById('tBtn').innerHTML=tI===tSteps.length-1?'Done ✓':'Next <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   document.getElementById('tPips').innerHTML=tSteps.map(function(_,i){return '<div class="tour-pip'+(i<tI?' done':'')+(i===tI?' active':'')+'"></div>';}).join('');
-  // Position highlight and card after a single frame so DOM has updated
-  requestAnimationFrame(function(){tPosition(s);});
-}
-function tPosition(s){
-  var hl=document.getElementById('tHL');
-  var card=document.getElementById('tCard');
-  var hole=document.getElementById('tHole');
+
   if(s.sel){
     var el=document.querySelector(s.sel);
     if(el){
@@ -1645,26 +1617,71 @@ function tPosition(s){
       card.setAttribute('data-pos',pos);
       card.style.left=cx+'px';card.style.top=cy+'px';
       card.style.transform='none';
-    } else {tHideVisuals();tCenterCard(card);}
+    } else {
+      tClear();
+      card.setAttribute('data-pos','center');
+      card.style.left='50%';card.style.top='50%';card.style.transform='translate(-50%,-50%)';
+    }
   } else {
-    tHideVisuals();
-    tCenterCard(card);
+    tClear();
+    card.setAttribute('data-pos','center');
+    card.style.left='50%';card.style.top='50%';card.style.transform='translate(-50%,-50%)';
   }
 }
-function tCenterCard(card){
-  card.setAttribute('data-pos','center');
-  card.style.left='50%';card.style.top='50%';card.style.transform='translate(-50%,-50%)';
+
+function startTour(){
+  tI=0;
+  var card=document.getElementById('tCard');
+  // 1. Hide card completely
+  card.classList.remove('on');
+  card.style.visibility='hidden';
+  card.style.opacity='0';
+  tClear();
+  // 2. Reset page to overview
+  selectClient('overview',document.querySelector('.sn-item'));
+  window.scrollTo({top:0});
+  // 3. Show overlay
+  document.getElementById('tSvg').style.display='block';
+  document.body.style.overflow='hidden';
+  // 4. Wait for DOM to settle, then render step 1 and show
+  setTimeout(function(){
+    tPlace();
+    card.classList.add('on');
+    card.style.visibility='visible';
+    card.style.opacity='1';
+  },50);
 }
-function tNext(){if(tI<tSteps.length-1){tI++;tRenderImmediate();}else tEnd();}
+
+function tNext(){
+  if(tI>=tSteps.length-1){tEnd();return;}
+  tI++;
+  var card=document.getElementById('tCard');
+  var s=tSteps[tI];
+  // 1. Hide card + highlight instantly
+  card.style.visibility='hidden';
+  tClear();
+  // 2. Execute onEnter (page navigation)
+  if(s.onEnter) s.onEnter();
+  window.scrollTo({top:0});
+  // 3. Wait for DOM to update, then position and show
+  setTimeout(function(){
+    tPlace();
+    card.style.visibility='visible';
+  },60);
+}
+
 function tEnd(){
+  var card=document.getElementById('tCard');
+  card.classList.remove('on');
+  card.style.visibility='hidden';
+  card.style.opacity='0';
   document.getElementById('tSvg').style.display='none';
-  document.getElementById('tCard').classList.remove('on');
-  document.getElementById('tCard').style.opacity='0';
-  tHideVisuals();
+  tClear();
   document.body.style.overflow='';
   selectClient('overview',document.querySelector('.sn-item'));
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0});
 }
+
 document.getElementById('tSvg').addEventListener('click',function(e){
   var card=document.getElementById('tCard');
   var cr=card.getBoundingClientRect();
