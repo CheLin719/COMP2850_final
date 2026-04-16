@@ -27,10 +27,16 @@ class NutritionController(
     @GetMapping("/feedback")
     fun getMyNutritionFeedback(
         authentication: Authentication,
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        date: LocalDate?
+        @RequestParam(required = false, defaultValue = "5") days: Int
     ): NutritionFeedback {
-        return nutritionService.getMyNutritionFeedback(authentication, date)
+        return nutritionService.getMyNutritionFeedback(authentication, days)
+    }
+
+    @GetMapping("/trends")
+    fun getMyNutritionTrends(
+        authentication: Authentication,
+        @RequestParam(required = false, defaultValue = "7") days: Int
+    ): List<DailyNutritionTrend> {
+        return nutritionService.getMyNutritionTrends(authentication, days)
     }
 }
