@@ -124,7 +124,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 .msg-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-top:2px}
 .chat-input-area{display:flex;gap:10px;align-items:flex-end}
 .chat-input{flex:1;border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);resize:none;outline:none;min-height:46px;max-height:120px;background:var(--white);transition:border-color .2s}
-.chat-input:focus{border-color:var(--teal)}
+.chat-input:focus{border-color:var(--border);box-shadow:0 1px 4px rgba(10,20,16,0.08)}
 .chat-send{padding:12px 20px;background:var(--ink);color:#fff;border:none;border-radius:10px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;flex-shrink:0}
 .chat-send:hover{background:var(--teal)}
 .quick-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -207,7 +207,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 .plan-edit-day:last-child{border-bottom:none}
 .plan-edit-day-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);width:28px;flex-shrink:0}
 .plan-edit-input{flex:1;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:11px;font-family:'Bricolage Grotesque',sans-serif;color:var(--ink);outline:none}
-.plan-edit-input:focus{border-color:var(--teal)}
+.plan-edit-input:focus{border-color:var(--border);box-shadow:0 1px 4px rgba(10,20,16,0.08)}
 /* Status badge editable */
 .status-edit-btn{font-size:10px;cursor:pointer;opacity:.6;margin-left:4px}
 .status-edit-btn:hover{opacity:1}
@@ -1439,19 +1439,19 @@ function renderScoreRing(c) {
           <div style="display:flex;flex-direction:column;gap:16px">
             <div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">First Name</div>
-              <input type="text" value="Dr." style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              <input type="text" value="Dr." style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'">
             </div>
             <div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Last Name</div>
-              <input type="text" value="Rivera" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              <input type="text" value="Rivera" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'">
             </div>
             <div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Email Address</div>
-              <input type="email" value="rivera@nourishwell.com" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              <input type="email" value="rivera@nourishwell.com" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'">
             </div>
             <div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Licence Number</div>
-              <input type="text" value="NW-PRO-2024-0042" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              <input type="text" value="NW-PRO-2024-0042" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'">
             </div>
           </div>
           <button onclick="proSettingsSaved(this)" style="margin-top:20px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Save Changes</button>
@@ -1480,7 +1480,7 @@ function renderScoreRing(c) {
               </div>
               <div style="grid-column:1/-1">
                 <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Bio / About</div>
-                <textarea rows="3" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none;resize:vertical" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">Registered nutritionist with 12 years of experience helping clients achieve sustainable dietary goals. Specialising in sports nutrition and weight management.</textarea>
+                <textarea rows="3" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none;resize:vertical" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'">Registered nutritionist with 12 years of experience helping clients achieve sustainable dietary goals. Specialising in sports nutrition and weight management.</textarea>
               </div>
             </div>
             <button onclick="proSettingsSaved(this)" style="margin-top:16px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Update Profile</button>
@@ -1528,15 +1528,15 @@ function renderScoreRing(c) {
             <div style="display:flex;flex-direction:column;gap:14px">
               <div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Current Password</div>
-                <input type="password" placeholder="Enter current password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+                <input type="password" placeholder="Enter current password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'">
               </div>
               <div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">New Password</div>
-                <input type="password" placeholder="Min. 8 characters" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+                <input type="password" placeholder="Min. 8 characters" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'">
               </div>
               <div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Confirm New Password</div>
-                <input type="password" placeholder="Re-enter new password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+                <input type="password" placeholder="Re-enter new password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'">
               </div>
             </div>
             <button onclick="proSettingsSaved(this)" style="margin-top:16px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Update Password</button>

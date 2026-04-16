@@ -274,7 +274,7 @@ body.dark-mode .add-recipe-modal { background:#142420; }
 .arm-field { margin-bottom:14px; }
 .arm-field label { display:block; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-m); text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
 .arm-field input, .arm-field textarea, .arm-field select { width:100%; padding:10px 13px; font-family:'Bricolage Grotesque',sans-serif; font-size:13px; color:var(--ink); background:var(--paper); border:1px solid var(--border); border-radius:8px; outline:none; transition:border-color .2s; }
-.arm-field input:focus, .arm-field textarea:focus { border-color:var(--teal); }
+.arm-field input:focus, .arm-field textarea:focus { border-color:var(--border); box-shadow:0 1px 4px rgba(10,20,16,0.08); }
 .arm-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 
 /* ── STAR RATING INTERACTIVE ── */
@@ -291,7 +291,7 @@ body.dark-mode .add-recipe-modal { background:#142420; }
 .comment-text { font-size:12px; color:var(--ink-m); margin-top:3px; line-height:1.5; }
 .comment-input-wrap { display:flex; gap:8px; margin-top:8px; }
 .comment-input-wrap input { flex:1; padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; outline:none; }
-.comment-input-wrap input:focus { border-color:var(--teal); }
+.comment-input-wrap input:focus { border-color:var(--border); box-shadow:0 1px 4px rgba(10,20,16,0.08); }
 .comment-input-wrap button { padding:8px 16px; background:var(--ink); color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; }
 
 /* ── DATE PICKER ── */
@@ -299,7 +299,7 @@ body.dark-mode .add-recipe-modal { background:#142420; }
 .date-nav-btn { width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--ink-m); transition:all .2s; }
 .date-nav-btn:hover { border-color:var(--teal); color:var(--teal); }
 .date-nav input[type=date] { font-family:'JetBrains Mono',monospace; font-size:11px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; color:var(--ink); background:var(--white); outline:none; }
-.date-nav input[type=date]:focus { border-color:var(--teal); }
+.date-nav input[type=date]:focus { border-color:var(--border); box-shadow:0 1px 4px rgba(10,20,16,0.08); }
 
 </style>
 </head>
@@ -407,7 +407,7 @@ body.dark-mode .add-recipe-modal { background:#142420; }
     <div style="border-top:1px solid var(--fog);margin-top:12px;padding-top:10px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Custom exclusions</div>
       <div style="display:flex;gap:6px;margin-bottom:6px">
-        <input type="text" id="customExcludeInput" placeholder="e.g. tomato, onion..." style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--paper)" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){addCustomExclusion();event.preventDefault();}">
+        <input type="text" id="customExcludeInput" placeholder="e.g. tomato, onion..." style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--paper)" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'" onkeydown="if(event.key==='Enter'){addCustomExclusion();event.preventDefault();}">
         <button onclick="addCustomExclusion()" style="padding:7px 12px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;transition:background .2s" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Add</button>
       </div>
       <div id="customExcludeTags" style="display:flex;flex-wrap:wrap;gap:5px"></div>
@@ -486,10 +486,10 @@ body.dark-mode .add-recipe-modal { background:#142420; }
 <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
 <div style="display:flex;align-items:center;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--fog)"><div style="width:64px;height:64px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700">RC</div><div><div style="font-size:18px;font-weight:700;color:var(--ink)">Rose Campbell</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);margin-top:3px">Subscriber · Member since March 2026</div></div></div>
 <div style="display:flex;flex-direction:column;gap:16px">
-<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">First Name</div><input type="text" value="Rose" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
-<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Last Name</div><input type="text" value="Campbell" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
-<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Email Address</div><input type="email" value="rose.campbell@example.com" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
-<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Date of Birth</div><input type="date" value="1995-06-14" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></div>
+<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">First Name</div><input type="text" value="Rose" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'"></div>
+<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Last Name</div><input type="text" value="Campbell" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'"></div>
+<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Email Address</div><input type="email" value="rose.campbell@example.com" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'"></div>
+<div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Date of Birth</div><input type="date" value="1995-06-14" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'"></div>
 </div>
 <button style="margin-top:20px;padding:11px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Save Changes</button>
 </div>
@@ -541,7 +541,7 @@ body.dark-mode .add-recipe-modal { background:#142420; }
 <div style="font-family:'Instrument Serif',serif;font-size:20px;font-style:italic;color:#0a1410">Add Food</div>
 <button onclick="closeFoodPanel()" style="width:32px;height:32px;border-radius:6px;border:none;background:#f5f7f5;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
 </div>
-<div style="padding:10px 22px;border-bottom:1px solid #d4dfd8"><input id="foodSearch" type="text" placeholder="Search food..." aria-label="Search food items" oninput="filterFoodItems(this.value)" style="width:100%;padding:9px 12px;border:1px solid #d4dfd8;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;outline:none" onfocus="this.style.borderColor='#1e6b5e'" onblur="this.style.borderColor='#d4dfd8'"></div>
+<div style="padding:10px 22px;border-bottom:1px solid #d4dfd8"><input id="foodSearch" type="text" placeholder="Search food..." aria-label="Search food items" oninput="filterFoodItems(this.value)" style="width:100%;padding:9px 12px;border:1px solid #d4dfd8;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'"></div>
 <div style="padding:8px 22px;border-bottom:1px solid #d4dfd8;display:flex;gap:5px;flex-wrap:wrap">
 <button class="fcb active" onclick="pickCat(this)">All</button>
 <button class="fcb" onclick="pickCat(this)">Staples</button>
@@ -590,7 +590,7 @@ body.dark-mode .add-recipe-modal { background:#142420; }
 <div style="font-family:'Instrument Serif',serif;font-size:20px;font-style:italic;color:#0a1410">Log Exercise</div>
 <button onclick="closeExPanel()" style="width:32px;height:32px;border-radius:6px;border:none;background:#f5f7f5;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
 </div>
-<div style="padding:10px 22px;border-bottom:1px solid #d4dfd8"><input type="text" placeholder="Search exercise..." style="width:100%;padding:9px 12px;border:1px solid #d4dfd8;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;outline:none" onfocus="this.style.borderColor='#1e6b5e'" onblur="this.style.borderColor='#d4dfd8'"></div>
+<div style="padding:10px 22px;border-bottom:1px solid #d4dfd8"><input type="text" placeholder="Search exercise..." style="width:100%;padding:9px 12px;border:1px solid #d4dfd8;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'"></div>
 <div style="padding:8px 22px;border-bottom:1px solid #d4dfd8;display:flex;gap:5px;flex-wrap:wrap">
 <button class="fcb active" onclick="pickCat(this)">All</button>
 <button class="fcb" onclick="pickCat(this)">Cardio</button>
