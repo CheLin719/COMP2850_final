@@ -807,16 +807,65 @@ body {
 #page-auth { display: none; }
 body.show-auth #page-landing { display: none; }
 body.show-auth #page-auth { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width:1024px) {
+  .hero-content { grid-template-columns:1fr !important; gap:32px; }
+  .hero-app-panel { width:100% !important; max-width:500px; margin:0 auto; }
+  .hero { padding:90px 32px 0; }
+  .feat-list { grid-template-columns:repeat(3,1fr); }
+  .persona-grid { grid-template-columns:1fr 1fr; }
+  .cta-grid { grid-template-columns:1fr; }
+  .persona-card.large { grid-row:auto; }
+}
+@media (max-width:768px) {
+  nav { padding:0 16px; }
+  .hero { padding:90px 16px 0; min-height:auto; }
+  h1.hero-title { font-size:clamp(48px,8vw,100px); }
+  .hero-bottom { flex-direction:column; gap:20px; }
+  .feat-list { grid-template-columns:repeat(2,1fr); }
+  .feat-item { border-right:none; border-bottom:1px solid var(--border); }
+  .persona-grid { grid-template-columns:1fr; }
+  .how-step { grid-template-columns:1fr !important; }
+  .how-step:nth-child(even) { direction:ltr; }
+  .how-step-num { padding:24px; }
+  .diagonal-band-inner { flex-direction:column; gap:24px; }
+  .d-divider { width:48px; height:1px; }
+  .auth-shell { grid-template-columns:1fr !important; }
+  .panel-left { display:none; }
+  .panel-right { padding:40px 24px; }
+  .role-selector { grid-template-columns:1fr 1fr !important; }
+  section[style*="grid-template-columns:repeat(3"] > div { grid-template-columns:1fr !important; }
+  section[style*="grid-template-columns:1fr 1fr"] > div { grid-template-columns:1fr !important; }
+}
+@media (max-width:480px) {
+  .nav-center { display:none; }
+  .hero-bg-text { display:none; }
+  .feat-list { grid-template-columns:1fr; }
+  h1.hero-title { font-size:42px; }
+  .hero-app-panel { display:none !important; }
+  .cta-btns { flex-direction:column; }
+}
+
+/* ── ACCESSIBILITY ── */
+*:focus-visible { outline:2px solid var(--teal); outline-offset:2px; border-radius:4px; }
+.skip-link { position:absolute; top:-40px; left:0; background:var(--teal); color:#fff; padding:8px 16px; z-index:99999; font-size:14px; font-weight:600; border-radius:0 0 8px 0; transition:top .2s; }
+.skip-link:focus { top:0; }
+
+/* ── PRINT ── */
+@media print { nav, .ticker-wrap, .auth-shell, footer { display:none !important; } .hero { min-height:auto; padding-top:20px; } }
+
 </style>
 </head>
 <body>
+<a href="#page-landing" class="skip-link">Skip to content</a>
 
 
 
 <div id="page-landing">
 <!-- Custom cursor -->
 <!-- NAV -->
-<nav>
+<nav role="navigation" aria-label="Main navigation">
   <div class="nav-bg"></div>
   <a href="#" class="logo">
     <div class="logo-mark">🌿</div>
@@ -832,7 +881,7 @@ body.show-auth #page-auth { display: block; }
 </nav>
 
 <!-- HERO -->
-<section class="hero">
+<section class="hero" role="banner">
   <div class="hero-bg-text">
     <svg width="66vw" height="220" viewBox="0 0 1000 220" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:70vw;">
       <text x="0" y="190" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="240" fill="none" stroke="rgba(30,107,94,0.12)" stroke-width="2" letter-spacing="-6">NOURISH</text>
@@ -1206,7 +1255,7 @@ body.show-auth #page-auth { display: block; }
     <a href="#" onclick="showLanding();return false" class="auth-back-btn">← Back</a>
     <div class="auth-card">
 
-      <div class="form-page" id="page-login">
+      <div class="form-page" id="page-login" role="form" aria-label="Login form">
         <div class="success-overlay" id="login-success">
           <div class="success-icon">✓</div>
           <div class="success-title">Welcome back!</div>
@@ -1218,13 +1267,13 @@ body.show-auth #page-auth { display: block; }
           <p class="form-sub">Sign in to your NourishWell account.</p>
           <div class="field">
             <label>Email address</label>
-            <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+            <input type="email" id="login-email" aria-label="Email address" placeholder="you@example.com" autocomplete="email">
             <div class="field-error" id="login-email-err">Please enter a valid email address.</div>
           </div>
           <div class="field">
             <label>Password</label>
             <div class="pw-wrap">
-              <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
+              <input type="password" id="login-password" aria-label="Password" placeholder="Your password" autocomplete="current-password">
               <button class="pw-toggle" onclick="togglePw('login-password', this)" tabindex="-1">👁</button>
             </div>
             <div class="field-error" id="login-pw-err">Incorrect email or password.</div>
@@ -1236,7 +1285,7 @@ body.show-auth #page-auth { display: block; }
         </div>
       </div>
 
-      <div class="form-page hidden" id="page-register">
+      <div class="form-page hidden" id="page-register" role="form" aria-label="Registration form">
         <div class="success-overlay" id="register-success">
           <div class="success-icon">🌿</div>
           <div class="success-title">You're all set!</div>
@@ -1263,31 +1312,31 @@ body.show-auth #page-auth { display: block; }
           <div class="field-row">
             <div class="field" style="margin-bottom:0">
               <label>First name</label>
-              <input type="text" id="reg-first" placeholder="Rose" autocomplete="given-name">
+              <input type="text" id="reg-first" aria-label="First name" placeholder="Rose" autocomplete="given-name">
               <div class="field-error" id="reg-first-err">Required.</div>
             </div>
             <div class="field" style="margin-bottom:0">
               <label>Last name</label>
-              <input type="text" id="reg-last" placeholder="Thompson" autocomplete="family-name">
+              <input type="text" id="reg-last" aria-label="Last name" placeholder="Thompson" autocomplete="family-name">
               <div class="field-error" id="reg-last-err">Required.</div>
             </div>
           </div>
           <div class="field" style="margin-top:16px">
             <label>Email address</label>
-            <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+            <input type="email" id="reg-email" aria-label="Email address" placeholder="you@example.com" autocomplete="email">
             <div class="field-error" id="reg-email-err">Please enter a valid email address.</div>
           </div>
           <div class="pro-field" id="pro-field">
             <div class="field" style="margin-bottom:0">
               <label>Professional licence no.</label>
-              <input type="text" id="reg-licence" placeholder="e.g. NUT-2024-00123">
+              <input type="text" id="reg-licence" aria-label="Professional licence number" placeholder="e.g. NUT-2024-00123">
               <div class="field-error" id="reg-licence-err">Required for health professionals.</div>
             </div>
           </div>
           <div class="field">
             <label>Password</label>
             <div class="pw-wrap">
-              <input type="password" id="reg-password" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)">
+              <input type="password" id="reg-password" aria-label="Password" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)">
               <button class="pw-toggle" onclick="togglePw('reg-password', this)" tabindex="-1">👁</button>
             </div>
             <div class="field-error" id="reg-pw-err">Password must be at least 8 characters.</div>

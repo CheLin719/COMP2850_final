@@ -171,24 +171,149 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 .pc-legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
 .pc-leg-item{display:flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f)}
 .pc-leg-dot{width:6px;height:6px;border-radius:50%}
+
+/* ── DARK MODE ── */
+body.dark-mode { --paper:#0d1a14; --white:#142420; --ink:#e8f0ec; --ink-s:#d0ddd4; --ink-m:#a8bfb0; --ink-f:#7a9488; --border:#2a3e34; --fog:#1e3028; }
+body.dark-mode .top-nav { background:#060e0a; }
+body.dark-mode .side-nav { background:#0d1a14; border-color:#1e3028; }
+body.dark-mode .donut-card { background:#060e0a; }
+body.dark-mode .action-btn, body.dark-mode .meal-col, body.dark-mode .chart-card,
+body.dark-mode .recipe-card, body.dark-mode .fav-card, body.dark-mode .stat-card,
+body.dark-mode .plan-chart-card { background:#142420; border-color:#2a3e34; }
+body.dark-mode .recipe-search { background:#142420; border-color:#2a3e34; }
+body.dark-mode .fav-link { background:#142420; border-color:#2a3e34; color:var(--ink); }
+body.dark-mode .rs-input { color:var(--ink); }
+body.dark-mode .settings-overlay { background:#0d1a14; }
+body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background:#142420; color:#e8f0ec; border-color:#2a3e34; }
+body.dark-mode .tn-dropdown { background:#142420; border-color:#2a3e34; }
+body.dark-mode .tn-dropdown a { color:#e8f0ec; border-color:#1e3028; }
+body.dark-mode .tn-dropdown a:hover { background:#1e3028; }
+body.dark-mode .fav-overlay .fav-modal { background:#142420; border-color:#2a3e34; }
+body.dark-mode .fav-item:hover { background:#1e3028; }
+body.dark-mode #foodPanel, body.dark-mode #exPanel { background:#0d1a14; }
+body.dark-mode .frow { border-color:#1e3028; }
+body.dark-mode .frow:hover { background:#1e3028; }
+body.dark-mode .fcb { background:#142420; border-color:#2a3e34; color:#7a9488; }
+body.dark-mode .fcb.active { background:#1e3028; color:var(--teal-l); border-color:var(--teal); }
+body.dark-mode .finf b { color:#e8f0ec; }
+body.dark-mode .mc-row { border-color:#1e3028; }
+body.dark-mode .mc-section-label::after { background:#1e3028; }
+body.dark-mode .fadd { background:#142420; border-color:#2a3e34; }
+body.dark-mode .bar-chart-card { background:#142420; border-color:#2a3e34; }
+
+/* ── RESPONSIVE ── */
+@media (max-width:1024px) {
+  .side-nav { width:60px; overflow:hidden; }
+  .sn-item .sn-text { display:none; }
+  .sn-item { padding:14px 0; justify-content:center; }
+  .sn-icon { margin:0; }
+  .main { margin-left:60px; padding:24px 20px; }
+  .dash-grid { grid-template-columns:1fr; }
+  .meal-columns { grid-template-columns:1fr; }
+  .recipe-grid, .fav-grid { grid-template-columns:repeat(2,1fr); }
+  .action-row { grid-template-columns:1fr; }
+  .plan-charts { grid-template-columns:1fr; }
+}
+@media (max-width:768px) {
+  .side-nav { position:fixed; bottom:0; top:auto; left:0; right:0; width:100%; height:56px; flex-direction:row; justify-content:space-around; padding:0; border-right:none; border-top:1px solid var(--border); z-index:999; }
+  .sn-item { flex-direction:column; padding:6px 4px; gap:2px; border-left:none; border-bottom:2px solid transparent; font-size:9px; }
+  .sn-item.active { border-bottom-color:var(--teal); border-left-color:transparent; }
+  .sn-item .sn-text { display:block; font-size:9px; }
+  .sn-icon { font-size:18px; }
+  .main { margin-left:0; margin-bottom:60px; padding:16px 14px; }
+  .top-nav { padding:0 12px; }
+  .tn-avatar-name { display:none; }
+  .recipe-grid, .fav-grid { grid-template-columns:1fr; }
+  .hero-content { grid-template-columns:1fr; }
+  .recipe-top-bar { flex-direction:column; }
+  .page-title { font-size:22px; }
+  #foodPanel, #exPanel { width:100% !important; }
+  .dash-grid { grid-template-columns:1fr; }
+  .settings-inner { padding:20px 16px; }
+  .settings-inner > div { grid-template-columns:1fr !important; }
+}
+@media (max-width:480px) {
+  .top-nav-right { gap:8px; }
+  .tn-link, .tour-trigger-btn { display:none; }
+}
+
+/* ── PRINT ── */
+@media print {
+  .top-nav, .side-nav, .action-row, .tour-trigger-btn, .mc-add, #foodPanel, #exPanel, #foodDim, #exDim, .fav-overlay, .settings-overlay, .tn-dropdown, #msgPanel, #msgDim { display:none !important; }
+  .main { margin:0; padding:20px; }
+  body { background:#fff; color:#000; }
+  .donut-card { box-shadow:none; border:1px solid #ccc; }
+  .meal-col, .chart-card { box-shadow:none; border:1px solid #ccc; page-break-inside:avoid; }
+  .page-title::after { content:' — NourishWell Nutrition Report'; font-size:14px; font-style:normal; color:#666; }
+}
+
+/* ── ACCESSIBILITY FOCUS ── */
+*:focus-visible { outline:2px solid var(--teal); outline-offset:2px; border-radius:4px; }
+.skip-link { position:absolute; top:-40px; left:0; background:var(--teal); color:#fff; padding:8px 16px; z-index:99999; font-size:14px; font-weight:600; border-radius:0 0 8px 0; transition:top .2s; }
+.skip-link:focus { top:0; }
+
+/* ── RECIPE TAG FILTERS ── */
+.recipe-filters { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
+.rf-tag { font-family:'JetBrains Mono',monospace; font-size:9px; padding:5px 12px; border-radius:16px; border:1px solid var(--border); background:var(--white); color:var(--ink-f); cursor:pointer; transition:all .2s; }
+.rf-tag.active { background:var(--teal-lll); color:var(--teal); border-color:var(--teal-ll); }
+.rf-tag:hover:not(.active) { border-color:var(--ink-f); }
+
+/* ── ADD RECIPE MODAL ── */
+.add-recipe-overlay { position:fixed; inset:0; background:rgba(10,20,16,0.4); z-index:3000; display:none; align-items:center; justify-content:center; }
+.add-recipe-overlay.open { display:flex; }
+.add-recipe-modal { background:var(--white); border-radius:20px; width:520px; max-width:90vw; max-height:85vh; overflow-y:auto; box-shadow:0 24px 80px rgba(10,20,16,0.2); padding:28px; }
+body.dark-mode .add-recipe-modal { background:#142420; }
+.arm-field { margin-bottom:14px; }
+.arm-field label { display:block; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-m); text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+.arm-field input, .arm-field textarea, .arm-field select { width:100%; padding:10px 13px; font-family:'Bricolage Grotesque',sans-serif; font-size:13px; color:var(--ink); background:var(--paper); border:1px solid var(--border); border-radius:8px; outline:none; transition:border-color .2s; }
+.arm-field input:focus, .arm-field textarea:focus { border-color:var(--teal); }
+.arm-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+
+/* ── STAR RATING INTERACTIVE ── */
+.star-rate { display:inline-flex; gap:2px; cursor:pointer; font-size:14px; }
+.star-rate .star { color:var(--fog); transition:color .15s; }
+.star-rate .star.filled { color:var(--amber); }
+.star-rate .star:hover, .star-rate .star:hover ~ .star { color:var(--amber-l); }
+
+/* ── COMMENTS ── */
+.comment-section { margin-top:14px; border-top:1px solid var(--fog); padding-top:12px; }
+.comment-item { padding:8px 0; border-bottom:1px solid var(--fog); }
+.comment-item:last-child { border-bottom:none; }
+.comment-author { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--teal); font-weight:600; }
+.comment-text { font-size:12px; color:var(--ink-m); margin-top:3px; line-height:1.5; }
+.comment-input-wrap { display:flex; gap:8px; margin-top:8px; }
+.comment-input-wrap input { flex:1; padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; outline:none; }
+.comment-input-wrap input:focus { border-color:var(--teal); }
+.comment-input-wrap button { padding:8px 16px; background:var(--ink); color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; }
+
+/* ── DATE PICKER ── */
+.date-nav { display:flex; align-items:center; gap:12px; margin-top:6px; }
+.date-nav-btn { width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--ink-m); transition:all .2s; }
+.date-nav-btn:hover { border-color:var(--teal); color:var(--teal); }
+.date-nav input[type=date] { font-family:'JetBrains Mono',monospace; font-size:11px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; color:var(--ink); background:var(--white); outline:none; }
+.date-nav input[type=date]:focus { border-color:var(--teal); }
+
 </style>
 </head>
 <body>
-<nav class="top-nav"><div class="top-nav-left"><a href="#" class="tn-logo"><div class="tn-logo-mark">🌿</div><span class="tn-logo-text">NourishWell</span></a></div><div class="top-nav-right"><a href="#" id="proSwitchNavBtn" onclick="switchBackToPro();return false" class="tn-link" style="display:none;align-items:center;gap:6px;border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.9)"><svg width="13" height="13" viewBox="0 0 15 15" fill="none"><path d="M1 4.5h10M8 1.5l3 3-3 3M14 10.5H4M7 7.5l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Switch to Pro</a><a href="qa_subscriber.html" class="tn-link" id="helpLink" style="display:flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.3"/><text x="7" y="10.5" text-anchor="middle" font-size="8.5" fill="currentColor" font-weight="600" font-family="JetBrains Mono,monospace">?</text></svg> Help</a><button onclick="startTour()" class="tour-trigger-btn" title="Guided tour"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M9 4.5l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="3" cy="7.5" r="1.5" fill="currentColor"/></svg> Tour</button><div class="tn-icon" id="userMailIcon" onclick="openUserMessages()" style="position:relative;cursor:pointer"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><rect x="1" y="1" width="18" height="14" rx="2" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/><path d="M1 4l9 6 9-6" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg><div id="userMailDot" style="display:block;width:7px;height:7px;border-radius:50%;background:#dc2626;position:absolute;top:4px;right:4px;border:1.5px solid #0a1410"></div></div><div class="tn-avatar-wrap"><div class="tn-avatar" onclick="toggleAvatarMenu(event)"><div class="tn-avatar-pic">RC</div><span class="tn-avatar-name">Rose C.</span></div><div class="tn-dropdown" id="avatarMenu"><a href="#" onclick="showSettingsPage('personal');return false">Personal Details</a><a href="#" onclick="showSettingsPage('preferences');return false">Preferences</a><a href="#" class="logout" onclick="event.preventDefault();window.location.href='/COMP2850_final/index.html'">Log Out</a></div></div></div></nav>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="top-nav" role="navigation" aria-label="Main navigation"><div class="top-nav-left"><a href="#" class="tn-logo"><div class="tn-logo-mark">🌿</div><span class="tn-logo-text">NourishWell</span></a></div><div class="top-nav-right"><a href="#" id="proSwitchNavBtn" onclick="switchBackToPro();return false" class="tn-link" style="display:none;align-items:center;gap:6px;border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.9)"><svg width="13" height="13" viewBox="0 0 15 15" fill="none"><path d="M1 4.5h10M8 1.5l3 3-3 3M14 10.5H4M7 7.5l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Switch to Pro</a><a href="qa_subscriber.html" class="tn-link" id="helpLink" style="display:flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.3"/><text x="7" y="10.5" text-anchor="middle" font-size="8.5" fill="currentColor" font-weight="600" font-family="JetBrains Mono,monospace">?</text></svg> Help</a><button onclick="startTour()" class="tour-trigger-btn" title="Guided tour"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M9 4.5l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="3" cy="7.5" r="1.5" fill="currentColor"/></svg> Tour</button><div class="tn-icon" id="userMailIcon" onclick="openUserMessages()" style="position:relative;cursor:pointer" aria-label="Messages" role="button" tabindex="0"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><rect x="1" y="1" width="18" height="14" rx="2" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/><path d="M1 4l9 6 9-6" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg><div id="userMailDot" style="display:block;width:7px;height:7px;border-radius:50%;background:#dc2626;position:absolute;top:4px;right:4px;border:1.5px solid #0a1410"></div></div><div class="tn-avatar-wrap"><div class="tn-avatar" onclick="toggleAvatarMenu(event)" aria-label="User menu" aria-expanded="false" aria-haspopup="true"><div class="tn-avatar-pic">RC</div><span class="tn-avatar-name">Rose C.</span></div><div class="tn-dropdown" id="avatarMenu"><a href="#" onclick="showSettingsPage('personal');return false">Personal Details</a><a href="#" onclick="showSettingsPage('preferences');return false">Preferences</a><a href="#" onclick="toggleDarkMode();return false">🌙 Dark Mode</a>
+<a href="#" class="logout" onclick="event.preventDefault();window.location.href='/COMP2850_final/index.html'">Log Out</a></div></div></div></nav>
 
-<aside class="side-nav">
-<a class="sn-item active" onclick="switchPage('record',this)" href="#"><span class="sn-icon">📋</span> <span class="sn-text">Record Today</span></a>
+<aside class="side-nav" role="navigation" aria-label="Page navigation">
+<a class="sn-item active" onclick="switchPage('record',this)" href="#" aria-label="Record Today" role="tab" aria-selected="true"><span class="sn-icon" aria-hidden="true">📋</span> <span class="sn-text">Record Today</span></a>
 <a class="sn-item" onclick="switchPage('recipe',this)" href="#"><span class="sn-icon">🍳</span> <span class="sn-text">Recipe</span></a>
 <a class="sn-item" onclick="switchPage('favourites',this)" href="#"><span class="sn-icon">❤️</span> <span class="sn-text">Favourites</span></a>
 <a class="sn-item" onclick="switchPage('plan',this)" href="#"><span class="sn-icon">📊</span> <span class="sn-text">Recipe Compare</span></a>
 <a class="sn-item" onclick="switchPage('planner',this)" href="#"><span class="sn-icon">🧠</span> <span class="sn-text">Meal Planner</span></a>
 </aside>
 
-<div class="main">
+<div class="main" id="main-content" role="main">
 
 <!-- Record Today -->
-<div class="page active" id="page-record">
-<div class="page-header"><div class="page-title">Record <em>Today</em></div><div class="page-date" id="today-date"></div></div>
+<div class="page active" id="page-record" role="tabpanel" aria-label="Record Today">
+<div class="page-header"><div class="page-title">Record <em>Today</em></div><div class="page-date" id="today-date"></div>
+<div class="date-nav"><button class="date-nav-btn" onclick="changeDate(-1)" aria-label="Previous day">←</button><input type="date" id="diary-date-picker" onchange="loadDateDiary(this.value)" aria-label="Select date"><button class="date-nav-btn" onclick="changeDate(1)" aria-label="Next day">→</button><button class="date-nav-btn" onclick="goToday()" style="font-size:10px;width:auto;padding:0 10px;font-family:'JetBrains Mono',monospace">Today</button></div></div>
 <div class="dash-grid">
 <div class="donut-card"><div class="dc-eyebrow">Today's Nutrition</div><div class="dc-donut"><svg width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="48" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="16"/><circle cx="75" cy="75" r="48" fill="none" stroke="#2f8f7f" stroke-width="16" stroke-dasharray="126.7 175" stroke-linecap="butt" transform="rotate(-90 75 75)"/><circle cx="75" cy="75" r="48" fill="none" stroke="#d4956a" stroke-width="16" stroke-dasharray="84.5 217.2" stroke-linecap="butt" transform="rotate(61 75 75)"/><circle cx="75" cy="75" r="48" fill="none" stroke="#7aaad4" stroke-width="16" stroke-dasharray="54.3 247.4" stroke-linecap="butt" transform="rotate(162 75 75)"/><circle cx="75" cy="75" r="48" fill="none" stroke="#e07b78" stroke-width="16" stroke-dasharray="36.2 265.5" stroke-linecap="butt" transform="rotate(227 75 75)"/><text x="75" y="72" text-anchor="middle" font-size="20" font-weight="700" fill="#fff" font-family="Bricolage Grotesque,sans-serif">1,920</text><text x="75" y="88" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.35)" font-family="JetBrains Mono,monospace">kcal today</text></svg></div><div class="dc-legend"><div class="dc-leg-row"><div class="dc-leg-dot" style="background:#2f8f7f"></div><span class="dc-leg-name">Carbs</span><span class="dc-leg-val">42% · 201g</span></div><div class="dc-leg-row"><div class="dc-leg-dot" style="background:#d4956a"></div><span class="dc-leg-name">Protein</span><span class="dc-leg-val">28% · 68g</span></div><div class="dc-leg-row"><div class="dc-leg-dot" style="background:#7aaad4"></div><span class="dc-leg-name">Fat</span><span class="dc-leg-val">18% · 38g</span></div><div class="dc-leg-row"><div class="dc-leg-dot" style="background:#e07b78"></div><span class="dc-leg-name">Sugar</span><span class="dc-leg-val">12% · 84g</span></div></div><div class="dc-divider"></div><div class="dc-total"><div><div class="dc-total-num">1,920 <span class="dc-total-sub">/ 2,400</span></div><div class="dc-total-label">Daily target</div></div><div style="text-align:right"><div class="dc-total-pct">80%</div><div class="dc-total-label">Complete</div></div></div></div>
 <div class="right-panel"><div class="chart-card"><div class="cc-header"><span class="cc-title">Exercise Activity</span><div style="display:flex;align-items:center;gap:14px"><div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#1e6b5e"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b8878">Actual</span></div><div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#dce6e0"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b8878">Target</span></div><div class="cc-tabs"><button class="cc-tab active" onclick="switchChartTab(this)">Week</button><button class="cc-tab" onclick="switchChartTab(this)">Month</button><button class="cc-tab" onclick="switchChartTab(this)">Year</button></div></div></div>
@@ -237,10 +362,23 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
   <div id="exercise-log"></div>
 </div>
 
+
+<div class="chart-card" style="margin-top:16px">
+  <div class="cc-header">
+    <span class="cc-title">Calorie Intake Trend</span>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#1e6b5e"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b8878">Intake</span></div>
+      <div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:9px;height:2px;background:#b8621f"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b8878">Target</span></div>
+    </div>
+  </div>
+  <div style="position:relative;width:100%;height:148px"><canvas id="calorieTrendChart" aria-label="Weekly calorie intake trend chart" role="img"></canvas></div>
+</div>
+
 </div><!-- end page-record -->
 
-<div class="page" id="page-recipe"><div class="page-header"><div class="page-title">Discover <em>Recipes</em></div></div>
-<div class="recipe-top-bar"><div class="recipe-search"><span style="font-size:18px;color:var(--ink-f)">🔍</span><input class="rs-input" type="text" placeholder="Search by ingredient, cuisine, or recipe name..."></div><a href="#" class="fav-link" onclick="switchPage('favourites',document.querySelectorAll('.sn-item')[2]);return false">❤️ My Favourites</a></div>
+<div class="page" id="page-recipe" role="tabpanel" aria-label="Recipes"><div class="page-header"><div class="page-title">Discover <em>Recipes</em></div></div>
+<div class="recipe-top-bar" role="search"><div class="recipe-search"><span style="font-size:18px;color:var(--ink-f)">🔍</span><input class="rs-input" type="text" placeholder="Search by ingredient, cuisine, or recipe name..." aria-label="Search recipes" oninput="filterRecipes(this.value)"></div><a href="#" class="fav-link" onclick="switchPage('favourites',document.querySelectorAll('.sn-item')[2]);return false">❤️ My Favourites</a><button onclick="openAddRecipeModal()" class="fav-link" style="background:var(--teal);color:#fff;border-color:var(--teal)" aria-label="Add new recipe">+ Add Recipe</button></div>
+<div class="recipe-filters" role="toolbar" aria-label="Filter recipes"><button class="rf-tag active" onclick="filterRecipeTag(this,'all')" aria-pressed="true">All</button><button class="rf-tag" onclick="filterRecipeTag(this,'healthy')" aria-pressed="false">Healthy</button><button class="rf-tag" onclick="filterRecipeTag(this,'quick')" aria-pressed="false">Quick</button><button class="rf-tag" onclick="filterRecipeTag(this,'vegan')" aria-pressed="false">Vegan</button><button class="rf-tag" onclick="filterRecipeTag(this,'high-protein')" aria-pressed="false">High Protein</button><button class="rf-tag" onclick="filterRecipeTag(this,'comfort')" aria-pressed="false">Comfort</button><button class="rf-tag" onclick="filterRecipeTag(this,'my-recipes')" aria-pressed="false">My Recipes</button></div>
 <div class="recipe-grid">
 <div class="recipe-card" data-recipe-id="mediterranean-quinoa"><div class="rc-img" style="background:var(--teal-lll)">🥗</div><div class="rc-body"><div class="rc-tag">Healthy · 15 min</div><div class="rc-title">Mediterranean Quinoa Bowl</div><div class="rc-meta">420 kcal · £3.20</div><div class="rc-footer"><span class="rc-rating">★★★★☆</span><span class="rc-fav">🤍</span></div></div></div>
 <div class="recipe-card" data-recipe-id="shakshuka"><div class="rc-img" style="background:var(--amber-ll)">🍳</div><div class="rc-body"><div class="rc-tag">Quick · 20 min</div><div class="rc-title">Shakshuka</div><div class="rc-meta">380 kcal · £2.40</div><div class="rc-footer"><span class="rc-rating">★★★★★</span><span class="rc-fav">❤️</span></div></div></div>
@@ -251,7 +389,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 </div></div>
 
 <!-- Favourites -->
-<div class="page" id="page-favourites"><div class="page-header"><div class="page-title">My <em>Favourites</em></div><div class="page-date">Your saved recipes — click remove to unfavourite</div></div>
+<div class="page" id="page-favourites" role="tabpanel" aria-label="Favourites"><div class="page-header"><div class="page-title">My <em>Favourites</em></div><div class="page-date">Your saved recipes — click remove to unfavourite</div></div>
 <div class="fav-grid" id="fav-cards-grid">
 <div class="fav-card"><div class="fav-card-img" style="background:var(--amber-ll)">🍳</div><div class="fav-card-body"><div class="fav-card-title">Shakshuka</div><div class="fav-card-meta">380 kcal · 20 min · £2.40</div><div class="fav-card-footer"><span class="fav-card-rating">★★★★★</span><span class="fav-remove">Remove</span></div></div></div>
 <div class="fav-card"><div class="fav-card-img" style="background:var(--teal-lll)">🥑</div><div class="fav-card-body"><div class="fav-card-title">Avocado Toast</div><div class="fav-card-meta">290 kcal · 10 min · £1.80</div><div class="fav-card-footer"><span class="fav-card-rating">★★★★★</span><span class="fav-remove">Remove</span></div></div></div>
@@ -259,7 +397,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 </div></div>
 
 <!-- Plan -->
-<div class="page" id="page-plan"><div class="page-header"><div class="page-title">Recipe <em>Compare</em></div><div class="page-date">Select up to 4 favourite recipes to compare nutritional data</div></div>
+<div class="page" id="page-plan" role="tabpanel" aria-label="Recipe Compare"><div class="page-header"><div class="page-title">Recipe <em>Compare</em></div><div class="page-date">Select up to 4 favourite recipes to compare nutritional data</div></div>
 <div class="plan-selector" id="compare-chips">
 <div class="plan-chip selected"><div class="chip-dot" style="background:var(--teal)"></div>Shakshuka<span class="chip-remove">×</span></div>
 <div class="plan-chip selected"><div class="chip-dot" style="background:var(--amber)"></div>Avocado Toast<span class="chip-remove">×</span></div>
@@ -278,7 +416,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 </div>
 
 <!-- PAGE 5: Meal Planner -->
-<div class="page" id="page-planner">
+<div class="page" id="page-planner" role="tabpanel" aria-label="Meal Planner">
 <div class="page-header"><div class="page-title">Meal <em>Planner</em></div><div class="page-date">Plan your meals for the day — lock your picks, let us fill the rest</div></div>
 <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 24px;margin-bottom:20px;box-shadow:0 2px 8px rgba(10,20,16,0.03)">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-size:13px;font-weight:700;color:var(--ink)">Today's Calorie Budget</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f)">1,920 used · <span style="color:var(--teal);font-weight:600">480 remaining</span></div></div>
@@ -359,7 +497,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 <div style="font-family:'Instrument Serif',serif;font-size:20px;font-style:italic;color:#0a1410">Add Food</div>
 <button onclick="closeFoodPanel()" style="width:32px;height:32px;border-radius:6px;border:none;background:#f5f7f5;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
 </div>
-<div style="padding:10px 22px;border-bottom:1px solid #d4dfd8"><input id="foodSearch" type="text" placeholder="Search food..." style="width:100%;padding:9px 12px;border:1px solid #d4dfd8;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;outline:none" onfocus="this.style.borderColor='#1e6b5e'" onblur="this.style.borderColor='#d4dfd8'"></div>
+<div style="padding:10px 22px;border-bottom:1px solid #d4dfd8"><input id="foodSearch" type="text" placeholder="Search food..." aria-label="Search food items" oninput="filterFoodItems(this.value)" style="width:100%;padding:9px 12px;border:1px solid #d4dfd8;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;outline:none" onfocus="this.style.borderColor='#1e6b5e'" onblur="this.style.borderColor='#d4dfd8'"></div>
 <div style="padding:8px 22px;border-bottom:1px solid #d4dfd8;display:flex;gap:5px;flex-wrap:wrap">
 <button class="fcb active" onclick="pickCat(this)">All</button>
 <button class="fcb" onclick="pickCat(this)">Staples</button>
@@ -1117,6 +1255,494 @@ function sendMsg(){
   userMsgs.push({from:'user',text:t,time:now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')});
   inp.value=''; renderMsgs();
 }
+</script>
+
+
+<!-- Add Recipe Modal -->
+<div class="add-recipe-overlay" id="addRecipeOverlay" onclick="closeAddRecipeModal()" role="dialog" aria-modal="true" aria-label="Add new recipe">
+<div class="add-recipe-modal" onclick="event.stopPropagation()">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div style="font-family:'Instrument Serif',serif;font-size:22px;font-style:italic;color:var(--ink)">Add Your Recipe</div>
+    <button onclick="closeAddRecipeModal()" style="width:32px;height:32px;border-radius:8px;border:none;background:var(--paper);cursor:pointer;font-size:16px" aria-label="Close">✕</button>
+  </div>
+  <div class="arm-row">
+    <div class="arm-field"><label for="arm-emoji">Emoji</label><input id="arm-emoji" type="text" placeholder="🍕" maxlength="2"></div>
+    <div class="arm-field" style="grid-column:span 2"><label for="arm-name">Recipe Name</label><input id="arm-name" type="text" placeholder="My Amazing Dish"></div>
+  </div>
+  <div class="arm-row">
+    <div class="arm-field"><label for="arm-kcal">Calories (kcal)</label><input id="arm-kcal" type="number" placeholder="400" min="0"></div>
+    <div class="arm-field"><label for="arm-time">Prep Time</label><input id="arm-time" type="text" placeholder="20 min"></div>
+    <div class="arm-field"><label for="arm-cost">Cost</label><input id="arm-cost" type="text" placeholder="£2.50"></div>
+  </div>
+  <div class="arm-field"><label for="arm-tag">Category</label>
+    <select id="arm-tag"><option value="Healthy">Healthy</option><option value="Quick">Quick</option><option value="Vegan">Vegan</option><option value="Comfort">Comfort</option><option value="High Protein">High Protein</option><option value="Italian">Italian</option></select>
+  </div>
+  <div class="arm-field"><label for="arm-ingredients">Ingredients (one per line)</label><textarea id="arm-ingredients" rows="4" placeholder="200g pasta&#10;1 onion&#10;2 tomatoes"></textarea></div>
+  <div class="arm-field"><label for="arm-steps">Steps (one per line)</label><textarea id="arm-steps" rows="4" placeholder="Boil pasta.&#10;Sauté onion.&#10;Combine and serve."></textarea></div>
+  <div style="display:flex;gap:10px;margin-top:8px">
+    <button onclick="submitCustomRecipe()" style="flex:1;padding:12px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--teal)'" onmouseout="this.style.background='var(--ink)'">Save Recipe →</button>
+    <button onclick="closeAddRecipeModal()" style="padding:12px 20px;background:var(--paper);color:var(--ink-m);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer">Cancel</button>
+  </div>
+</div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Dark Mode
+// ══════════════════════════════════════════════════════════════
+function toggleDarkMode(){
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  try { localStorage.setItem('nw-dark-mode', isDark ? '1' : '0'); } catch(e){}
+  showToast(isDark ? '🌙 Dark mode on' : '☀️ Light mode on');
+}
+(function(){try{if(localStorage.getItem('nw-dark-mode')==='1') document.body.classList.add('dark-mode');}catch(e){}})();
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Recipe Search (actually working)
+// ══════════════════════════════════════════════════════════════
+function filterRecipes(q){
+  const term = q.toLowerCase().trim();
+  document.querySelectorAll('.recipe-card').forEach(card=>{
+    const id = card.dataset.recipeId;
+    const r = RECIPES[id];
+    if(!r){ card.style.display = term ? 'none' : ''; return; }
+    const haystack = (r.name + ' ' + r.tag + ' ' + (r.ingredients||[]).join(' ')).toLowerCase();
+    card.style.display = (!term || haystack.includes(term)) ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Recipe Tag Filter
+// ══════════════════════════════════════════════════════════════
+function filterRecipeTag(btn, tag){
+  document.querySelectorAll('.rf-tag').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+  btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
+  document.querySelectorAll('.recipe-card').forEach(card=>{
+    if(tag==='all'){ card.style.display=''; return; }
+    const id = card.dataset.recipeId;
+    const r = RECIPES[id];
+    if(!r){ card.style.display='none'; return; }
+    if(tag==='my-recipes'){ card.style.display = r.custom ? '' : 'none'; return; }
+    const t = (r.tag||'').toLowerCase();
+    const matches = t.includes(tag.replace('-',' '));
+    card.style.display = matches ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Food Panel Search (actually working)
+// ══════════════════════════════════════════════════════════════
+function filterFoodItems(q){
+  const term = q.toLowerCase().trim();
+  document.querySelectorAll('#foodPanel .frow').forEach(row=>{
+    const name = (row.querySelector('b')?.textContent || '').toLowerCase();
+    row.style.display = (!term || name.includes(term)) ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Food/Exercise Category Filter (actually working)
+// ══════════════════════════════════════════════════════════════
+(function(){
+  // Assign data-cat to food rows
+  const foodCats = {
+    'White Rice':'staples','Steamed Broccoli':'vegetables','Grilled Chicken':'meat & eggs',
+    'Boiled Egg':'meat & eggs','Mixed Salad':'vegetables','Wholemeal Toast':'staples',
+    'Apple':'fruits','Semi-Skimmed Milk':'dairy','Mixed Nuts':'snacks','Grilled Salmon':'meat & eggs'
+  };
+  const exCats = {
+    'Running':'cardio','Swimming':'cardio','Weight Training':'strength','Cycling':'cardio',
+    'Yoga':'flexibility','Walking':'cardio','Football':'sports','Tennis':'sports','HIIT Workout':'cardio'
+  };
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('#foodPanel .frow').forEach(row=>{
+      const name = row.querySelector('b')?.textContent||'';
+      row.dataset.cat = foodCats[name] || 'all';
+    });
+    document.querySelectorAll('#exPanel .frow').forEach(row=>{
+      const name = row.querySelector('b')?.textContent||'';
+      row.dataset.cat = exCats[name] || 'all';
+    });
+  });
+})();
+
+// Override pickCat to actually filter
+var _origPickCat = typeof pickCat === 'function' ? pickCat : null;
+pickCat = function(el){
+  el.parentElement.querySelectorAll('.fcb').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const cat = el.textContent.toLowerCase().trim();
+  const panel = el.closest('#foodPanel') || el.closest('#exPanel');
+  if(!panel) return;
+  panel.querySelectorAll('.frow').forEach(row=>{
+    if(cat==='all'){ row.style.display=''; return; }
+    row.style.display = (row.dataset.cat||'').includes(cat) ? '' : 'none';
+  });
+};
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Add Custom Recipe
+// ══════════════════════════════════════════════════════════════
+function openAddRecipeModal(){ document.getElementById('addRecipeOverlay').classList.add('open'); }
+function closeAddRecipeModal(){ document.getElementById('addRecipeOverlay').classList.remove('open'); }
+function submitCustomRecipe(){
+  const emoji = document.getElementById('arm-emoji').value.trim() || '🍽️';
+  const name = document.getElementById('arm-name').value.trim();
+  const kcal = parseInt(document.getElementById('arm-kcal').value) || 0;
+  const time = document.getElementById('arm-time').value.trim() || '? min';
+  const cost = document.getElementById('arm-cost').value.trim() || '£0';
+  const tag = document.getElementById('arm-tag').value;
+  const ingredients = document.getElementById('arm-ingredients').value.split('\n').filter(Boolean);
+  const steps = document.getElementById('arm-steps').value.split('\n').filter(Boolean);
+  if(!name){ showToast('Please enter a recipe name','#c0392b'); return; }
+  if(!kcal){ showToast('Please enter calories','#c0392b'); return; }
+  const id = 'custom-' + Date.now();
+  const bgColors = ['var(--teal-lll)','var(--amber-ll)','rgba(122,170,212,0.15)','rgba(224,123,120,0.1)'];
+  RECIPES[id] = { id, emoji, name, tag: tag+' · '+time, kcal, cost, rating:'★★★★★', bg: bgColors[Math.floor(Math.random()*bgColors.length)], ingredients, steps, custom:true };
+  // Add card to grid
+  const grid = document.querySelector('.recipe-grid');
+  const card = document.createElement('div');
+  card.className = 'recipe-card';
+  card.dataset.recipeId = id;
+  card.innerHTML = '<div class="rc-img" style="background:'+RECIPES[id].bg+'">'+emoji+'</div><div class="rc-body"><div class="rc-tag">'+RECIPES[id].tag+'</div><div class="rc-title">'+name+'</div><div class="rc-meta">'+kcal+' kcal · '+cost+'</div><div class="rc-footer"><span class="rc-rating">★★★★★</span><span class="rc-fav" onclick="event.stopPropagation();toggleFav(\''+id+'\',this)">🤍</span></div></div>';
+  card.addEventListener('click', function(e){ if(!e.target.classList.contains('rc-fav')) openRecipeDetail(id); });
+  grid.appendChild(card);
+  closeAddRecipeModal();
+  showToast('✓ Recipe "'+name+'" added!','#1e6b5e');
+  // Save to localStorage
+  saveCustomRecipes();
+  // Clear form
+  ['arm-emoji','arm-name','arm-kcal','arm-time','arm-cost','arm-ingredients','arm-steps'].forEach(id=>document.getElementById(id).value='');
+}
+function saveCustomRecipes(){
+  try{
+    const custom = {};
+    Object.entries(RECIPES).forEach(([k,v])=>{ if(v.custom) custom[k]=v; });
+    localStorage.setItem('nw-custom-recipes', JSON.stringify(custom));
+  }catch(e){}
+}
+function loadCustomRecipes(){
+  try{
+    const data = localStorage.getItem('nw-custom-recipes');
+    if(!data) return;
+    const custom = JSON.parse(data);
+    Object.entries(custom).forEach(([k,v])=>{
+      v.custom = true;
+      RECIPES[k] = v;
+      // Render card
+      const grid = document.querySelector('.recipe-grid');
+      if(!grid) return;
+      const card = document.createElement('div');
+      card.className = 'recipe-card';
+      card.dataset.recipeId = k;
+      card.innerHTML = '<div class="rc-img" style="background:'+v.bg+'">'+v.emoji+'</div><div class="rc-body"><div class="rc-tag">'+v.tag+'</div><div class="rc-title">'+v.name+'</div><div class="rc-meta">'+v.kcal+' kcal · '+v.cost+'</div><div class="rc-footer"><span class="rc-rating">'+(v.rating||'★★★★★')+'</span><span class="rc-fav">🤍</span></div></div>';
+      card.addEventListener('click', function(e){ if(!e.target.classList.contains('rc-fav')) openRecipeDetail(k); });
+      const fav = card.querySelector('.rc-fav');
+      if(fav) fav.addEventListener('click', function(e){ e.stopPropagation(); toggleFav(k, fav); });
+      grid.appendChild(card);
+    });
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Interactive Star Rating
+// ══════════════════════════════════════════════════════════════
+var recipeRatings = {};
+(function(){ try{ recipeRatings = JSON.parse(localStorage.getItem('nw-ratings')||'{}'); }catch(e){} })();
+function renderStarRating(recipeId, container){
+  const current = recipeRatings[recipeId] || 0;
+  let html = '<div class="star-rate" data-recipe="'+recipeId+'" role="radiogroup" aria-label="Rate this recipe">';
+  for(let i=1;i<=5;i++){
+    html += '<span class="star '+(i<=current?'filled':'')+'" data-val="'+i+'" onclick="setRating(\''+recipeId+'\','+i+',this)" role="radio" aria-checked="'+(i<=current)+'" aria-label="'+i+' star'+(i>1?'s':'')+'" tabindex="0">★</span>';
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+function setRating(recipeId, val, starEl){
+  recipeRatings[recipeId] = val;
+  try{ localStorage.setItem('nw-ratings', JSON.stringify(recipeRatings)); }catch(e){}
+  const wrap = starEl.closest('.star-rate');
+  wrap.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.toggle('filled', i < val);
+    s.setAttribute('aria-checked', i < val);
+  });
+  // Update recipe card rating text
+  const stars = '★'.repeat(val) + '☆'.repeat(5-val);
+  if(RECIPES[recipeId]) RECIPES[recipeId].rating = stars;
+  const card = document.querySelector('[data-recipe-id="'+recipeId+'"] .rc-rating');
+  if(card) card.textContent = stars;
+  showToast('Rated '+val+' star'+(val>1?'s':''),'#b8621f');
+}
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Recipe Comments
+// ══════════════════════════════════════════════════════════════
+var recipeComments = {};
+(function(){ try{ recipeComments = JSON.parse(localStorage.getItem('nw-comments')||'{}'); }catch(e){} })();
+function renderComments(recipeId){
+  const comments = recipeComments[recipeId] || [];
+  let html = '<div class="comment-section"><div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Comments ('+comments.length+')</div>';
+  comments.forEach(c=>{
+    html += '<div class="comment-item"><div class="comment-author">'+c.author+' · '+c.time+'</div><div class="comment-text">'+c.text+'</div></div>';
+  });
+  html += '<div class="comment-input-wrap"><input type="text" id="comment-input-'+recipeId+'" placeholder="Add a comment..." aria-label="Add comment" onkeydown="if(event.key===\'Enter\')addComment(\''+recipeId+'\')"><button onclick="addComment(\''+recipeId+'\')">Post</button></div></div>';
+  return html;
+}
+function addComment(recipeId){
+  const input = document.getElementById('comment-input-'+recipeId);
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+  if(!recipeComments[recipeId]) recipeComments[recipeId] = [];
+  const now = new Date();
+  recipeComments[recipeId].push({ author:'Rose C.', text, time: now.getHours()+':'+String(now.getMinutes()).padStart(2,'0') });
+  try{ localStorage.setItem('nw-comments', JSON.stringify(recipeComments)); }catch(e){}
+  input.value = '';
+  // Re-render comments section
+  const panel = document.getElementById('recipe-detail-panel');
+  if(panel){
+    const cs = panel.querySelector('.comment-section');
+    if(cs) cs.outerHTML = renderComments(recipeId);
+  }
+  showToast('Comment added','#1e6b5e');
+}
+
+// ── Patch openRecipeDetail to include rating + comments ──
+var _origOpenRecipeDetail = openRecipeDetail;
+openRecipeDetail = function(id){
+  _origOpenRecipeDetail(id);
+  // Wait for panel to render
+  setTimeout(function(){
+    const panel = document.getElementById('recipe-detail-panel');
+    if(!panel) return;
+    // Add star rating
+    const footer = panel.querySelector('[style*="border-top"]');
+    if(footer){
+      const ratingWrap = document.createElement('div');
+      ratingWrap.style.cssText = 'padding:0 22px 6px';
+      footer.parentNode.insertBefore(ratingWrap, footer);
+      renderStarRating(id, ratingWrap);
+    }
+    // Add comments
+    const scrollArea = panel.querySelector('[style*="overflow-y:auto"]');
+    if(scrollArea){
+      const commentsHtml = renderComments(id);
+      scrollArea.insertAdjacentHTML('beforeend', commentsHtml);
+    }
+  }, 50);
+};
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Food Diary History with Date Navigation
+// ══════════════════════════════════════════════════════════════
+var currentDiaryDate = new Date().toISOString().split('T')[0];
+var diaryHistory = {};
+
+function saveDiaryForDate(){
+  diaryHistory[currentDiaryDate] = JSON.parse(JSON.stringify(mealLog));
+  try{ localStorage.setItem('nw-diary-history', JSON.stringify(diaryHistory)); }catch(e){}
+}
+function loadDiaryHistory(){
+  try{
+    const data = localStorage.getItem('nw-diary-history');
+    if(data) diaryHistory = JSON.parse(data);
+  }catch(e){}
+}
+function loadDateDiary(dateStr){
+  // Save current day first
+  saveDiaryForDate();
+  currentDiaryDate = dateStr;
+  if(diaryHistory[dateStr]){
+    Object.keys(mealLog).forEach(k=>{ mealLog[k] = diaryHistory[dateStr][k] || []; });
+  } else {
+    Object.keys(mealLog).forEach(k=>{ mealLog[k] = []; });
+  }
+  renderMealLog(); updateDonut();
+  // Update display date
+  const d = new Date(dateStr+'T12:00:00');
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('today-date').textContent = days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+  document.getElementById('diary-date-picker').value = dateStr;
+}
+function changeDate(delta){
+  const d = new Date(currentDiaryDate+'T12:00:00');
+  d.setDate(d.getDate()+delta);
+  loadDateDiary(d.toISOString().split('T')[0]);
+}
+function goToday(){
+  loadDateDiary(new Date().toISOString().split('T')[0]);
+}
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Calorie Trend Line Chart
+// ══════════════════════════════════════════════════════════════
+var calorieTrendData = [1850, 2100, 1600, 2350, 1920, 2200, 1920];
+function initCalorieTrendChart(){
+  const ctx = document.getElementById('calorieTrendChart');
+  if(!ctx) return;
+  new Chart(ctx.getContext('2d'), {
+    type:'line',
+    data:{
+      labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets:[
+        { label:'Intake', data:calorieTrendData, borderColor:'#1e6b5e', backgroundColor:'rgba(30,107,94,0.1)', fill:true, tension:0.35, pointRadius:4, pointBackgroundColor:'#1e6b5e', borderWidth:2 },
+        { label:'Target', data:Array(7).fill(DAILY_TARGET), borderColor:'#b8621f', borderWidth:1.5, borderDash:[4,3], pointRadius:0, fill:false, tension:0 }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#0a1410', titleColor:'rgba(255,255,255,0.5)', bodyColor:'#fff', titleFont:{family:"'JetBrains Mono',monospace",size:9}, bodyFont:{family:"'JetBrains Mono',monospace",size:11}, padding:10, cornerRadius:6 } },
+      scales:{
+        x:{ grid:{display:false}, border:{display:false}, ticks:{font:{family:"'JetBrains Mono',monospace",size:9},color:'#6b8878'} },
+        y:{ min:0, max:3000, grid:{color:'#dce6e0',lineWidth:0.5}, border:{display:false}, ticks:{font:{family:"'JetBrains Mono',monospace",size:9},color:'#6b8878',stepSize:500} }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Exercise Chart Month/Year Data Switching
+// ══════════════════════════════════════════════════════════════
+var exMonthData = [280,420,0,310,390,500,180,450,320,0,280,410,350,290,0,310,480,0,390,270,510,0,320,440,380,290,0,410,370,0];
+var exYearData = [8500,9200,7800,10100,9600,11200,8900,10500,9800,7200,8800,9500];
+var _origSwitchChartTab = switchChartTab;
+switchChartTab = function(el){
+  el.parentElement.querySelectorAll('.cc-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const mode = el.textContent.trim();
+  if(!exChartInstance) return;
+  if(mode==='Week'){
+    exChartInstance.data.labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    exChartInstance.data.datasets[0].data = [...exChartData];
+    exChartInstance.data.datasets[0].backgroundColor = exChartData.map(v=>v===0?'#dce6e0':v>=EX_TARGET?'#1e6b5e':'#2f8f7f');
+    exChartInstance.data.datasets[1].data = Array(7).fill(EX_TARGET);
+    exChartInstance.options.scales.y.max = 600;
+  } else if(mode==='Month'){
+    exChartInstance.data.labels = Array.from({length:30},(_,i)=>i+1);
+    exChartInstance.data.datasets[0].data = exMonthData;
+    exChartInstance.data.datasets[0].backgroundColor = exMonthData.map(v=>v===0?'#dce6e0':v>=EX_TARGET?'#1e6b5e':'#2f8f7f');
+    exChartInstance.data.datasets[1].data = Array(30).fill(EX_TARGET);
+    exChartInstance.options.scales.y.max = 600;
+  } else {
+    exChartInstance.data.labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    exChartInstance.data.datasets[0].data = exYearData;
+    exChartInstance.data.datasets[0].backgroundColor = exYearData.map(v=>'#1e6b5e');
+    exChartInstance.data.datasets[1].data = Array(12).fill(EX_TARGET*30);
+    exChartInstance.options.scales.y.max = 12000;
+  }
+  exChartInstance.update();
+};
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: localStorage Persistence
+// ══════════════════════════════════════════════════════════════
+function saveState(){
+  saveDiaryForDate();
+  try{
+    localStorage.setItem('nw-favourites', JSON.stringify([...favourites]));
+    localStorage.setItem('nw-compare', JSON.stringify([...compareSelected]));
+    localStorage.setItem('nw-exlog', JSON.stringify(exLog));
+    localStorage.setItem('nw-exdata', JSON.stringify(exChartData));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    const f = localStorage.getItem('nw-favourites');
+    if(f){ favourites = new Set(JSON.parse(f)); }
+    const c = localStorage.getItem('nw-compare');
+    if(c){ compareSelected = new Set(JSON.parse(c)); }
+    const el = localStorage.getItem('nw-exlog');
+    if(el){ const parsed = JSON.parse(el); exLog.length=0; parsed.forEach(e=>exLog.push(e)); }
+    const ed = localStorage.getItem('nw-exdata');
+    if(ed){ const parsed = JSON.parse(ed); parsed.forEach((v,i)=>exChartData[i]=v); }
+  }catch(e){}
+  loadDiaryHistory();
+}
+// Auto-save on changes
+var _origToggleFav = toggleFav;
+toggleFav = function(id, heart){
+  _origToggleFav(id, heart);
+  saveState();
+};
+var _origCommitFoodEntries = commitFoodEntries;
+commitFoodEntries = function(){
+  _origCommitFoodEntries();
+  saveState();
+};
+var _origDeleteMeal = deleteMeal;
+deleteMeal = function(key,idx){
+  _origDeleteMeal(key,idx);
+  saveState();
+};
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Form Validation Enhancement
+// ══════════════════════════════════════════════════════════════
+function validateSettingsField(input, type){
+  let valid = true;
+  const val = input.value.trim();
+  if(type==='email') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  else if(type==='required') valid = val.length > 0;
+  else if(type==='number') valid = !isNaN(val) && parseInt(val) > 0;
+  else if(type==='password') valid = val.length >= 8;
+  input.style.borderColor = valid ? 'var(--border)' : '#c0392b';
+  return valid;
+}
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Keyboard Navigation
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){
+    // Close any open overlay/panel
+    closeFoodPanel();
+    closeExPanel();
+    closeRecipeDetail();
+    closeAddRecipeModal();
+    closeCompareSelect();
+    closeUserMessages();
+    closeSettings();
+    closeAvatarMenu();
+  }
+});
+// Let Enter work on mail icon
+document.addEventListener('DOMContentLoaded', function(){
+  var mailIcon = document.getElementById('userMailIcon');
+  if(mailIcon) mailIcon.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openUserMessages(); } });
+});
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE: Print / Export
+// ══════════════════════════════════════════════════════════════
+// Print is handled by CSS @media print - no JS needed
+
+// ══════════════════════════════════════════════════════════════
+// INIT: Wire everything up on DOMContentLoaded
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function(){
+  loadState();
+  loadCustomRecipes();
+  initCalorieTrendChart();
+  // Set date picker to today
+  var picker = document.getElementById('diary-date-picker');
+  if(picker) picker.value = new Date().toISOString().split('T')[0];
+  // Update recipe hearts from loaded favourites
+  document.querySelectorAll('.recipe-card').forEach(card=>{
+    const id = card.dataset.recipeId;
+    const heart = card.querySelector('.rc-fav');
+    if(heart && id) heart.textContent = favourites.has(id) ? '❤️' : '🤍';
+  });
+  // Re-render compare if loaded from storage
+  if(typeof renderComparePage === 'function') renderComparePage();
+  if(typeof renderExerciseLog === 'function') renderExerciseLog();
+  if(typeof updateExerciseChart === 'function') updateExerciseChart();
+});
+
+// Save state before leaving
+window.addEventListener('beforeunload', saveState);
 </script>
 
 </body></html>

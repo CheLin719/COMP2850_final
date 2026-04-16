@@ -59,11 +59,33 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 .qa-help-sub{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px}
 .qa-help-btn{display:inline-flex;align-items:center;gap:6px;padding:11px 24px;background:var(--pro);color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .2s}
 .qa-help-btn:hover{background:var(--pro-l)}
+
+/* ── DARK MODE ── */
+body.dark-mode { --paper:#0d1a14; --white:#142420; --ink:#e8f0ec; --ink-m:#a8bfb0; --ink-f:#7a9488; --border:#2a3e34; --fog:#1e3028; }
+body.dark-mode .top-nav { background:#060e0a; }
+body.dark-mode .qa-item { background:#142420; border-color:#2a3e34; }
+body.dark-mode .qa-item.open { border-color:var(--teal-ll); }
+body.dark-mode .qa-answer { border-color:#1e3028; color:#a8bfb0; }
+body.dark-mode .qa-search { background:#142420; border-color:#2a3e34; }
+body.dark-mode .qa-search-input { color:#e8f0ec; }
+body.dark-mode .qa-cat { background:#142420; border-color:#2a3e34; color:#7a9488; }
+body.dark-mode .qa-help { background:#060e0a; }
+
+/* ── RESPONSIVE ── */
+@media (max-width:768px) { .main { padding:40px 16px 64px; } .top-nav { padding:0 16px; } .qa-title { font-size:32px; } }
+@media (max-width:480px) { .qa-cats { gap:6px; } .qa-cat { font-size:9px; padding:5px 10px; } .qa-question { padding:14px 16px; } .qa-answer { padding:0 16px 14px; } }
+
+/* ── ACCESSIBILITY ── */
+*:focus-visible { outline:2px solid var(--teal); outline-offset:2px; border-radius:4px; }
+
+/* ── PRINT ── */
+@media print { .top-nav { display:none; } .main { margin-top:0; } .qa-answer { display:block !important; } .qa-toggle { display:none; } .qa-help { display:none; } }
+
 </style>
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" role="navigation" aria-label="Navigation">
   <div class="tn-left">
     <a href="pro_dashboard.html" class="tn-logo">
       <div class="tn-logo-mark">🌿</div>
@@ -74,7 +96,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
   <a href="pro_dashboard.html" class="back-btn">← Back to Dashboard</a>
 </nav>
 
-<div class="main">
+<div class="main" role="main">
 
   <div class="qa-hero">
     <div class="qa-eyebrow">Professional Help Centre</div>
@@ -84,7 +106,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 
   <div class="qa-search">
     <span class="qa-search-icon">🔍</span>
-    <input class="qa-search-input" type="text" placeholder="Search questions..." oninput="filterQA(this.value)">
+    <input class="qa-search-input" aria-label="Search questions" type="text" placeholder="Search questions..." oninput="filterQA(this.value)">
   </div>
 
   <div class="qa-cats">
@@ -100,7 +122,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
   <div class="qa-section" data-cat="clients">
     <div class="qa-section-title">Client Management</div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I view a client's dashboard?</span>
         <span class="qa-toggle">+</span>
@@ -110,7 +132,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I search for a specific client?</span>
         <span class="qa-toggle">+</span>
@@ -120,7 +142,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I update a client's status?</span>
         <span class="qa-toggle">+</span>
@@ -130,7 +152,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">What does the overall health score mean?</span>
         <span class="qa-toggle">+</span>
@@ -152,7 +174,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
   <div class="qa-section" data-cat="analytics">
     <div class="qa-section-title">Analytics</div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">What does the calorie trend chart show?</span>
         <span class="qa-toggle">+</span>
@@ -162,7 +184,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How is BMI calculated?</span>
         <span class="qa-toggle">+</span>
@@ -179,7 +201,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">What do the macro bars show?</span>
         <span class="qa-toggle">+</span>
@@ -194,7 +216,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
   <div class="qa-section" data-cat="messaging">
     <div class="qa-section-title">Messaging</div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I send a message to a client?</span>
         <span class="qa-toggle">+</span>
@@ -204,7 +226,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I know if a client has sent me a message?</span>
         <span class="qa-toggle">+</span>
@@ -214,7 +236,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">What are the quick-tag buttons?</span>
         <span class="qa-toggle">+</span>
@@ -236,7 +258,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
   <div class="qa-section" data-cat="plans">
     <div class="qa-section-title">Plans & Appointments</div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I edit a client's meal plan?</span>
         <span class="qa-toggle">+</span>
@@ -246,7 +268,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I edit a client's training schedule?</span>
         <span class="qa-toggle">+</span>
@@ -256,7 +278,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I book a new appointment?</span>
         <span class="qa-toggle">+</span>
@@ -266,7 +288,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I confirm or cancel an appointment?</span>
         <span class="qa-toggle">+</span>
@@ -276,7 +298,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I add pro notes for a client?</span>
         <span class="qa-toggle">+</span>
@@ -291,7 +313,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
   <div class="qa-section" data-cat="account">
     <div class="qa-section-title">Account & Settings</div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I update my professional profile?</span>
         <span class="qa-toggle">+</span>
@@ -301,7 +323,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I set client alert thresholds?</span>
         <span class="qa-toggle">+</span>
@@ -315,7 +337,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I switch to my personal user view?</span>
         <span class="qa-toggle">+</span>
@@ -325,7 +347,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
       </div>
     </div>
 
-    <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleQA(this)">
       <div class="qa-question">
         <span class="qa-q-text">How do I log out?</span>
         <span class="qa-toggle">+</span>
@@ -346,6 +368,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 
 <script>
 function toggleQA(item) {
+  item.setAttribute("aria-expanded", !item.classList.contains("open"));
   const answer = item.querySelector('.qa-answer');
   const isOpen = item.classList.contains('open');
   document.querySelectorAll('.qa-item.open').forEach(i => {
@@ -375,6 +398,10 @@ function filterQA(q) {
   });
   if (term) document.querySelectorAll('.qa-section').forEach(s => s.style.display = 'block');
 }
+</script>
+
+<script>
+(function(){try{if(localStorage.getItem('nw-dark-mode')==='1')document.body.classList.add('dark-mode');}catch(e){}})();
 </script>
 </body>
 </html>
