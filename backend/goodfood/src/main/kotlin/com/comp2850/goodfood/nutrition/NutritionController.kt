@@ -14,6 +14,25 @@ class NutritionController(
     private val nutritionService: NutritionService
 ) {
 
+    @GetMapping("/guides")
+    fun getAllNutritionGuides(): List<NutritionGuide> {
+        return nutritionService.getAllNutritionGuides()
+    }
+
+    @GetMapping("/foods")
+    fun getAllFoodNutrition(
+        @RequestParam(required = false) name: String?
+    ): List<FoodNutrition> {
+        return nutritionService.getAllFoodNutrition(name)
+    }
+
+    @GetMapping("/foods/suggestions")
+    fun getFoodSuggestions(
+        @RequestParam(required = false) name: String?
+    ): List<String> {
+        return nutritionService.getFoodSuggestions(name)
+    }
+
     @GetMapping("/summary")
     fun getMyNutritionSummary(
         authentication: Authentication,
@@ -36,7 +55,22 @@ class NutritionController(
     fun getMyNutritionTrends(
         authentication: Authentication,
         @RequestParam(required = false, defaultValue = "7") days: Int
-    ): List<DailyNutritionTrend> {
+    ): NutritionTrendsResponse {
         return nutritionService.getMyNutritionTrends(authentication, days)
+    }
+
+    @GetMapping("/status")
+    fun getDailyNutritionStatus(
+        authentication: Authentication,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        date: LocalDate?
+    ): DailyNutritionStatusResponse {
+        return nutritionService.getDailyNutritionStatus(authentication, date)
+    }
+
+    @GetMapping("/status/today")
+    fun getTodayNutritionStatus(authentication: Authentication): DailyNutritionStatusResponse {
+        return nutritionService.getDailyNutritionStatus(authentication, LocalDate.now())
     }
 }

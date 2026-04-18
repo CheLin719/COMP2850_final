@@ -24,7 +24,7 @@ class DiaryController(
     fun createDiary(
         @Valid @RequestBody request: CreateDiaryRequest,
         authentication: Authentication
-    ): DiaryEntry {
+    ): DiarySaveResponse {
         return diaryService.createDiary(request, authentication)
     }
 
@@ -43,7 +43,7 @@ class DiaryController(
         @PathVariable id: Long,
         @Valid @RequestBody request: UpdateDiaryRequest,
         authentication: Authentication
-    ): DiaryEntry {
+    ): DiarySaveResponse {
         return diaryService.updateMyDiaryEntry(id, request, authentication)
     }
 

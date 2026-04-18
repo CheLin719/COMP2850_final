@@ -17,4 +17,21 @@ class InMemoryFoodNutritionRepository {
     fun findByFoodName(foodName: String): FoodNutrition? {
         return foods.find { it.foodName.equals(foodName, ignoreCase = true) }
     }
+
+    fun findAll(): List<FoodNutrition> {
+        return foods.sortedBy { it.foodName }
+    }
+
+    fun searchByFoodName(name: String): List<FoodNutrition> {
+        return foods
+            .filter { it.foodName.contains(name, ignoreCase = true) }
+            .sortedBy { it.foodName }
+    }
+
+    fun suggestFoodNames(name: String): List<String> {
+        return foods
+            .map { it.foodName }
+            .filter { it.contains(name, ignoreCase = true) }
+            .sorted()
+    }
 }
