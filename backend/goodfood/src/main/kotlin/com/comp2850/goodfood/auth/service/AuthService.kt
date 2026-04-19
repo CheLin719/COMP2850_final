@@ -2,25 +2,40 @@ package com.comp2850.goodfood.auth.service
 
 import com.comp2850.goodfood.auth.dto.LoginRequest
 import com.comp2850.goodfood.auth.dto.RegisterRequest
+import com.comp2850.goodfood.auth.jwt.JwtService
+import com.comp2850.goodfood.auth.validation.PasswordValidator
 import com.comp2850.goodfood.user.Role
 import com.comp2850.goodfood.user.User
-import com.comp2850.goodfood.user.repository.InMemoryUserRepository
+import com.comp2850.goodfood.user.repository.UserStore
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.util.UUID
-import com.comp2850.goodfood.auth.jwt.JwtService
 
 @Service
 class AuthService(
-    private val userRepository: InMemoryUserRepository,
+    private val userRepository: UserStore,
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService
-){
+) {
 
-    fun register(request: RegisterRequest): Map<String, Any> {
+    fun register(request: RegisterRequest): Map<String, Any?> {
         val role = parseRole(request.role)
+
+        if (role == Role.HEALTH_PROFESSIONAL && request.licence.isNullOrBlank()) {
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "health professional must provide a licence number"
+            )
+        }
+
+        if (!PasswordValidator.isValid(request.password)) {
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "password does not meet requirements"
+            )
+        }
 
         val existingUser = userRepository.findByEmail(request.email)
         if (existingUser != null) {
@@ -28,34 +43,37 @@ class AuthService(
         }
 
         val encodedPassword = passwordEncoder.encode(request.password)
-            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "password encoding failed")
+            ?: throw ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "failed to encode password"
+            )
 
         val user = User(
             id = UUID.randomUUID().toString(),
             name = request.name,
             email = request.email,
-            password = encodedPassword,
-            role = role
+            passwordHash = encodedPassword,
+            role = role,
+            licence = request.licence
         )
 
-        userRepository.save(user)
+        val savedUser = userRepository.save(user)
 
         return mapOf(
-            "message" to "register success",
-            "user" to mapOf(
-                "id" to user.id,
-                "name" to user.name,
-                "email" to user.email,
-                "role" to user.role.name
-            )
+            "id" to savedUser.id,
+            "name" to savedUser.name,
+            "email" to savedUser.email,
+            "role" to savedUser.role.name,
+            "licence" to savedUser.licence
         )
     }
 
-    fun login(request: LoginRequest): Map<String, Any> {
+    fun login(request: LoginRequest): Map<String, Any?> {
         val user = userRepository.findByEmail(request.email)
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid email or password")
 
-        if (!passwordEncoder.matches(request.password, user.password)) {
+        val matches = passwordEncoder.matches(request.password, user.passwordHash)
+        if (!matches) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid email or password")
         }
 
@@ -68,20 +86,35 @@ class AuthService(
                 "id" to user.id,
                 "name" to user.name,
                 "email" to user.email,
-                "role" to user.role.name
+                "role" to user.role.name,
+                "licence" to user.licence
             )
         )
     }
 
-    fun getAllUsers(): List<Map<String, Any>> {
-        return userRepository.findAll().map { user ->
+    fun getAllUsers(): List<Map<String, Any?>> {
+        return userRepository.findAll().map {
             mapOf(
-                "id" to user.id,
-                "name" to user.name,
-                "email" to user.email,
-                "role" to user.role.name
+                "id" to it.id,
+                "name" to it.name,
+                "email" to it.email,
+                "role" to it.role.name,
+                "licence" to it.licence
             )
         }
+    }
+
+    fun getCurrentUser(email: String): Map<String, Any?> {
+        val user = userRepository.findByEmail(email)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "user not found")
+
+        return mapOf(
+            "id" to user.id,
+            "name" to user.name,
+            "email" to user.email,
+            "role" to user.role.name,
+            "licence" to user.licence
+        )
     }
 
     private fun parseRole(role: String): Role {
@@ -91,16 +124,4 @@ class AuthService(
             else -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid role")
         }
     }
-
-    fun getCurrentUser(email: String): Map<String, Any> {
-        val user = userRepository.findByEmail(email)
-        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "user not found")
-
-        return mapOf(
-        "id" to user.id,
-        "name" to user.name,
-        "email" to user.email,
-        "role" to user.role.name
-        )
-    }   
 }

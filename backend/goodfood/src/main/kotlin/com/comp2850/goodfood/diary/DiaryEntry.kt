@@ -7,6 +7,7 @@ data class DiaryEntry(
     val userEmail: String,
     val foodName: String,
     val quantity: String,
+    val servings: Double,
     val mealType: MealType,
     val diaryDate: LocalDate
 )

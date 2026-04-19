@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 data class DailyNutritionTrend(
     val date: LocalDate,
-    val totalCalories: Int,
+    val totalCalories: Double,
     val totalProtein: Double,
     val totalSugar: Double
 )

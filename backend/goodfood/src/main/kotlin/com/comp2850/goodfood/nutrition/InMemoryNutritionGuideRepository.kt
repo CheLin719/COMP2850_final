@@ -2,7 +2,6 @@ package com.comp2850.goodfood.nutrition
 
 import org.springframework.stereotype.Repository
 
-@Repository
 class InMemoryNutritionGuideRepository {
 
     private val guides = listOf(

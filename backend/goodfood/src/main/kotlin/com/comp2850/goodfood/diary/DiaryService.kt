@@ -1,6 +1,6 @@
 package com.comp2850.goodfood.diary
 
-import com.comp2850.goodfood.nutrition.InMemoryFoodNutritionRepository
+import com.comp2850.goodfood.nutrition.FoodNutritionStore
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
@@ -9,18 +9,19 @@ import java.time.LocalDate
 
 @Service
 class DiaryService(
-    private val diaryRepository: InMemoryDiaryRepository,
-    private val foodNutritionRepository: InMemoryFoodNutritionRepository
+    private val diaryRepository: DiaryStore,
+    private val foodNutritionRepository: FoodNutritionStore
 ) {
 
     fun createDiary(request: CreateDiaryRequest, authentication: Authentication): DiarySaveResponse {
         val userEmail = authentication.name
 
         val entry = DiaryEntry(
-            id = diaryRepository.nextId(),
+            id = 0L,
             userEmail = userEmail,
             foodName = request.foodName,
             quantity = request.quantity,
+            servings = request.servings!!,
             mealType = request.mealType!!,
             diaryDate = request.diaryDate!!
         )
@@ -72,6 +73,7 @@ class DiaryService(
         val updatedEntry = existingEntry.copy(
             foodName = request.foodName,
             quantity = request.quantity,
+            servings = request.servings!!,
             mealType = request.mealType!!,
             diaryDate = request.diaryDate!!
         )

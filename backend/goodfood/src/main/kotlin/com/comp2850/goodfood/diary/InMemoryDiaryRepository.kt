@@ -4,7 +4,6 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicLong
 
-@Repository
 class InMemoryDiaryRepository {
 
     private val entries = mutableListOf<DiaryEntry>()

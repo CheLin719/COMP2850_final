@@ -1,6 +1,6 @@
 package com.comp2850.goodfood.nutrition
 
-import com.comp2850.goodfood.diary.InMemoryDiaryRepository
+import com.comp2850.goodfood.diary.DiaryStore
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
@@ -10,9 +10,9 @@ import kotlin.math.round
 
 @Service
 class NutritionService(
-    private val diaryRepository: InMemoryDiaryRepository,
-    private val foodNutritionRepository: InMemoryFoodNutritionRepository,
-    private val nutritionGuideRepository: InMemoryNutritionGuideRepository
+    private val diaryRepository: DiaryStore,
+    private val foodNutritionRepository: FoodNutritionStore,
+    private val nutritionGuideRepository: NutritionGuideStore
 ) {
 
     fun getAllNutritionGuides(): List<NutritionGuide> {
@@ -27,6 +27,13 @@ class NutritionService(
         }
     }
 
+    fun getFoodSuggestions(name: String?): List<String> {
+        if (name.isNullOrBlank()) {
+            return emptyList()
+        }
+        return foodNutritionRepository.suggestFoodNames(name.trim())
+    }
+
     fun getMyNutritionSummary(authentication: Authentication, date: LocalDate?): NutritionSummary {
         val userEmail = authentication.name
 
@@ -36,7 +43,7 @@ class NutritionService(
             diaryRepository.findByUserEmailAndDate(userEmail, date)
         }
 
-        var totalCalories = 0
+        var totalCalories = 0.0
         var totalProtein = 0.0
         var totalSugar = 0.0
         var matchedEntries = 0
@@ -46,9 +53,9 @@ class NutritionService(
             val nutrition = foodNutritionRepository.findByFoodName(entry.foodName)
 
             if (nutrition != null) {
-                totalCalories += nutrition.calories
-                totalProtein += nutrition.protein
-                totalSugar += nutrition.sugar
+                totalCalories += nutrition.calories * entry.servings
+                totalProtein += nutrition.protein * entry.servings
+                totalSugar += nutrition.sugar * entry.servings
                 matchedEntries++
             } else {
                 unmatchedFoods.add(entry.foodName)
@@ -56,9 +63,9 @@ class NutritionService(
         }
 
         return NutritionSummary(
-            totalCalories = totalCalories,
-            totalProtein = totalProtein,
-            totalSugar = totalSugar,
+            totalCalories = round2(totalCalories),
+            totalProtein = round2(totalProtein),
+            totalSugar = round2(totalSugar),
             matchedEntries = matchedEntries,
             unmatchedFoods = unmatchedFoods.distinct()
         )
@@ -94,7 +101,7 @@ class NutritionService(
         val groupedByDate = filteredEntries.groupBy { it.diaryDate }.toSortedMap()
         val analysedDays = groupedByDate.size
 
-        var totalCalories = 0
+        var totalCalories = 0.0
         var totalProtein = 0.0
         var totalSugar = 0.0
         val unmatchedFoods = mutableListOf<String>()
@@ -104,16 +111,16 @@ class NutritionService(
                 val nutrition = foodNutritionRepository.findByFoodName(entry.foodName)
 
                 if (nutrition != null) {
-                    totalCalories += nutrition.calories
-                    totalProtein += nutrition.protein
-                    totalSugar += nutrition.sugar
+                    totalCalories += nutrition.calories * entry.servings
+                    totalProtein += nutrition.protein * entry.servings
+                    totalSugar += nutrition.sugar * entry.servings
                 } else {
                     unmatchedFoods.add(entry.foodName)
                 }
             }
         }
 
-        val avgCalories = if (analysedDays > 0) round2(totalCalories.toDouble() / analysedDays) else 0.0
+        val avgCalories = if (analysedDays > 0) round2(totalCalories / analysedDays) else 0.0
         val avgProtein = if (analysedDays > 0) round2(totalProtein / analysedDays) else 0.0
         val avgSugar = if (analysedDays > 0) round2(totalSugar / analysedDays) else 0.0
 
@@ -191,24 +198,24 @@ class NutritionService(
 
         val trends = groupedByDate
             .map { (date, entriesForDate) ->
-                var totalCalories = 0
+                var totalCalories = 0.0
                 var totalProtein = 0.0
                 var totalSugar = 0.0
 
                 for (entry in entriesForDate) {
                     val nutrition = foodNutritionRepository.findByFoodName(entry.foodName)
                     if (nutrition != null) {
-                        totalCalories += nutrition.calories
-                        totalProtein += nutrition.protein
-                        totalSugar += nutrition.sugar
+                        totalCalories += nutrition.calories * entry.servings
+                        totalProtein += nutrition.protein * entry.servings
+                        totalSugar += nutrition.sugar * entry.servings
                     }
                 }
 
                 DailyNutritionTrend(
                     date = date,
-                    totalCalories = totalCalories,
-                    totalProtein = totalProtein,
-                    totalSugar = totalSugar
+                    totalCalories = round2(totalCalories),
+                    totalProtein = round2(totalProtein),
+                    totalSugar = round2(totalSugar)
                 )
             }
             .sortedBy { it.date }
@@ -279,7 +286,7 @@ class NutritionService(
             items = listOf(
                 buildStatusItem(
                     nutrient = caloriesGuide.nutrient,
-                    currentValue = summary.totalCalories.toDouble(),
+                    currentValue = summary.totalCalories,
                     targetValue = caloriesGuide.dailyTarget,
                     unit = caloriesGuide.unit,
                     higherIsWorse = true,
@@ -377,12 +384,5 @@ class NutritionService(
 
     private fun round2(value: Double): Double {
         return round(value * 100) / 100
-    }
-
-    fun getFoodSuggestions(name: String?): List<String> {
-        if (name.isNullOrBlank()) {
-            return emptyList()
-        }
-        return foodNutritionRepository.suggestFoodNames(name.trim())
     }
 }
