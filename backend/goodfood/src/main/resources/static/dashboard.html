@@ -561,7 +561,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
     </div>
   </div>
 </div>
-<div class="recipe-search"><span style="font-size:16px;color:var(--ink-f)" aria-hidden="true">🔍</span><label for="recipe-search-input" class="sr-only">Search recipes by name or ingredient</label><input id="recipe-search-input" class="rs-input" type="text" placeholder="Search by name or ingredient (e.g. salmon, lentils)" aria-label="Search recipes by name or ingredient" oninput="filterRecipes(this.value)" autocomplete="off"></div>
+<div class="recipe-search"><span style="font-size:16px;color:var(--ink-f)" aria-hidden="true">🔍</span><label for="recipe-search-input" class="sr-only">Search recipes by name or ingredient</label><input id="recipe-search-input" class="rs-input" type="search" placeholder="Search by name or ingredient (e.g. salmon, lentils)" aria-label="Search recipes by name or ingredient" oninput="filterRecipes(this.value)" autocomplete="off" name="recipe-search-nofill"></div>
 <a href="#" class="fav-link" onclick="switchPage('favourites',document.querySelectorAll('.sn-item')[2]);return false">❤️ My Favourites</a>
 <button onclick="openAddRecipeModal()" class="fav-link" style="background:var(--teal);color:#fff;border-color:var(--teal)" aria-label="Add new recipe">+ Add Recipe</button>
 </div>
