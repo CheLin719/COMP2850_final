@@ -17,47 +17,103 @@
   }
 })();
 
-// ── 注入密码要求提示到注册表单 ─────────────────────────────────
+// ── 注入密码要求清单到注册表单 ─────────────────────────────────
 (function () {
   const pwField = document.getElementById('reg-password');
   if (!pwField) return;
 
-  const hint = document.createElement('div');
-  hint.id = 'pw-requirements';
-  hint.setAttribute('aria-live', 'polite');
-  hint.innerHTML =
-    '<ul style="list-style:none;padding:0;margin:6px 0 0 0;display:flex;flex-wrap:wrap;gap:4px 12px">' +
-      '<li id="pw-req-len" style="font-size:11px;color:var(--ink-f,#6b6b6b)">✕ 8+ characters</li>' +
-      '<li id="pw-req-upper" style="font-size:11px;color:var(--ink-f,#6b6b6b)">✕ Uppercase</li>' +
-      '<li id="pw-req-lower" style="font-size:11px;color:var(--ink-f,#6b6b6b)">✕ Lowercase</li>' +
-      '<li id="pw-req-digit" style="font-size:11px;color:var(--ink-f,#6b6b6b)">✕ Number</li>' +
-      '<li id="pw-req-special" style="font-size:11px;color:var(--ink-f,#6b6b6b)">✕ Special char</li>' +
-    '</ul>';
+  // Inject styles
+  const style = document.createElement('style');
+  style.textContent = `
+    #pw-requirements {
+      margin-top: 10px; padding: 12px 14px; border-radius: 10px;
+      background: var(--teal-lll, #e8f4f2);
+      border: 1px solid var(--teal-ll, #b8ddd8);
+      transition: border-color 0.3s;
+    }
+    #pw-requirements.shake {
+      animation: reqShake 0.4s ease;
+      border-color: var(--amber, #b8621f) !important;
+    }
+    @keyframes reqShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+    .pw-req-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.08em; font-weight: 600;
+      color: var(--teal, #1e6b5e);
+      margin-bottom: 8px;
+    }
+    .pw-req-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 3px 0;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 12.5px; color: var(--ink-f, #6b6b6b);
+      line-height: 1.4;
+      transition: color 0.2s;
+    }
+    .pw-req-icon {
+      flex-shrink: 0; width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; font-size: 11px; font-weight: 700;
+      background: var(--fog, #ddd); color: var(--ink-f, #999);
+      transition: background 0.25s, color 0.25s;
+    }
+    .pw-req-row.met .pw-req-icon {
+      background: var(--teal, #1e6b5e); color: white;
+    }
+    .pw-req-row.met .pw-req-text { color: var(--teal, #1e6b5e); }
+    .pw-req-eg {
+      color: var(--ink-f, #999); font-size: 11px; font-style: italic;
+    }
+    .pw-req-row.met .pw-req-eg { color: var(--teal-l, #2f8f7f); }
+  `;
+  document.head.appendChild(style);
 
-  // Insert after the strength bars (or after the password wrapper)
-  const strengthBars = pwField.closest('.field').querySelector('.strength-bars');
-  if (strengthBars) {
-    strengthBars.insertAdjacentElement('afterend', hint);
-  } else {
-    pwField.closest('.pw-wrap').insertAdjacentElement('afterend', hint);
+  // Build the checklist
+  const box = document.createElement('div');
+  box.id = 'pw-requirements';
+  box.setAttribute('aria-live', 'polite');
+  box.innerHTML =
+    '<div class="pw-req-title">Password requirements</div>' +
+    buildRow('pw-req-len',     'At least <strong>8 characters</strong> long', 'e.g. mypassword') +
+    buildRow('pw-req-upper',   'One <strong>uppercase</strong> letter',       'e.g. A, B, Z') +
+    buildRow('pw-req-lower',   'One <strong>lowercase</strong> letter',       'e.g. a, b, z') +
+    buildRow('pw-req-digit',   'One <strong>number</strong>',                 'e.g. 0, 5, 9') +
+    buildRow('pw-req-special', 'One <strong>special character</strong>',      'e.g. ! @ # $ &');
+
+  function buildRow(id, text, example) {
+    return '<div id="' + id + '" class="pw-req-row">' +
+      '<span class="pw-req-icon">✕</span>' +
+      '<span class="pw-req-text">' + text + ' <span class="pw-req-eg">(' + example + ')</span></span>' +
+    '</div>';
   }
 
-  // Live-update requirement checks as user types
+  // Insert after strength-label, or strength-bars, or pw-wrap
+  const anchor =
+    pwField.closest('.field').querySelector('#strength-label') ||
+    pwField.closest('.field').querySelector('.strength-bars') ||
+    pwField.closest('.pw-wrap');
+  anchor.insertAdjacentElement('afterend', box);
+
+  // Live-update as user types
   pwField.addEventListener('input', function () {
-    const val = this.value;
-    updateReq('pw-req-len',     val.length >= 8);
-    updateReq('pw-req-upper',   /[A-Z]/.test(val));
-    updateReq('pw-req-lower',   /[a-z]/.test(val));
-    updateReq('pw-req-digit',   /[0-9]/.test(val));
-    updateReq('pw-req-special', /[^A-Za-z0-9]/.test(val));
+    const v = this.value;
+    tick('pw-req-len',     v.length >= 8);
+    tick('pw-req-upper',   /[A-Z]/.test(v));
+    tick('pw-req-lower',   /[a-z]/.test(v));
+    tick('pw-req-digit',   /[0-9]/.test(v));
+    tick('pw-req-special', /[^A-Za-z0-9]/.test(v));
   });
 
-  function updateReq(id, met) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const label = el.textContent.replace(/^[✓✕]\s*/, '');
-    el.textContent = (met ? '✓ ' : '✕ ') + label;
-    el.style.color = met ? 'var(--teal, #1e6b5e)' : 'var(--ink-f, #6b6b6b)';
+  function tick(id, met) {
+    const row = document.getElementById(id);
+    if (!row) return;
+    row.classList.toggle('met', met);
+    row.querySelector('.pw-req-icon').textContent = met ? '✓' : '✕';
   }
 })();
 
@@ -76,7 +132,6 @@ window.handleLogin = async function () {
   const pw    = document.getElementById('login-password').value;
   let ok = true;
 
-  // 前端验证（与原来一致）
   const eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   showErr('login-email-err', !eOk); setErr('login-email', !eOk); if (!eOk) ok = false;
   showErr('login-pw-err', pw.length < 1); setErr('login-password', pw.length < 1); if (pw.length < 1) ok = false;
@@ -87,23 +142,17 @@ window.handleLogin = async function () {
 
   try {
     const data = await NW.login(email, pw);
-
-    // 根据 role 决定跳转目标
     const dest = data.role === 'professional' ? 'pro_dashboard.html' : 'dashboard.html';
     window._redirectTo = dest;
 
-    // 显示成功覆盖层（原来的动画）
     document.getElementById('login-form-wrap').style.display = 'none';
     document.getElementById('login-success').classList.add('show');
-
-    // 1.2s 后跳转
     setTimeout(() => { window.location.href = dest; }, 1200);
 
   } catch (err) {
     btn.textContent = 'Sign in →'; btn.classList.remove('loading'); btn.disabled = false;
 
     if (err.status === 401) {
-      // 密码错误
       showErr('login-pw-err', true);
       setErr('login-password', true);
       document.getElementById('login-pw-err').textContent = 'Incorrect email or password.';
@@ -112,7 +161,6 @@ window.handleLogin = async function () {
       setErr('login-email', true);
       document.getElementById('login-email-err').textContent = 'No account found with this email.';
     } else {
-      // 通用错误：显示在密码字段下
       showErr('login-pw-err', true);
       document.getElementById('login-pw-err').textContent = 'Server error — please try again.';
     }
@@ -128,7 +176,6 @@ window.handleRegister = async function () {
   const lic   = document.getElementById('reg-licence').value.trim();
   let ok = true;
 
-  // 前端验证（与原来一致）
   showErr('reg-first-err', !first); setErr('reg-first', !first); if (!first) ok = false;
   showErr('reg-last-err',  !last);  setErr('reg-last',  !last);  if (!last)  ok = false;
   const eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -144,7 +191,15 @@ window.handleRegister = async function () {
     showErr('reg-pw-err', true);
     setErr('reg-password', true);
     document.getElementById('reg-pw-err').textContent =
-      'Password needs 8+ chars, uppercase, lowercase, number, and special character.';
+      'Please meet all password requirements below.';
+    // Shake the requirements box to draw attention
+    const reqBox = document.getElementById('pw-requirements');
+    if (reqBox) {
+      reqBox.classList.remove('shake');
+      void reqBox.offsetWidth; // force reflow to restart animation
+      reqBox.classList.add('shake');
+      setTimeout(() => reqBox.classList.remove('shake'), 500);
+    }
     ok = false;
   } else {
     showErr('reg-pw-err', false);
@@ -159,13 +214,11 @@ window.handleRegister = async function () {
 
   try {
     await NW.register(first, last, email, pw, currentRole, lic || undefined);
-
     const dest = currentRole === 'professional' ? 'pro_dashboard.html' : 'dashboard.html';
     window._redirectTo = dest;
 
     document.getElementById('register-form-wrap').style.display = 'none';
     document.getElementById('register-success').classList.add('show');
-
     setTimeout(() => { window.location.href = dest; }, 1200);
 
   } catch (err) {
@@ -177,7 +230,6 @@ window.handleRegister = async function () {
       setErr('reg-email', true);
       document.getElementById('reg-email-err').textContent = 'This email is already registered.';
     } else if (err.status === 400) {
-      // 后端验证失败（含密码不符合要求）
       const msg = err.data?.message || 'Invalid input — please check your details.';
       showErr('reg-pw-err', true);
       document.getElementById('reg-pw-err').textContent = msg;
