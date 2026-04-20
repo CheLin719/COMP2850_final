@@ -28,6 +28,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("tools.jackson.module:jackson-module-kotlin")
+	implementation("org.springframework.boot:spring-boot-h2console")
 
 	runtimeOnly("org.postgresql:postgresql")
 	runtimeOnly("com.h2database:h2")

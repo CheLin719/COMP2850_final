@@ -30,5 +30,8 @@ class UserEntity(
     var role: Role = Role.SUBSCRIBER,
 
     @Column(nullable = true)
-    var licence: String? = null
+    var licence: String? = null,
+
+    @Column(nullable = true)
+    var proId: String? = null
 )

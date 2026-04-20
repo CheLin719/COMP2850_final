@@ -54,7 +54,8 @@ class AuthService(
             email = request.email,
             passwordHash = encodedPassword,
             role = role,
-            licence = request.licence
+            licence = request.licence,
+            proId = request.proId
         )
 
         val savedUser = userRepository.save(user)

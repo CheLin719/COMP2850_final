@@ -6,5 +6,6 @@ data class User(
     val email: String,
     val passwordHash: String,
     val role: Role,
-    val licence: String? = null
+    val licence: String? = null,
+    val proId: String? = null
 )

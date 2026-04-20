@@ -17,5 +17,6 @@ data class RegisterRequest(
     @field:NotBlank(message = "role cannot be blank")
     val role: String,
 
-    val licence: String? = null
+    val licence: String? = null,
+    val proId: String? = null
 )
