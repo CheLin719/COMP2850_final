@@ -1,17 +1,20 @@
 package com.comp2850.goodfood.auth.jwt
 
+import com.comp2850.goodfood.user.repository.UserStore
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthenticationFilter(
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val userRepository: UserStore
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -27,30 +30,23 @@ class JwtAuthenticationFilter(
         }
 
         val token = authHeader.substring(7)
+        val email = jwtService.extractEmail(token)
 
-        try {
-            val email = jwtService.extractEmail(token)
-            val role = jwtService.extractRole(token)
+        if (email != null && SecurityContextHolder.getContext().authentication == null) {
+            val user = userRepository.findByEmail(email)
 
-            if (SecurityContextHolder.getContext().authentication == null &&
-                jwtService.isTokenValid(token, email)
-            ) {
-                val authorities = if (role != null) {
-                    listOf(SimpleGrantedAuthority("ROLE_$role"))
-                } else {
-                    emptyList()
-                }
+            if (user != null && jwtService.isTokenValid(token, email)) {
+                val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}"))
 
-                val authentication = UsernamePasswordAuthenticationToken.authenticated(
-                    email,
+                val authentication = UsernamePasswordAuthenticationToken(
+                    user.email,
                     null,
                     authorities
                 )
 
+                authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
                 SecurityContextHolder.getContext().authentication = authentication
             }
-        } catch (_: Exception) {
-            // token 无效就当作未登录，继续走后面的安全规则
         }
 
         filterChain.doFilter(request, response)
