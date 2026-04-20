@@ -241,15 +241,26 @@ async function loadCommentsFromAPI(recipeKey, numericId) {
   }
 }
 
-// 拦截 openRecipeDetail，加载评论
-var _origOpenRecipeDetail = window.openRecipeDetail;
-window.openRecipeDetail = async function (id) {
-  if (_origOpenRecipeDetail) _origOpenRecipeDetail(id);
-  const numericId = window.RECIPES[id]?._numericId;
-  if (numericId) {
-    await loadCommentsFromAPI(id, numericId);
-  }
-};
+// 拦截 openRecipeDetail，加载评论（不覆盖，用包装避免递归）
+(function () {
+  // dashboard.html 已经覆盖了一次 openRecipeDetail（加评分+评论UI）
+  // 这里用 _dashOrigOpen 保存当前版本，然后替换为新版本
+  var _dashOrigOpen = window.openRecipeDetail;
+  window.openRecipeDetail = async function (id) {
+    // 临时恢复，防止递归
+    window.openRecipeDetail = _dashOrigOpen;
+    try {
+      _dashOrigOpen(id);
+    } finally {
+      // 重新挂载本包装
+      window.openRecipeDetail = arguments.callee;
+    }
+    const numericId = window.RECIPES[id]?._numericId;
+    if (numericId) {
+      await loadCommentsFromAPI(id, numericId);
+    }
+  };
+})();
 
 // ══════════════════════════════════════════════════════════════
 // 5. 食谱新增：覆盖 saveCustomRecipe
