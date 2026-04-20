@@ -28,6 +28,9 @@
       window.location.replace('pro_dashboard.html');
       return;
     }
+    // 验证通过，显示页面
+    document.body.style.opacity = '1';
+    document.body.style.transition = 'opacity 0.2s';
   } catch (e) {
     // token 无效或过期 → 清除并跳回登录
     NW.logout();
