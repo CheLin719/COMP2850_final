@@ -14,7 +14,7 @@
 
 const NW = (function () {
   // ── 基础配置 ─────────────────────────────────────────────────
-  const BASE = 'https://shiny-cod-g475j77x775wcvjr5-8080.app.github.dev';
+  const BASE = '';
 
   // ── Token 持久化（sessionStorage，关闭标签页即清除）──────────
   const auth = {
