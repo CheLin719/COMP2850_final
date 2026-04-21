@@ -1011,7 +1011,7 @@ const d=new Date(),days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Fri
 document.getElementById('today-date').textContent=days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let DAILY_TARGET=2400;
+var DAILY_TARGET=2400;
 let foodAdded=[];
 let favourites=new Set(['shakshuka','avocado-toast','lentil-soup']);
 let compareSelected=new Set(['shakshuka','avocado-toast','lentil-soup']);
