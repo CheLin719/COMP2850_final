@@ -111,8 +111,8 @@
     if (!profile) return;
     var stats = computeAll(profile);
 
-    // 1. DAILY_TARGET (now let, can reassign)
-    window.DAILY_TARGET = stats.target;
+    // 1. Set the dynamic target that updateDonut, meal planner, and insights all read
+    window._nwDailyTarget = stats.target;
 
     // 2. Profile summary line
     var found = false;

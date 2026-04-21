@@ -1108,9 +1108,10 @@ function deleteMeal(key,idx){mealLog[key].splice(idx,1);renderMealLog();updateDo
 
 // ── Donut ─────────────────────────────────────────────────────────────────────
 function updateDonut(){
+  var _target = window._nwDailyTarget || DAILY_TARGET;
   let kcal=0; Object.values(mealLog).forEach(arr=>arr.forEach(e=>kcal+=e.kcal));
   const carbs=Math.round(kcal*.42/4),protein=Math.round(kcal*.28/4),fat=Math.round(kcal*.18/9),sugar=Math.round(kcal*.12/4);
-  const circ=2*Math.PI*48,pct=Math.min(kcal/DAILY_TARGET,1);
+  const circ=2*Math.PI*48,pct=Math.min(kcal/_target,1);
   const segs=[{p:.42,c:'#2f8f7f'},{p:.28,c:'#d4956a'},{p:.18,c:'#7aaad4'},{p:.12,c:'#e07b78'}];
   const svg=document.querySelector('.dc-donut svg'); if(!svg) return;
   let a=-90,h=`<circle cx="75" cy="75" r="48" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="16"/>`;
@@ -1119,8 +1120,8 @@ function updateDonut(){
   svg.innerHTML=h;
   const leg=document.querySelector('.dc-legend');
   if(leg) leg.innerHTML=`<div class="dc-leg-row"><div class="dc-leg-dot" style="background:#2f8f7f"></div><span class="dc-leg-name">Carbs</span><span class="dc-leg-val">42% · ${carbs}g</span></div><div class="dc-leg-row"><div class="dc-leg-dot" style="background:#d4956a"></div><span class="dc-leg-name">Protein</span><span class="dc-leg-val">28% · ${protein}g</span></div><div class="dc-leg-row"><div class="dc-leg-dot" style="background:#7aaad4"></div><span class="dc-leg-name">Fat</span><span class="dc-leg-val">18% · ${fat}g</span></div><div class="dc-leg-row"><div class="dc-leg-dot" style="background:#e07b78"></div><span class="dc-leg-name">Sugar</span><span class="dc-leg-val">12% · ${sugar}g</span></div>`;
-  const tn=document.querySelector('.dc-total-num');if(tn)tn.innerHTML=`${kcal.toLocaleString()} <span class="dc-total-sub">/ ${DAILY_TARGET.toLocaleString()}</span>`;
-  const tp=document.querySelector('.dc-total-pct');if(tp)tp.textContent=Math.round(kcal/DAILY_TARGET*100)+'%';
+  const tn=document.querySelector('.dc-total-num');if(tn)tn.innerHTML=`${kcal.toLocaleString()} <span class="dc-total-sub">/ ${_target.toLocaleString()}</span>`;
+  const tp=document.querySelector('.dc-total-pct');if(tp)tp.textContent=Math.round(kcal/_target*100)+'%';
 }
 
 // ── Recipe detail ─────────────────────────────────────────────────────────────
@@ -2179,7 +2180,7 @@ function clearAllFilters(){
   // ── INSIGHTS ───────────────────────────────────────────────────
   function computeTodayNutrition() {
     const kcalEl = document.querySelector('.dc-total-num');
-    const values = { kcal: 1920, target: 2400, carbs: 201, protein: 68, fat: 38, sugar: 84, carbsT: 300, proteinT: 120, fatT: 65, sugarT: 50 };
+    const values = { kcal: 1920, target: window._nwDailyTarget || 2400, carbs: 201, protein: 68, fat: 38, sugar: 84, carbsT: 300, proteinT: 120, fatT: 65, sugarT: 50 };
     if (kcalEl) {
       const m = kcalEl.textContent.replace(/,/g,'').match(/\d+/);
       if (m) values.kcal = parseInt(m[0], 10);
@@ -2574,7 +2575,8 @@ function clearAllFilters(){
 // MEAL PLANNER ENGINE v2 — empty start + favourites + smart fill
 // ═══════════════════════════════════════════════════════════════
 (function(){
-  var TARGET_KCAL = window.DAILY_TARGET || 2400;
+  function getTargetKcal() { return window._nwDailyTarget || 2400; }
+  var TARGET_KCAL = getTargetKcal();
   var mpFillMode = 'balanced'; // 'light' = ~50%, 'balanced' = ~75%, 'full' = 100%
   var mpPlan = { breakfast:[], lunch:[], dinner:[] };
   var mpLocked = new Set();
@@ -2758,6 +2760,7 @@ function clearAllFilters(){
   }
 
   function mpRenderAll(){
+    TARGET_KCAL = getTargetKcal();
     mpRenderMeal('breakfast','🌅','Breakfast');
     mpRenderMeal('lunch','☀️','Lunch');
     mpRenderMeal('dinner','🌙','Dinner');
