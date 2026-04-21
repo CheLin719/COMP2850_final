@@ -561,7 +561,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
     </div>
   </div>
 </div>
-<div class="recipe-search"><span style="font-size:16px;color:var(--ink-f)" aria-hidden="true">🔍</span><label for="recipe-search-input" class="sr-only">Search recipes by name or ingredient</label><input id="recipe-search-input" class="rs-input" type="search" placeholder="Search by name or ingredient (e.g. salmon, lentils)" aria-label="Search recipes by name or ingredient" oninput="filterRecipes(this.value)" autocomplete="off" name="recipe-search-nofill"></div>
+<div class="recipe-search"><span style="font-size:16px;color:var(--ink-f)" aria-hidden="true">🔍</span><label for="recipe-search-input" class="sr-only">Search recipes by name or ingredient</label><input style="display:none" type="text" name="fake-autofill-trap" tabindex="-1" autocomplete="username"><input id="recipe-search-input" class="rs-input" type="search" placeholder="Search by name or ingredient (e.g. salmon, lentils)" aria-label="Search recipes by name or ingredient" oninput="filterRecipes(this.value)" autocomplete="new-password" name="nw-recipe-q" role="searchbox"></div>
 <a href="#" class="fav-link" onclick="switchPage('favourites',document.querySelectorAll('.sn-item')[2]);return false">❤️ My Favourites</a>
 <button onclick="openAddRecipeModal()" class="fav-link" style="background:var(--teal);color:#fff;border-color:var(--teal)" aria-label="Add new recipe">+ Add Recipe</button>
 </div>
@@ -817,35 +817,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 .finf{flex:1;font-size:12px;color:#0a1410;line-height:1.5}
 .fadd{width:28px;height:28px;border-radius:7px;border:1px solid #d4dfd8;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;color:#1e6b5e;flex-shrink:0;transition:all .15s}
 .frow:hover .fadd{background:#1e6b5e;color:#fff;border-color:#1e6b5e}
-/* Tour */
-.tour-trigger-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(47,143,127,0.15);color:rgba(255,255,255,0.85);cursor:pointer;font-size:11px;font-weight:600;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:.02em;transition:all .2s}
-.tour-trigger-btn:hover{background:rgba(47,143,127,0.3);border-color:rgba(47,143,127,0.5);color:#fff}
-.tour-dim-svg{position:fixed;inset:0;width:100%;height:100%;z-index:8000;display:none;pointer-events:all}
-.tour-highlight{position:fixed;z-index:8001;border-radius:12px;pointer-events:none;transition:all .35s cubic-bezier(.4,0,.2,1);display:none}
-.tour-highlight.on{display:block;box-shadow:0 0 0 3px #2f8f7f,0 0 0 7px rgba(47,143,127,0.35),0 0 24px rgba(47,143,127,0.2);animation:tourPulse 2s ease-in-out infinite}
-@keyframes tourPulse{0%,100%{box-shadow:0 0 0 3px #2f8f7f,0 0 0 7px rgba(47,143,127,0.35),0 0 24px rgba(47,143,127,0.2)}50%{box-shadow:0 0 0 4px #2f8f7f,0 0 0 10px rgba(47,143,127,0.25),0 0 32px rgba(47,143,127,0.15)}}
-.tour-card{position:fixed;z-index:8002;background:#fff;border-radius:14px;padding:20px 22px;width:340px;box-shadow:0 12px 40px rgba(10,20,16,0.3),0 0 0 1px rgba(30,107,94,0.15);display:none;pointer-events:all;transition:opacity .25s,transform .25s,left .3s,top .3s}
-.tour-card.on{display:block}
-.tour-card::before{content:'';position:absolute;width:12px;height:12px;background:#fff;transform:rotate(45deg);box-shadow:-1px -1px 0 rgba(30,107,94,0.12)}
-.tour-card[data-pos="bottom"]::before{top:-6px;left:28px}
-.tour-card[data-pos="top"]::before{bottom:-6px;left:28px;box-shadow:1px 1px 0 rgba(30,107,94,0.12)}
-.tour-card[data-pos="right"]::before{left:-6px;top:20px}
-.tour-card[data-pos="left"]::before{right:-6px;top:20px;box-shadow:1px -1px 0 rgba(30,107,94,0.12)}
-.tour-card[data-pos="center"]::before{display:none}
-.tour-step-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.tour-step-label::after{content:'';flex:1;height:1px;background:var(--teal-ll)}
-.tour-card-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;line-height:1.3}
-.tour-card-body{font-size:13px;color:var(--ink-m);line-height:1.65;margin-bottom:16px}
-.tour-card-foot{display:flex;align-items:center;justify-content:space-between}
-.tour-progress{display:flex;gap:4px;align-items:center}
-.tour-pip{width:20px;height:3px;border-radius:2px;background:var(--fog);transition:all .3s}
-.tour-pip.done{background:var(--teal)}
-.tour-pip.active{background:var(--teal);width:28px}
-.tour-actions{display:flex;gap:8px;align-items:center}
-.tour-skip-btn{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);background:none;border:none;cursor:pointer;padding:6px 10px;border-radius:6px;transition:all .2s}
-.tour-skip-btn:hover{color:var(--ink);background:var(--paper)}
-.tour-next-btn{font-size:12px;font-weight:600;padding:8px 18px;border-radius:8px;border:none;background:var(--teal);color:#fff;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
-.tour-next-btn:hover{background:var(--teal-l)}
+/* Tour — removed, will be rebuilt */
 
 /* ── MEAL PLANNER ── */
 .mp-meal-section { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:18px 20px; margin-bottom:14px; box-shadow:0 2px 8px rgba(10,20,16,0.03); }
@@ -1013,8 +985,8 @@ document.getElementById('today-date').textContent=days[d.getDay()]+', '+d.getDat
 // ── State ─────────────────────────────────────────────────────────────────────
 var DAILY_TARGET=2400;
 let foodAdded=[];
-let favourites=new Set(['shakshuka','avocado-toast','lentil-soup']);
-let compareSelected=new Set(['shakshuka','avocado-toast','lentil-soup']);
+let favourites=new Set();
+let compareSelected=new Set();
 
 const RECIPES={
   'mediterranean-quinoa':{id:'mediterranean-quinoa',emoji:'🥗',name:'Mediterranean Quinoa Bowl',tag:'Healthy · 15 min',kcal:420,cost:'£3.20',rating:'★★★★☆',bg:'var(--teal-lll)',ingredients:['200g quinoa','1 cucumber','200g cherry tomatoes','100g feta','Olives','Olive oil & lemon'],steps:['Cook quinoa, allow to cool.','Dice cucumber, halve tomatoes.','Combine all in a bowl.','Drizzle with olive oil and lemon.','Season and serve.']},
@@ -1373,97 +1345,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 });
 </script>
-<svg class="tour-dim-svg" id="tSvg" style="position:fixed;inset:0;width:100%;height:100%;z-index:8000;display:none;pointer-events:all">
-  <defs><mask id="tMask"><rect width="100%" height="100%" fill="white"/><rect id="tHole" rx="12" fill="black"/></mask></defs>
-  <rect width="100%" height="100%" fill="rgba(10,20,16,0.82)" mask="url(#tMask)"/>
-</svg>
-<div class="tour-highlight" id="tHL"></div>
-<div class="tour-card" id="tCard" data-pos="bottom">
-  <div class="tour-step-label" id="tLabel"></div>
-  <div class="tour-card-title" id="tTitle"></div>
-  <div class="tour-card-body" id="tBody"></div>
-  <div class="tour-card-foot">
-    <div class="tour-progress" id="tPips"></div>
-    <div class="tour-actions">
-      <button class="tour-skip-btn" onclick="tEnd()">Skip</button>
-      <button class="tour-next-btn" id="tBtn" onclick="tNext()">Next <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    </div>
-  </div>
-</div>
+<!-- Tour placeholder — will be rebuilt as separate module -->
 <script>
-var tSteps=[
-  {title:'Welcome to NourishWell 🌿',body:"Your personal health dashboard — track meals, explore recipes, and plan your nutrition. Let's walk through the key areas.",sel:null,pos:'center'},
-  {title:'Your Daily Tracker',body:'This is where you log meals across 6 time slots. The donut chart shows your macro breakdown and updates in real time as you add food.',sel:'#page-record .donut-card',pos:'right'},
-  {title:'Log Food & Exercise',body:'Click Record Meal to open the food panel, or switch to Exercise to log workouts. Your calories and activity chart update instantly.',sel:'.action-row',pos:'bottom'},
-  {title:'Sidebar Navigation',body:'Switch between pages here: Record Today for logging, Recipe to browse meals, Favourites for saved recipes, Compare to contrast nutrition, and Meal Planner to plan your day.',sel:'.side-nav',pos:'right'},
-  {title:'Meal Planner',body:"Plan your full day's meals within your calorie budget. Lock meals you like, swap the rest, then confirm your plan.",sel:'.side-nav a:nth-child(5)',pos:'right'},
-  {title:'Messages & Settings',body:'Click your avatar to update Personal Details or Preferences.',sel:'.tn-avatar-wrap',pos:'bottom'},
-  {title:'Help & Q&A',body:"Need more detail? Click Help for the full Q&A with searchable answers about every feature. Enjoy NourishWell!",sel:'#helpLink',pos:'left'}
-];
-var tI=0;
-function startTour(){
-  tI=0;
-  var card=document.getElementById('tCard');
-  card.setAttribute('data-pos','center');
-  card.style.left='50%';card.style.top='50%';card.style.transform='translate(-50%,-50%)';
-  card.style.opacity='0';
-  document.getElementById('tSvg').style.display='block';
-  card.classList.add('on');
-  document.body.style.overflow='hidden';
-  tRender();
-  requestAnimationFrame(function(){requestAnimationFrame(function(){card.style.opacity='1';});});
-}
-function tRender(){
-  var s=tSteps[tI];
-  document.getElementById('tLabel').textContent='Step '+(tI+1)+' of '+tSteps.length;
-  document.getElementById('tTitle').textContent=s.title;
-  document.getElementById('tBody').textContent=s.body;
-  document.getElementById('tBtn').innerHTML=tI===tSteps.length-1?'Done ✓':'Next <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  document.getElementById('tPips').innerHTML=tSteps.map(function(_,i){return '<div class="tour-pip'+(i<tI?' done':'')+(i===tI?' active':'')+'"></div>';}).join('');
-  var hl=document.getElementById('tHL');
-  var card=document.getElementById('tCard');
-  var hole=document.getElementById('tHole');
-  if(s.sel){
-    var el=document.querySelector(s.sel);
-    if(el){
-      var r=el.getBoundingClientRect(),pad=8;
-      var hx=r.left-pad,hy=r.top-pad,hw=r.width+pad*2,hh=r.height+pad*2;
-      hole.setAttribute('x',hx);hole.setAttribute('y',hy);hole.setAttribute('width',hw);hole.setAttribute('height',hh);
-      hl.style.cssText='display:block;left:'+hx+'px;top:'+hy+'px;width:'+hw+'px;height:'+hh+'px';
-      hl.classList.add('on');
-      var cw=340,ch=card.offsetHeight||200,gap=16,vw=window.innerWidth,vh=window.innerHeight;
-      var cx,cy,pos=s.pos||'bottom';
-      if(pos==='right'&&r.right+gap+cw<vw){cx=r.right+gap;cy=Math.max(12,Math.min(r.top,vh-ch-12));}
-      else if(pos==='left'&&r.left-gap-cw>0){cx=r.left-gap-cw;cy=Math.max(12,Math.min(r.top,vh-ch-12));}
-      else if(pos==='top'&&r.top-gap-ch>60){cx=Math.max(12,Math.min(r.left,vw-cw-12));cy=r.top-gap-ch;}
-      else{cx=Math.max(12,Math.min(r.left,vw-cw-12));cy=r.bottom+gap;pos='bottom';}
-      card.setAttribute('data-pos',pos);
-      card.style.left=cx+'px';card.style.top=cy+'px';
-      card.style.transform='none';
-    } else { hole.setAttribute('width',0);hole.setAttribute('height',0);hl.classList.remove('on');hl.style.display='none';tCenterCard(card);}
-  } else {
-    hole.setAttribute('width',0);hole.setAttribute('height',0);
-    hl.classList.remove('on');hl.style.display='none';
-    tCenterCard(card);
-  }
-}
-function tCenterCard(card){
-  card.setAttribute('data-pos','center');
-  card.style.left='50%';card.style.top='50%';card.style.transform='translate(-50%,-50%)';
-}
-function tNext(){if(tI<tSteps.length-1){tI++;tRender();}else tEnd();}
-function tEnd(){
-  document.getElementById('tSvg').style.display='none';
-  document.getElementById('tCard').classList.remove('on');
-  document.getElementById('tHL').classList.remove('on');
-  document.getElementById('tHL').style.display='none';
-  document.body.style.overflow='';
-}
-document.getElementById('tSvg').addEventListener('click',function(e){
-  var card=document.getElementById('tCard');
-  var cr=card.getBoundingClientRect();
-  if(e.clientX<cr.left||e.clientX>cr.right||e.clientY<cr.top||e.clientY>cr.bottom) tEnd();
-});
+function startTour(){} // stub
 </script>
 
 
@@ -1828,17 +1712,19 @@ function goToday(){
 // ══════════════════════════════════════════════════════════════
 // FEATURE: Calorie Trend Line Chart
 // ══════════════════════════════════════════════════════════════
-var calorieTrendData = [1850, 2100, 1600, 2350, 1920, 2200, 1920];
+var calorieTrendData = [0, 0, 0, 0, 0, 0, 0];
+var _calorieTrendChart = null;
 function initCalorieTrendChart(){
   const ctx = document.getElementById('calorieTrendChart');
   if(!ctx) return;
-  new Chart(ctx.getContext('2d'), {
+  var _t = window._nwDailyTarget || DAILY_TARGET;
+  _calorieTrendChart = new Chart(ctx.getContext('2d'), {
     type:'line',
     data:{
       labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
       datasets:[
         { label:'Intake', data:calorieTrendData, borderColor:'#1e6b5e', backgroundColor:'rgba(30,107,94,0.1)', fill:true, tension:0.35, pointRadius:4, pointBackgroundColor:'#1e6b5e', borderWidth:2 },
-        { label:'Target', data:Array(7).fill(DAILY_TARGET), borderColor:'#b8621f', borderWidth:1.5, borderDash:[4,3], pointRadius:0, fill:false, tension:0 }
+        { label:'Target', data:Array(7).fill(_t), borderColor:'#b8621f', borderWidth:1.5, borderDash:[4,3], pointRadius:0, fill:false, tension:0 }
       ]
     },
     options:{
@@ -1851,6 +1737,13 @@ function initCalorieTrendChart(){
     }
   });
 }
+// Update calorie trend target line when profile changes
+window._nwUpdateCalorieTrend = function(){
+  if(!_calorieTrendChart) return;
+  var _t = window._nwDailyTarget || DAILY_TARGET;
+  _calorieTrendChart.data.datasets[1].data = Array(7).fill(_t);
+  _calorieTrendChart.update();
+};
 
 // ══════════════════════════════════════════════════════════════
 // FEATURE: Exercise Chart Month/Year Data Switching

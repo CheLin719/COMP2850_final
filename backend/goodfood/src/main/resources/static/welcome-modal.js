@@ -125,8 +125,11 @@
       }
     });
 
-    // 3. Donut card — call updateDonut which now reads DAILY_TARGET
+    // 3. Donut card — call updateDonut which now reads _nwDailyTarget
     if (typeof window.updateDonut === 'function') window.updateDonut();
+
+    // 3b. Calorie trend chart target line
+    if (typeof window._nwUpdateCalorieTrend === 'function') window._nwUpdateCalorieTrend();
 
     // 4. Meal planner target
     var mpLabel = document.getElementById('mp-target-label');
