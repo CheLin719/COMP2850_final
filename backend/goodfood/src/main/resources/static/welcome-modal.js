@@ -1,608 +1,189 @@
 /**
- * NourishWell — Welcome Modal & Profile System v2
- * ══════════════════════════════════════════════════════════════
- * Self-contained: <script src="welcome-modal.js"></script>
- *
- * Steps: 1) Name confirm  2) Body data  3) Lifestyle & goal
- *        4) Exercise preference  5) Results summary
- *
- * Calculates: BMI, BMR (Mifflin-St Jeor), TDEE, daily calorie
- *   target, macro split (protein/carbs/fat in grams),
- *   exercise recommendation
- *
- * Syncs: donut card, profile line, meal planner target,
- *   exercise chart target, settings Health Profile,
- *   calorie trend chart target line
- * ══════════════════════════════════════════════════════════════
+ * NourishWell — Welcome Onboarding v3
+ * Complete redesign: progress bar top, step tag + title + subtitle header,
+ * scrollable content area, fixed footer with back/next.
+ * Fixed 600×540 card, no jumping.
  */
-(function () {
-  'use strict';
+(function(){
+'use strict';
+function profileKey(){var u=(typeof NW!=='undefined'&&NW.auth)?NW.auth.userId:'';return u?'nw-'+u+'-profile':'nw-user-profile';}
+function getProfile(){try{return JSON.parse(localStorage.getItem(profileKey()));}catch(e){return null;}}
+function saveProfile(p){localStorage.setItem(profileKey(),JSON.stringify(p));}
+function isProfileComplete(p){return p&&p.gender&&p.heightCm&&p.weightKg&&p.activityLevel&&p.goal&&p.dateOfBirth;}
+function calcAge(d){var b=new Date(d),t=new Date(),a=t.getFullYear()-b.getFullYear(),m=t.getMonth()-b.getMonth();if(m<0||(m===0&&t.getDate()<b.getDate()))a--;return Math.max(a,1);}
+function calcBMI(w,h){return+(w/((h/100)*(h/100))).toFixed(1);}
+function bmiCat(b){return b<18.5?'Underweight':b<25?'Normal':b<30?'Overweight':'Obese';}
+function calcBMR(w,h,a,g){return g==='female'?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;}
+var ACT={sedentary:1.2,lightly_active:1.375,moderately_active:1.55,very_active:1.725};
+var ACT_L={sedentary:'Sedentary',lightly_active:'Lightly Active',moderately_active:'Moderately Active',very_active:'Very Active'};
+var GOAL_OFF={lose:-500,maintain:0,gain:300};
+var GOAL_L={lose:'Lose Weight',maintain:'Maintain Weight',gain:'Gain Muscle'};
+function calcMacros(t,g){var s={lose:{p:.30,c:.40,f:.30},maintain:{p:.25,c:.50,f:.25},gain:{p:.35,c:.40,f:.25}}[g]||{p:.25,c:.50,f:.25};return{pG:Math.round(t*s.p/4),cG:Math.round(t*s.c/4),fG:Math.round(t*s.f/9),pP:Math.round(s.p*100),cP:Math.round(s.c*100),fP:Math.round(s.f*100)};}
+function calcEx(p){if(!p.wantsExercise)return{kcal:0,mins:0,text:''};var b={lose:400,maintain:300,gain:200}[p.goal]||300,m={light:.6,moderate:1,intense:1.4}[p.exerciseIntensity]||1,k=Math.round(b*m),r={light:5,moderate:8,intense:12}[p.exerciseIntensity]||8,mn=Math.round(k/r),a={light:'walking, yoga, or stretching',moderate:'jogging, cycling, or swimming',intense:'running, HIIT, or weight training'}[p.exerciseIntensity]||'';return{kcal:k,mins:mn,text:mn+' min of '+a};}
+function computeAll(p){var a=calcAge(p.dateOfBirth),bmi=calcBMI(p.weightKg,p.heightCm),bmr=calcBMR(p.weightKg,p.heightCm,a,p.gender),tdee=Math.round(bmr*(ACT[p.activityLevel]||1.55)),tgt=Math.max(1200,tdee+(GOAL_OFF[p.goal]||0));return{age:a,bmi:bmi,bmiCat:bmiCat(bmi),bmr:Math.round(bmr),tdee:tdee,target:tgt,macros:calcMacros(tgt,p.goal),exercise:calcEx(p)};}
 
-  // ── Storage ──────────────────────────────────────────────────
-  function profileKey() {
-    var uid = (typeof NW !== 'undefined' && NW.auth) ? NW.auth.userId : '';
-    return uid ? 'nw-' + uid + '-profile' : 'nw-user-profile';
-  }
+// ── Apply ──
+function applyToDashboard(p){if(!p)return;var s=computeAll(p);window._nwDailyTarget=s.target;
+document.querySelectorAll('span').forEach(function(el){if(el.textContent.match(/\d+\s*kg\s*·/)||el.id==='profile-summary-line'){el.id='profile-summary-line';el.innerHTML=p.weightKg+' kg · '+(ACT_L[p.activityLevel]||'')+' · BMI '+s.bmi+' <span style="color:var(--ink-f)">('+s.bmiCat+')</span>';}});
+if(typeof window.updateDonut==='function')window.updateDonut();
+if(typeof window._nwUpdateCalorieTrend==='function')window._nwUpdateCalorieTrend();
+var ml=document.getElementById('mp-target-label');if(ml)ml.textContent=s.target.toLocaleString()+' kcal';
+window._nwExerciseTarget=p.wantsExercise?s.exercise.kcal:0;
+var er=document.getElementById('exercise-recommendation');
+if(!er){var ec=document.querySelector('.cc-title');if(ec&&ec.textContent.includes('Exercise')){var pa=ec.closest('.chart-card');if(pa){er=document.createElement('div');er.id='exercise-recommendation';er.style.cssText='padding:10px 16px;background:var(--teal-lll);border:1px solid var(--teal-ll);border-radius:8px;margin-top:10px;font-size:11px;color:var(--ink-m)';pa.appendChild(er);}}}
+if(er){if(p.wantsExercise){er.innerHTML='<strong style="color:var(--teal)">Daily goal:</strong> ~'+s.exercise.kcal+' kcal · '+s.exercise.text;er.style.display='block';}else er.style.display='none';}
+var mc=document.getElementById('macro-recommendation');
+if(!mc){var ic=document.getElementById('insights-container');if(ic){mc=document.createElement('div');mc.id='macro-recommendation';mc.style.cssText='background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(10,20,16,0.04)';ic.parentNode.insertBefore(mc,ic);}}
+if(mc){var m=s.macros;mc.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:6px"><span>🥗</span> Daily Nutrition Targets</div><div style="display:flex;gap:12px;flex-wrap:wrap">'+mC('Protein',m.pG+'g',m.pP+'%','#d4956a')+mC('Carbs',m.cG+'g',m.cP+'%','#2f8f7f')+mC('Fat',m.fG+'g',m.fP+'%','#7aaad4')+'</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);margin-top:8px">'+s.target.toLocaleString()+' kcal · '+(GOAL_L[p.goal]||'')+'</div>';}
+applyToSettings(p,s);}
+function mC(l,g,pc,c){return'<div style="flex:1;min-width:80px;background:var(--paper);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:18px;font-weight:800;color:'+c+'">'+g+'</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:8px;color:var(--ink-f);margin-top:2px">'+l+' · '+pc+'</div></div>';}
 
-  function getProfile() {
-    try { return JSON.parse(localStorage.getItem(profileKey())); }
-    catch (e) { return null; }
-  }
-  function saveProfile(p) {
-    localStorage.setItem(profileKey(), JSON.stringify(p));
-  }
-  function isProfileComplete(p) {
-    return p && p.gender && p.heightCm && p.weightKg && p.activityLevel && p.goal && p.dateOfBirth;
-  }
+// ── Settings ──
+function applyToSettings(p,s){var m={'settings-gender':p.gender,'settings-dob':p.dateOfBirth,'settings-height':p.heightCm,'settings-weight':p.weightKg,'settings-activity':p.activityLevel,'settings-goal':p.goal,'settings-calorie-target':s?s.target:''};Object.keys(m).forEach(function(id){var e=document.getElementById(id);if(e)e.value=m[id];});var b=document.getElementById('settings-bmi-display');if(b&&s){b.textContent='BMI: '+s.bmi+' ('+s.bmiCat+') · BMR: '+s.bmr+' · TDEE: '+s.tdee;b.style.color=(s.bmi>=18.5&&s.bmi<25)?'var(--teal)':'var(--amber)';}}
+function patchSettings(){var hp=document.querySelector('#overlay-personal .settings-inner');if(!hp)return;var cards=hp.querySelectorAll('div[style*="border-radius:16px"]');var hc=null;cards.forEach(function(c){if(c.textContent.includes('Height (cm)'))hc=c;});if(!hc)return;var g=hc.querySelector('div[style*="grid-template-columns"]');if(!g)return;var inp=g.querySelectorAll('input, select');if(inp[0])inp[0].id='settings-height';if(inp[1])inp[1].id='settings-weight';if(inp[2]){inp[2].id='settings-activity';inp[2].innerHTML='<option value="sedentary">Sedentary</option><option value="lightly_active">Lightly Active</option><option value="moderately_active">Moderately Active</option><option value="very_active">Very Active</option>';}if(inp[3]){inp[3].id='settings-calorie-target';inp[3].readOnly=true;inp[3].style.background='var(--paper)';inp[3].title='Auto-calculated';}
+var gD=document.createElement('div');gD.innerHTML='<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Gender</div><select id="settings-gender" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:\'Bricolage Grotesque\',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)"><option value="male">Male</option><option value="female">Female</option><option value="other">Prefer not to say</option></select>';g.insertBefore(gD,g.firstChild);
+var dD=document.createElement('div');dD.innerHTML='<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Date of Birth</div><input type="date" id="settings-dob" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:\'Bricolage Grotesque\',sans-serif;font-size:13px;color:var(--ink);outline:none">';g.insertBefore(dD,g.children[1]);
+var goD=document.createElement('div');goD.innerHTML='<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Goal</div><select id="settings-goal" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:\'Bricolage Grotesque\',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)"><option value="lose">Lose Weight</option><option value="maintain">Maintain Weight</option><option value="gain">Gain Muscle</option></select>';var cf=inp[3]?inp[3].parentElement:null;if(cf)g.insertBefore(goD,cf);
+var bD=document.createElement('div');bD.style.cssText='grid-column:1/-1;padding:12px 14px;background:var(--teal-lll);border:1px solid var(--teal-ll);border-radius:10px;font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:600';bD.id='settings-bmi-display';bD.textContent='BMI: —';g.appendChild(bD);
+var btn=hc.querySelector('button');if(btn)btn.addEventListener('click',function(e){e.preventDefault();var p=readSP();if(p){saveProfile(p);applyToDashboard(p);if(typeof showToast==='function')showToast('Profile updated','#1e6b5e');}});
+['settings-gender','settings-dob','settings-height','settings-weight','settings-activity','settings-goal'].forEach(function(id){var e=document.getElementById(id);if(e){e.addEventListener('change',recalcS);e.addEventListener('input',recalcS);}});}
+function readSP(){var old=getProfile()||{};return{displayName:old.displayName||'',gender:(document.getElementById('settings-gender')||{}).value||'other',dateOfBirth:(document.getElementById('settings-dob')||{}).value||'2000-01-01',heightCm:parseFloat((document.getElementById('settings-height')||{}).value)||170,weightKg:parseFloat((document.getElementById('settings-weight')||{}).value)||70,activityLevel:(document.getElementById('settings-activity')||{}).value||'moderately_active',goal:(document.getElementById('settings-goal')||{}).value||'maintain',wantsExercise:old.wantsExercise||false,exerciseIntensity:old.exerciseIntensity||'moderate'};}
+function recalcS(){var p=readSP();if(!p.dateOfBirth||!p.heightCm||!p.weightKg)return;var s=computeAll(p);var c=document.getElementById('settings-calorie-target');if(c)c.value=s.target;var b=document.getElementById('settings-bmi-display');if(b){b.textContent='BMI: '+s.bmi+' ('+s.bmiCat+') · BMR: '+s.bmr+' · TDEE: '+s.tdee;b.style.color=(s.bmi>=18.5&&s.bmi<25)?'var(--teal)':'var(--amber)';}}
 
-  // ── Calculation Engine ───────────────────────────────────────
-  function calcAge(dob) {
-    var b = new Date(dob), t = new Date();
-    var age = t.getFullYear() - b.getFullYear();
-    var m = t.getMonth() - b.getMonth();
-    if (m < 0 || (m === 0 && t.getDate() < b.getDate())) age--;
-    return Math.max(age, 1);
-  }
-  function calcBMI(w, h) { return +(w / ((h / 100) * (h / 100))).toFixed(1); }
-  function bmiCat(b) { return b < 18.5 ? 'Underweight' : b < 25 ? 'Normal' : b < 30 ? 'Overweight' : 'Obese'; }
-
-  // Mifflin-St Jeor
-  function calcBMR(w, h, age, g) {
-    return g === 'female' ? 10 * w + 6.25 * h - 5 * age - 161 : 10 * w + 6.25 * h - 5 * age + 5;
-  }
-
-  var ACT_MULT = { sedentary: 1.2, lightly_active: 1.375, moderately_active: 1.55, very_active: 1.725 };
-  var ACT_LABEL = { sedentary: 'Sedentary', lightly_active: 'Lightly Active', moderately_active: 'Moderately Active', very_active: 'Very Active' };
-  var GOAL_OFF = { lose: -500, maintain: 0, gain: 300 };
-  var GOAL_LABEL = { lose: 'Lose Weight', maintain: 'Maintain Weight', gain: 'Gain Muscle' };
-
-  function calcTDEE(bmr, act) { return Math.round(bmr * (ACT_MULT[act] || 1.55)); }
-  function calcTarget(tdee, goal) { return Math.max(1200, tdee + (GOAL_OFF[goal] || 0)); }
-
-  // Macro split based on goal (grams)
-  function calcMacros(target, goal) {
-    // Protein: 30% lose, 25% maintain, 35% gain
-    // Carbs:   40% lose, 50% maintain, 40% gain
-    // Fat:     30% lose, 25% maintain, 25% gain
-    var splits = {
-      lose:     { protein: 0.30, carbs: 0.40, fat: 0.30 },
-      maintain: { protein: 0.25, carbs: 0.50, fat: 0.25 },
-      gain:     { protein: 0.35, carbs: 0.40, fat: 0.25 }
-    };
-    var s = splits[goal] || splits.maintain;
-    return {
-      proteinG: Math.round(target * s.protein / 4),
-      carbsG:   Math.round(target * s.carbs / 4),
-      fatG:     Math.round(target * s.fat / 9),
-      proteinPct: Math.round(s.protein * 100),
-      carbsPct:   Math.round(s.carbs * 100),
-      fatPct:     Math.round(s.fat * 100)
-    };
-  }
-
-  // Exercise recommendation (kcal to burn per day)
-  function calcExerciseRec(p) {
-    if (!p.wantsExercise) return { kcalPerDay: 0, minsPerDay: 0, suggestion: 'No exercise target set' };
-    // Base: 300 kcal for maintenance, 400 for lose, 200 for gain
-    var base = { lose: 400, maintain: 300, gain: 200 };
-    var freq = { light: 0.6, moderate: 1.0, intense: 1.4 };
-    var kcal = Math.round((base[p.goal] || 300) * (freq[p.exerciseIntensity] || 1.0));
-    // Approximate minutes: ~8 kcal/min moderate activity
-    var rate = { light: 5, moderate: 8, intense: 12 };
-    var mins = Math.round(kcal / (rate[p.exerciseIntensity] || 8));
-    var suggestions = {
-      light: mins + ' min of walking, yoga, or light stretching',
-      moderate: mins + ' min of jogging, cycling, or swimming',
-      intense: mins + ' min of running, HIIT, or weight training'
-    };
-    return { kcalPerDay: kcal, minsPerDay: mins, suggestion: suggestions[p.exerciseIntensity] || '' };
-  }
-
-  function computeAll(p) {
-    var age = calcAge(p.dateOfBirth);
-    var bmi = calcBMI(p.weightKg, p.heightCm);
-    var bmr = calcBMR(p.weightKg, p.heightCm, age, p.gender);
-    var tdee = calcTDEE(bmr, p.activityLevel);
-    var target = calcTarget(tdee, p.goal);
-    var macros = calcMacros(target, p.goal);
-    var exercise = calcExerciseRec(p);
-    return { age: age, bmi: bmi, bmiCategory: bmiCat(bmi), bmr: Math.round(bmr), tdee: tdee, target: target, macros: macros, exercise: exercise };
-  }
-
-  // ── Apply to Dashboard ───────────────────────────────────────
-  function applyToDashboard(profile) {
-    if (!profile) return;
-    var stats = computeAll(profile);
-
-    // 1. Set the dynamic target that updateDonut, meal planner, and insights all read
-    window._nwDailyTarget = stats.target;
-
-    // 2. Profile summary line
-    var found = false;
-    document.querySelectorAll('span').forEach(function (el) {
-      if (el.textContent.match(/\d+\s*kg\s*·/) || el.id === 'profile-summary-line') {
-        el.id = 'profile-summary-line';
-        el.innerHTML = profile.weightKg + ' kg · ' + (ACT_LABEL[profile.activityLevel] || '') +
-          ' · BMI ' + stats.bmi + ' <span style="color:var(--ink-f)">(' + stats.bmiCategory + ')</span>';
-        found = true;
-      }
-    });
-
-    // 3. Donut card — call updateDonut which now reads _nwDailyTarget
-    if (typeof window.updateDonut === 'function') window.updateDonut();
-
-    // 3b. Calorie trend chart target line
-    if (typeof window._nwUpdateCalorieTrend === 'function') window._nwUpdateCalorieTrend();
-
-    // 4. Meal planner target
-    var mpLabel = document.getElementById('mp-target-label');
-    if (mpLabel) mpLabel.textContent = stats.target.toLocaleString() + ' kcal';
-
-    // 5. Exercise chart target line
-    if (profile.wantsExercise && stats.exercise.kcalPerDay > 0) {
-      window._nwExerciseTarget = stats.exercise.kcalPerDay;
-    } else {
-      window._nwExerciseTarget = 0;
-    }
-    // Update exercise summary text
-    var exSummary = document.getElementById('exercise-recommendation');
-    if (!exSummary) {
-      // Create it under exercise chart
-      var exChart = document.querySelector('.cc-title');
-      if (exChart && exChart.textContent.includes('Exercise')) {
-        var parent = exChart.closest('.chart-card');
-        if (parent) {
-          var div = document.createElement('div');
-          div.id = 'exercise-recommendation';
-          div.style.cssText = 'padding:10px 16px;background:var(--teal-lll);border:1px solid var(--teal-ll);border-radius:8px;margin-top:10px;font-size:11px;color:var(--ink-m)';
-          parent.appendChild(div);
-          exSummary = div;
-        }
-      }
-    }
-    if (exSummary) {
-      if (profile.wantsExercise) {
-        exSummary.innerHTML = '<strong style="color:var(--teal)">Daily exercise goal:</strong> ~' +
-          stats.exercise.kcalPerDay + ' kcal · ' + stats.exercise.suggestion;
-        exSummary.style.display = 'block';
-      } else {
-        exSummary.style.display = 'none';
-      }
-    }
-
-    // 6. Nutrition macro recommendation
-    var macroTip = document.getElementById('macro-recommendation');
-    if (!macroTip) {
-      var insightsEl = document.getElementById('insights-container');
-      if (insightsEl) {
-        var div = document.createElement('div');
-        div.id = 'macro-recommendation';
-        div.style.cssText = 'background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(10,20,16,0.04)';
-        insightsEl.parentNode.insertBefore(div, insightsEl);
-        macroTip = div;
-      }
-    }
-    if (macroTip) {
-      var m = stats.macros;
-      macroTip.innerHTML =
-        '<div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="font-size:14px">🥗</span> Your Daily Nutrition Targets</div>' +
-        '<div style="display:flex;gap:12px;flex-wrap:wrap">' +
-          macroChip('Protein', m.proteinG + 'g', m.proteinPct + '%', '#d4956a') +
-          macroChip('Carbs', m.carbsG + 'g', m.carbsPct + '%', '#2f8f7f') +
-          macroChip('Fat', m.fatG + 'g', m.fatPct + '%', '#7aaad4') +
-        '</div>' +
-        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);margin-top:8px">' +
-          'Based on ' + stats.target.toLocaleString() + ' kcal · ' + (GOAL_LABEL[profile.goal] || '') + ' · Tap avatar → Health Profile to adjust</div>';
-    }
-
-    // 7. Settings sync
-    applyToSettings(profile, stats);
-  }
-
-  function macroChip(label, grams, pct, color) {
-    return '<div style="flex:1;min-width:80px;background:var(--paper);border-radius:10px;padding:10px 12px;text-align:center">' +
-      '<div style="font-size:18px;font-weight:800;color:' + color + '">' + grams + '</div>' +
-      '<div style="font-family:\'JetBrains Mono\',monospace;font-size:8px;color:var(--ink-f);margin-top:2px">' + label + ' · ' + pct + '</div></div>';
-  }
-
-  // ── Settings Sync ────────────────────────────────────────────
-  function applyToSettings(profile, stats) {
-    var fields = {
-      'settings-gender': profile.gender,
-      'settings-dob': profile.dateOfBirth,
-      'settings-height': profile.heightCm,
-      'settings-weight': profile.weightKg,
-      'settings-activity': profile.activityLevel,
-      'settings-goal': profile.goal,
-      'settings-calorie-target': stats ? stats.target : ''
-    };
-    Object.keys(fields).forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.value = fields[id];
-    });
-    var bmiEl = document.getElementById('settings-bmi-display');
-    if (bmiEl && stats) {
-      bmiEl.textContent = 'BMI: ' + stats.bmi + ' (' + stats.bmiCategory + ') · BMR: ' + stats.bmr + ' · TDEE: ' + stats.tdee;
-      bmiEl.style.color = (stats.bmi >= 18.5 && stats.bmi < 25) ? 'var(--teal)' : 'var(--amber)';
-    }
-  }
-
-  // ── Patch Settings Page ──────────────────────────────────────
-  function patchSettings() {
-    var healthProfile = document.querySelector('#overlay-personal .settings-inner');
-    if (!healthProfile) return;
-    var cards = healthProfile.querySelectorAll('div[style*="border-radius:16px"]');
-    var hpCard = null;
-    cards.forEach(function (c) { if (c.textContent.includes('Height (cm)')) hpCard = c; });
-    if (!hpCard) return;
-
-    var grid = hpCard.querySelector('div[style*="grid-template-columns"]');
-    if (!grid) return;
-
-    var inputs = grid.querySelectorAll('input, select');
-    if (inputs[0]) inputs[0].id = 'settings-height';
-    if (inputs[1]) inputs[1].id = 'settings-weight';
-    if (inputs[2]) inputs[2].id = 'settings-activity';
-    if (inputs[3]) inputs[3].id = 'settings-calorie-target';
-
-    if (inputs[2] && inputs[2].tagName === 'SELECT') {
-      inputs[2].innerHTML = '<option value="sedentary">Sedentary</option><option value="lightly_active">Lightly Active</option><option value="moderately_active">Moderately Active</option><option value="very_active">Very Active</option>';
-    }
-
-    // Gender
-    var gDiv = document.createElement('div');
-    gDiv.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Gender</div><select id="settings-gender" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:\'Bricolage Grotesque\',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)"><option value="male">Male</option><option value="female">Female</option><option value="other">Prefer not to say</option></select>';
-    grid.insertBefore(gDiv, grid.firstChild);
-
-    // DOB
-    var dDiv = document.createElement('div');
-    dDiv.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Date of Birth</div><input type="date" id="settings-dob" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:\'Bricolage Grotesque\',sans-serif;font-size:13px;color:var(--ink);outline:none">';
-    grid.insertBefore(dDiv, grid.children[1]);
-
-    // Goal
-    var goDiv = document.createElement('div');
-    goDiv.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Goal</div><select id="settings-goal" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:\'Bricolage Grotesque\',sans-serif;font-size:13px;color:var(--ink);outline:none;background:var(--white)"><option value="lose">Lose Weight</option><option value="maintain">Maintain Weight</option><option value="gain">Gain Muscle</option></select>';
-    var calField = inputs[3] ? inputs[3].parentElement : null;
-    if (calField) grid.insertBefore(goDiv, calField);
-
-    // BMI display
-    var bDiv = document.createElement('div');
-    bDiv.style.cssText = 'grid-column:1/-1;padding:12px 14px;background:var(--teal-lll);border:1px solid var(--teal-ll);border-radius:10px;font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:600';
-    bDiv.id = 'settings-bmi-display';
-    bDiv.textContent = 'BMI: —';
-    grid.appendChild(bDiv);
-
-    // Calorie target readonly
-    if (inputs[3]) {
-      inputs[3].readOnly = true;
-      inputs[3].style.background = 'var(--paper)';
-      inputs[3].title = 'Auto-calculated from your profile';
-    }
-
-    // Hook save button
-    var btn = hpCard.querySelector('button');
-    if (btn) {
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        var p = readSettingsProfile();
-        if (p) { saveProfile(p); applyToDashboard(p); if (typeof showToast === 'function') showToast('Profile updated', '#1e6b5e'); }
-      });
-    }
-
-    // Auto-recalc
-    ['settings-gender', 'settings-dob', 'settings-height', 'settings-weight', 'settings-activity', 'settings-goal'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) { el.addEventListener('change', recalcSettings); el.addEventListener('input', recalcSettings); }
-    });
-  }
-
-  function readSettingsProfile() {
-    var old = getProfile() || {};
-    return {
-      displayName: old.displayName || '',
-      gender: (document.getElementById('settings-gender') || {}).value || 'other',
-      dateOfBirth: (document.getElementById('settings-dob') || {}).value || '2000-01-01',
-      heightCm: parseFloat((document.getElementById('settings-height') || {}).value) || 170,
-      weightKg: parseFloat((document.getElementById('settings-weight') || {}).value) || 70,
-      activityLevel: (document.getElementById('settings-activity') || {}).value || 'moderately_active',
-      goal: (document.getElementById('settings-goal') || {}).value || 'maintain',
-      wantsExercise: old.wantsExercise || false,
-      exerciseIntensity: old.exerciseIntensity || 'moderate'
-    };
-  }
-
-  function recalcSettings() {
-    var p = readSettingsProfile();
-    if (!p.dateOfBirth || !p.heightCm || !p.weightKg) return;
-    var s = computeAll(p);
-    var calEl = document.getElementById('settings-calorie-target');
-    if (calEl) calEl.value = s.target;
-    var bmiEl = document.getElementById('settings-bmi-display');
-    if (bmiEl) {
-      bmiEl.textContent = 'BMI: ' + s.bmi + ' (' + s.bmiCategory + ') · BMR: ' + s.bmr + ' · TDEE: ' + s.tdee;
-      bmiEl.style.color = (s.bmi >= 18.5 && s.bmi < 25) ? 'var(--teal)' : 'var(--amber)';
-    }
-  }
-
-  // ── Modal Styles ─────────────────────────────────────────────
-  function injectStyles() {
-    if (document.getElementById('nw-wm-styles')) return;
-    var s = document.createElement('style');
-    s.id = 'nw-wm-styles';
-    s.textContent = '\
-#nw-welcome-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(10,20,16,0.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}\
+// ══════════════════════════════════════════════════════════════
+// MODAL UI — v3 Complete Redesign
+// ══════════════════════════════════════════════════════════════
+var STEPS=5,cur=1,_un='',_ini='';
+function injectStyles(){if(document.getElementById('nw-wm-css'))return;var s=document.createElement('style');s.id='nw-wm-css';
+s.textContent='\
+#nw-welcome-overlay{position:fixed;inset:0;z-index:99999;background:rgba(10,20,16,0.6);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .4s}\
 #nw-welcome-overlay.visible{opacity:1}\
-#nw-welcome-card{background:var(--white,#fff);border-radius:24px;width:540px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(10,20,16,0.25);transform:translateY(20px);transition:transform .3s}\
-#nw-welcome-overlay.visible #nw-welcome-card{transform:translateY(0)}\
-.wm-header{background:var(--ink,#0a1410);color:#fff;padding:32px 32px 24px;border-radius:24px 24px 0 0}\
-.wm-header h2{font-family:"Instrument Serif",serif;font-size:28px;font-weight:400;font-style:italic;margin:0 0 6px}\
-.wm-header p{font-family:"JetBrains Mono",monospace;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:.04em;margin:0}\
-.wm-body{padding:28px 32px 32px}\
-.wm-steps{display:flex;gap:6px;margin-bottom:24px}\
-.wm-step{flex:1;height:4px;border-radius:4px;background:var(--fog,#dce6e0);transition:background .3s}\
-.wm-step.active{background:var(--teal,#1e6b5e)}.wm-step.done{background:var(--teal-l,#2f8f7f)}\
-.wm-field{margin-bottom:16px}\
-.wm-label{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--ink-f,#6b8878);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;display:block}\
-.wm-input{width:100%;padding:11px 14px;border:1px solid var(--border,#d4dfd8);border-radius:10px;font-family:"Bricolage Grotesque",sans-serif;font-size:14px;color:var(--ink,#0a1410);outline:none;transition:border-color .2s,box-shadow .2s;background:var(--white,#fff)}\
-.wm-input:focus{border-color:var(--teal,#1e6b5e);box-shadow:0 0 0 3px rgba(30,107,94,0.1)}\
-.wm-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}\
-.wm-option-group{display:flex;flex-wrap:wrap;gap:8px}\
-.wm-option{padding:10px 16px;border:1.5px solid var(--border,#d4dfd8);border-radius:10px;font-size:13px;font-weight:600;color:var(--ink-m,#3d5448);cursor:pointer;transition:all .2s;background:var(--white,#fff)}\
-.wm-option:hover{border-color:var(--teal-l,#2f8f7f);background:var(--teal-lll,#e8f4f2)}\
-.wm-option.selected{border-color:var(--teal,#1e6b5e);background:var(--teal,#1e6b5e);color:#fff}\
-.wm-option .wm-opt-sub{font-size:10px;font-weight:400;opacity:.7;margin-top:2px}\
-.wm-option.selected .wm-opt-sub{opacity:.85}\
-.wm-btn{width:100%;padding:14px;border:none;border-radius:12px;font-family:"Bricolage Grotesque",sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}\
-.wm-btn-primary{background:var(--ink,#0a1410);color:#fff;margin-top:8px}.wm-btn-primary:hover{background:var(--teal,#1e6b5e)}.wm-btn-primary:disabled{opacity:.4;cursor:not-allowed}\
-.wm-btn-secondary{background:transparent;color:var(--ink-f,#6b8878);font-size:12px;font-weight:500;margin-top:4px}.wm-btn-secondary:hover{color:var(--ink,#0a1410)}\
-.wm-result{background:var(--teal-lll,#e8f4f2);border:1px solid var(--teal-ll,#b8ddd8);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center}\
-.wm-result-num{font-size:36px;font-weight:800;color:var(--teal,#1e6b5e);font-family:"Bricolage Grotesque",sans-serif}\
-.wm-result-label{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-f,#6b8878);letter-spacing:.06em;text-transform:uppercase;margin-top:4px}\
-.wm-result-detail{display:flex;justify-content:center;gap:20px;margin-top:14px;flex-wrap:wrap}\
-.wm-result-item{text-align:center;min-width:60px}\
-.wm-result-item-num{font-size:18px;font-weight:700;color:var(--ink,#0a1410)}\
-.wm-result-item-label{font-family:"JetBrains Mono",monospace;font-size:8px;color:var(--ink-f,#6b8878);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}\
-.wm-avatar{width:64px;height:64px;border-radius:50%;background:var(--teal,#1e6b5e);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;margin:0 auto 12px}\
-.wm-name-display{font-size:20px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:4px}\
-.wm-name-hint{font-size:11px;color:var(--ink-f);text-align:center;margin-bottom:16px;line-height:1.5}\
-.wm-macro-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}\
-.wm-macro-chip{flex:1;min-width:70px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}\
-.wm-macro-val{font-size:18px;font-weight:800}.wm-macro-lbl{font-family:"JetBrains Mono",monospace;font-size:8px;color:var(--ink-f);margin-top:2px}\
-';
-    document.head.appendChild(s);
-  }
+#nw-wm{background:#fff;border-radius:20px;width:600px;max-width:94vw;height:540px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 40px 100px rgba(10,20,16,0.28),0 0 0 1px rgba(30,107,94,0.06);transform:translateY(14px) scale(0.97);transition:transform .4s cubic-bezier(.16,1,.3,1);overflow:hidden}\
+#nw-welcome-overlay.visible #nw-wm{transform:none}\
+.wm3-bar{height:3px;background:var(--fog,#dce6e0)}.wm3-bar-fill{height:100%;background:linear-gradient(90deg,#1e6b5e,#2f8f7f);border-radius:0 2px 2px 0;transition:width .4s cubic-bezier(.16,1,.3,1)}\
+.wm3-head{padding:24px 32px 0;flex-shrink:0}\
+.wm3-tag{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--teal,#1e6b5e);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}\
+.wm3-title{font-family:"Instrument Serif",serif;font-size:26px;font-style:italic;color:var(--ink,#0a1410);line-height:1.15;margin-bottom:4px}\
+.wm3-sub{font-size:13px;color:var(--ink-f,#6b8878);line-height:1.5}\
+.wm3-body{flex:1;overflow-y:auto;padding:18px 32px 20px}\
+.wm3-foot{padding:14px 32px 20px;border-top:1px solid var(--fog,#dce6e0);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#fff}\
+.wm3-fl{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-f)}\
+.wm3-fr{display:flex;gap:10px}\
+.wm3-back{padding:10px 20px;border:1px solid var(--border,#d4dfd8);border-radius:10px;background:#fff;color:var(--ink-m);font-size:13px;font-weight:600;cursor:pointer;font-family:"Bricolage Grotesque",sans-serif;transition:all .15s}\
+.wm3-back:hover{border-color:var(--ink-m);color:var(--ink)}\
+.wm3-next{padding:10px 28px;border:none;border-radius:10px;background:var(--ink,#0a1410);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:"Bricolage Grotesque",sans-serif;transition:all .15s}\
+.wm3-next:hover{background:var(--teal,#1e6b5e)}\
+.wm3-next:disabled{opacity:.3;cursor:not-allowed}\
+.wm3-label{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:block}\
+.wm3-input{width:100%;padding:12px 16px;border:1.5px solid var(--border,#d4dfd8);border-radius:10px;font-family:"Bricolage Grotesque",sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;background:#fff}\
+.wm3-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(30,107,94,0.08)}\
+.wm3-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}\
+.wm3-field{margin-bottom:16px}\
+.wm3-opts{display:grid;gap:10px}.wm3-opts.c2{grid-template-columns:1fr 1fr}.wm3-opts.c3{grid-template-columns:1fr 1fr 1fr}\
+.wm3-o{border:1.5px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;background:#fff;text-align:center}\
+.wm3-o:hover{border-color:var(--teal-l);background:var(--teal-lll)}\
+.wm3-o.on{border-color:var(--teal);background:var(--teal);color:#fff}\
+.wm3-o-em{font-size:22px;margin-bottom:4px}\
+.wm3-o-lb{font-size:13px;font-weight:700}\
+.wm3-o-ds{font-size:10px;opacity:.6;margin-top:3px;line-height:1.4}\
+.wm3-o.on .wm3-o-ds{opacity:.85}\
+.wm3-av{display:flex;align-items:center;gap:18px;padding:18px 20px;background:var(--paper);border-radius:14px;margin-bottom:18px}\
+.wm3-av-pic{width:56px;height:56px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0}\
+.wm3-av-name{font-size:17px;font-weight:700;color:var(--ink)}\
+.wm3-av-hint{font-size:11px;color:var(--ink-f);line-height:1.5;margin-top:3px}\
+.wm3-hero{background:linear-gradient(135deg,#0a1410,#1a3a30);border-radius:16px;padding:24px;text-align:center;color:#fff;margin-bottom:16px}\
+.wm3-hero-big{font-size:42px;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;line-height:1}\
+.wm3-hero-lbl{font-family:"JetBrains Mono",monospace;font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-top:6px}\
+.wm3-hero-row{display:flex;justify-content:center;gap:28px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}\
+.wm3-hero-stat{text-align:center}.wm3-hero-stat-n{font-size:20px;font-weight:700}.wm3-hero-stat-l{font-family:"JetBrains Mono",monospace;font-size:8px;color:rgba(255,255,255,.45);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}\
+.wm3-macros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}\
+.wm3-macro{background:var(--paper);border-radius:12px;padding:14px;text-align:center}\
+.wm3-macro-v{font-size:22px;font-weight:800}\
+.wm3-macro-l{font-family:"JetBrains Mono",monospace;font-size:8px;color:var(--ink-f);margin-top:3px}\
+.wm3-ex{background:var(--teal-lll);border:1px solid var(--teal-ll);border-radius:12px;padding:14px 16px;margin-bottom:14px}\
+.wm3-ex b{color:var(--teal)}\
+';document.head.appendChild(s);}
 
-  // ── Build Modal ──────────────────────────────────────────────
-  function buildModal() {
-    if (document.getElementById('nw-welcome-overlay')) return;
+function buildModal(){
+if(document.getElementById('nw-welcome-overlay'))return;
+injectStyles();
+_un=(typeof NW!=='undefined'&&NW.auth)?NW.auth.name:'User';
+_ini=_un.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().substring(0,2);
+var ov=document.createElement('div');ov.id='nw-welcome-overlay';
+ov.innerHTML='<div id="nw-wm"><div class="wm3-bar"><div class="wm3-bar-fill" id="wm-bar" style="width:20%"></div></div><div class="wm3-head"><div class="wm3-tag" id="wm-tag"></div><div class="wm3-title" id="wm-title"></div><div class="wm3-sub" id="wm-sub"></div></div><div class="wm3-body" id="wm-body"></div><div class="wm3-foot"><div class="wm3-fl" id="wm-fl"></div><div class="wm3-fr" id="wm-fr"></div></div></div>';
+document.body.appendChild(ov);
+cur=1;render();
+requestAnimationFrame(function(){requestAnimationFrame(function(){ov.classList.add('visible');});});}
 
-    // Get user's registered name
-    var userName = (typeof NW !== 'undefined' && NW.auth) ? NW.auth.name : 'User';
-    var initials = userName.split(' ').map(function (w) { return w[0] || ''; }).join('').toUpperCase().substring(0, 2);
+var SC={
+1:{tag:'Step 1 of 5 — Your Profile',title:'Hi there!',sub:'Let\'s confirm how you\'d like to appear on NourishWell.'},
+2:{tag:'Step 2 of 5 — Body Metrics',title:'About you',sub:'We use this to calculate your BMI, metabolic rate, and daily targets.'},
+3:{tag:'Step 3 of 5 — Lifestyle',title:'Activity & goal',sub:'This determines your calorie target and macro balance.'},
+4:{tag:'Step 4 of 5 — Exercise',title:'Exercise preferences',sub:'Optional — set a daily exercise target or skip this.'},
+5:{tag:'Step 5 of 5 — Your Plan',title:'Here\'s your plan',sub:'Personalised targets based on the Mifflin-St Jeor equation.'}
+};
 
-    var overlay = document.createElement('div');
-    overlay.id = 'nw-welcome-overlay';
-    overlay.innerHTML = '<div id="nw-welcome-card">\
-<div class="wm-header"><h2>Welcome to NourishWell</h2><p>Let\'s set up your personalised nutrition plan</p></div>\
-<div class="wm-body">\
-<div class="wm-steps"><div class="wm-step active" id="wm-s1"></div><div class="wm-step" id="wm-s2"></div><div class="wm-step" id="wm-s3"></div><div class="wm-step" id="wm-s4"></div><div class="wm-step" id="wm-s5"></div></div>\
-\
-<!-- Step 1: Name -->\
-<div id="wm-p1">\
-<div class="wm-avatar">' + initials + '</div>\
-<div class="wm-name-display">' + userName + '</div>\
-<div class="wm-name-hint">This is how you\'ll appear to others — professionals, comments, and your profile.<br>You can change this later in <strong>Settings → Personal Details</strong>.</div>\
-<div class="wm-field"><span class="wm-label">Display Name</span><input type="text" class="wm-input" id="wm-name" value="' + userName + '"></div>\
-<button class="wm-btn wm-btn-primary" id="wm-next-1">Continue →</button>\
-</div>\
-\
-<!-- Step 2: Body -->\
-<div id="wm-p2" style="display:none">\
-<div class="wm-field"><span class="wm-label">Gender</span><div class="wm-option-group" id="wm-gender"><div class="wm-option" data-val="male">👨 Male</div><div class="wm-option" data-val="female">👩 Female</div><div class="wm-option" data-val="other">🤝 Prefer not to say</div></div></div>\
-<div class="wm-field"><span class="wm-label">Date of Birth</span><input type="date" class="wm-input" id="wm-dob" max="' + new Date().toISOString().split('T')[0] + '"></div>\
-<div class="wm-row"><div class="wm-field"><span class="wm-label">Height (cm)</span><input type="number" class="wm-input" id="wm-height" placeholder="e.g. 170" min="100" max="250"></div><div class="wm-field"><span class="wm-label">Weight (kg)</span><input type="number" class="wm-input" id="wm-weight" placeholder="e.g. 70" min="30" max="300" step="0.1"></div></div>\
-<button class="wm-btn wm-btn-primary" id="wm-next-2" disabled>Next →</button>\
-<button class="wm-btn wm-btn-secondary" id="wm-back-2">← Back</button>\
-</div>\
-\
-<!-- Step 3: Activity & Goal -->\
-<div id="wm-p3" style="display:none">\
-<div class="wm-field"><span class="wm-label">Activity Level</span><div class="wm-option-group" id="wm-activity">\
-<div class="wm-option" data-val="sedentary">🪑 Sedentary<div class="wm-opt-sub">Little or no exercise</div></div>\
-<div class="wm-option" data-val="lightly_active">🚶 Lightly Active<div class="wm-opt-sub">Exercise 1–3 days/week</div></div>\
-<div class="wm-option" data-val="moderately_active">🏃 Moderately Active<div class="wm-opt-sub">Exercise 3–5 days/week</div></div>\
-<div class="wm-option" data-val="very_active">🏋️ Very Active<div class="wm-opt-sub">Exercise 6–7 days/week</div></div>\
-</div></div>\
-<div class="wm-field"><span class="wm-label">Your Goal</span><div class="wm-option-group" id="wm-goal"><div class="wm-option" data-val="lose">📉 Lose Weight</div><div class="wm-option" data-val="maintain">⚖️ Maintain</div><div class="wm-option" data-val="gain">💪 Gain Muscle</div></div></div>\
-<button class="wm-btn wm-btn-primary" id="wm-next-3" disabled>Next →</button>\
-<button class="wm-btn wm-btn-secondary" id="wm-back-3">← Back</button>\
-</div>\
-\
-<!-- Step 4: Exercise -->\
-<div id="wm-p4" style="display:none">\
-<div class="wm-field"><span class="wm-label">Would you like exercise recommendations?</span><div class="wm-option-group" id="wm-wants-ex"><div class="wm-option" data-val="yes">✅ Yes, help me plan</div><div class="wm-option" data-val="no">🚫 No thanks</div></div></div>\
-<div id="wm-ex-detail" style="display:none">\
-<div class="wm-field"><span class="wm-label">Preferred Intensity</span><div class="wm-option-group" id="wm-ex-intensity">\
-<div class="wm-option" data-val="light">🧘 Light<div class="wm-opt-sub">Walking, yoga, stretching</div></div>\
-<div class="wm-option" data-val="moderate">🏊 Moderate<div class="wm-opt-sub">Jogging, cycling, swimming</div></div>\
-<div class="wm-option" data-val="intense">🔥 Intense<div class="wm-opt-sub">Running, HIIT, weights</div></div>\
-</div></div>\
-</div>\
-<button class="wm-btn wm-btn-primary" id="wm-next-4" disabled>See my plan →</button>\
-<button class="wm-btn wm-btn-secondary" id="wm-back-4">← Back</button>\
-</div>\
-\
-<!-- Step 5: Results -->\
-<div id="wm-p5" style="display:none">\
-<div class="wm-result">\
-<div class="wm-result-num" id="wm-res-target">—</div>\
-<div class="wm-result-label">Your daily calorie target</div>\
-<div class="wm-result-detail">\
-<div class="wm-result-item"><div class="wm-result-item-num" id="wm-res-bmi">—</div><div class="wm-result-item-label">BMI</div></div>\
-<div class="wm-result-item"><div class="wm-result-item-num" id="wm-res-bmr">—</div><div class="wm-result-item-label">BMR</div></div>\
-<div class="wm-result-item"><div class="wm-result-item-num" id="wm-res-tdee">—</div><div class="wm-result-item-label">TDEE</div></div>\
-</div></div>\
-<div id="wm-res-macros"></div>\
-<div id="wm-res-exercise" style="margin-top:12px"></div>\
-<div style="font-size:11px;color:var(--ink-f);line-height:1.6;margin:14px 0;text-align:center">Calculated using <strong>Mifflin-St Jeor</strong> equation. Update anytime in <strong>Settings → Health Profile</strong>.</div>\
-<button class="wm-btn wm-btn-primary" id="wm-finish">Start tracking →</button>\
-</div>\
-</div></div>';
+function render(){
+var c=SC[cur];
+document.getElementById('wm-tag').textContent=c.tag;
+document.getElementById('wm-title').textContent=c.title;
+document.getElementById('wm-sub').textContent=c.sub;
+document.getElementById('wm-bar').style.width=(cur/STEPS*100)+'%';
+var bd=document.getElementById('wm-body'),fl=document.getElementById('wm-fl'),fr=document.getElementById('wm-fr');
+fl.textContent=cur+' of '+STEPS;
 
-    document.body.appendChild(overlay);
-    requestAnimationFrame(function () { requestAnimationFrame(function () { overlay.classList.add('visible'); }); });
+if(cur===1){
+bd.innerHTML='<div class="wm3-av"><div class="wm3-av-pic" id="wm-av">'+_ini+'</div><div><div class="wm3-av-name" id="wm-avn">'+_un+'</div><div class="wm3-av-hint">This name appears on comments, ratings, and messages with professionals. You can change it later in Settings → Personal Details.</div></div></div><div class="wm3-field"><span class="wm3-label">Display Name</span><input type="text" class="wm3-input" id="wm-name" value="'+_un+'"></div>';
+fr.innerHTML='<button class="wm3-next" id="wm-nx">Continue →</button>';
+document.getElementById('wm-name').addEventListener('input',function(){var v=this.value.trim();document.getElementById('wm-avn').textContent=v||'User';document.getElementById('wm-av').textContent=v?v.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().substring(0,2):'?';});
+document.getElementById('wm-nx').onclick=function(){cur=2;render();};
 
-    // Wire option groups
-    ['wm-gender', 'wm-activity', 'wm-goal', 'wm-wants-ex', 'wm-ex-intensity'].forEach(wireOptionGroup);
+}else if(cur===2){
+bd.innerHTML='<div class="wm3-field"><span class="wm3-label">Gender</span><div class="wm3-opts c3" id="wg">'+O('male','👨','Male')+O('female','👩','Female')+O('other','🤝','Other')+'</div></div><div class="wm3-field"><span class="wm3-label">Date of Birth</span><input type="date" class="wm3-input" id="wm-dob" max="'+new Date().toISOString().split('T')[0]+'"></div><div class="wm3-row"><div class="wm3-field"><span class="wm3-label">Height (cm)</span><input type="number" class="wm3-input" id="wm-h" placeholder="170" min="100" max="250"></div><div class="wm3-field"><span class="wm3-label">Weight (kg)</span><input type="number" class="wm3-input" id="wm-w" placeholder="70" min="30" max="300" step="0.1"></div></div>';
+fr.innerHTML='<button class="wm3-back" id="wm-bk">← Back</button><button class="wm3-next" id="wm-nx" disabled>Next →</button>';
+W('wg');['wm-dob','wm-h','wm-w'].forEach(function(i){document.getElementById(i).addEventListener('input',V2);});document.getElementById('wg').addEventListener('click',function(){setTimeout(V2,10);});
+document.getElementById('wm-bk').onclick=function(){cur=1;render();};
+document.getElementById('wm-nx').onclick=function(){cur=3;render();};
 
-    // Step 1 — name (always valid)
-    document.getElementById('wm-name').addEventListener('input', function () {
-      var av = document.querySelector('.wm-avatar');
-      var val = this.value.trim();
-      if (av && val) {
-        av.textContent = val.split(' ').map(function (w) { return w[0] || ''; }).join('').toUpperCase().substring(0, 2);
-      }
-    });
-    document.getElementById('wm-next-1').addEventListener('click', function () { goStep(2); });
+}else if(cur===3){
+bd.innerHTML='<div class="wm3-field"><span class="wm3-label">How active are you?</span><div class="wm3-opts c2" id="wa">'+OD('sedentary','🪑','Sedentary','Desk job, little exercise')+OD('lightly_active','🚶','Lightly Active','Exercise 1–3 days/week')+OD('moderately_active','🏃','Moderately Active','Exercise 3–5 days/week')+OD('very_active','🏋️','Very Active','Hard exercise 6–7 days')+'</div></div><div class="wm3-field"><span class="wm3-label">What\'s your goal?</span><div class="wm3-opts c3" id="wgo">'+O('lose','📉','Lose Weight')+O('maintain','⚖️','Maintain')+O('gain','💪','Gain Muscle')+'</div></div>';
+fr.innerHTML='<button class="wm3-back" id="wm-bk">← Back</button><button class="wm3-next" id="wm-nx" disabled>Next →</button>';
+W('wa');W('wgo');document.getElementById('wa').addEventListener('click',function(){setTimeout(V3,10);});document.getElementById('wgo').addEventListener('click',function(){setTimeout(V3,10);});
+document.getElementById('wm-bk').onclick=function(){cur=2;render();};
+document.getElementById('wm-nx').onclick=function(){cur=4;render();};
 
-    // Step 2 — body validation
-    ['wm-dob', 'wm-height', 'wm-weight'].forEach(function (id) {
-      document.getElementById(id).addEventListener('input', valStep2);
-    });
-    document.getElementById('wm-gender').addEventListener('click', function () { setTimeout(valStep2, 10); });
-    document.getElementById('wm-next-2').addEventListener('click', function () { goStep(3); });
-    document.getElementById('wm-back-2').addEventListener('click', function () { goStep(1); });
+}else if(cur===4){
+bd.innerHTML='<div class="wm3-field"><span class="wm3-label">Would you like a daily exercise target?</span><div class="wm3-opts c2" id="we">'+O('yes','✅','Yes please')+O('no','⏭️','Skip for now')+'</div></div><div id="wm-exd" style="display:none"><div class="wm3-field"><span class="wm3-label">Preferred intensity</span><div class="wm3-opts c3" id="wei">'+OD('light','🧘','Light','Walking, yoga')+OD('moderate','🏊','Moderate','Jogging, cycling')+OD('intense','🔥','Intense','HIIT, weights')+'</div></div></div>';
+fr.innerHTML='<button class="wm3-back" id="wm-bk">← Back</button><button class="wm3-next" id="wm-nx" disabled>See my plan →</button>';
+W('we');W('wei');
+document.getElementById('we').addEventListener('click',function(){setTimeout(function(){var v=SV('we');document.getElementById('wm-exd').style.display=v==='yes'?'block':'none';V4();},10);});
+document.getElementById('wei').addEventListener('click',function(){setTimeout(V4,10);});
+document.getElementById('wm-bk').onclick=function(){cur=3;render();};
+document.getElementById('wm-nx').onclick=function(){cur=5;render();};
 
-    // Step 3 — activity & goal
-    document.getElementById('wm-activity').addEventListener('click', function () { setTimeout(valStep3, 10); });
-    document.getElementById('wm-goal').addEventListener('click', function () { setTimeout(valStep3, 10); });
-    document.getElementById('wm-next-3').addEventListener('click', function () { goStep(4); });
-    document.getElementById('wm-back-3').addEventListener('click', function () { goStep(2); });
+}else if(cur===5){
+var p=CA(),s=computeAll(p),m=s.macros;
+bd.innerHTML='<div class="wm3-hero"><div class="wm3-hero-big">'+s.target.toLocaleString()+'</div><div class="wm3-hero-lbl">calories per day</div><div class="wm3-hero-row"><div class="wm3-hero-stat"><div class="wm3-hero-stat-n">'+s.bmi+'</div><div class="wm3-hero-stat-l">BMI</div></div><div class="wm3-hero-stat"><div class="wm3-hero-stat-n">'+s.bmr.toLocaleString()+'</div><div class="wm3-hero-stat-l">BMR</div></div><div class="wm3-hero-stat"><div class="wm3-hero-stat-n">'+s.tdee.toLocaleString()+'</div><div class="wm3-hero-stat-l">TDEE</div></div></div></div>'+
+'<div class="wm3-macros"><div class="wm3-macro"><div class="wm3-macro-v" style="color:#d4956a">'+m.pG+'g</div><div class="wm3-macro-l">Protein · '+m.pP+'%</div></div><div class="wm3-macro"><div class="wm3-macro-v" style="color:#2f8f7f">'+m.cG+'g</div><div class="wm3-macro-l">Carbs · '+m.cP+'%</div></div><div class="wm3-macro"><div class="wm3-macro-v" style="color:#7aaad4">'+m.fG+'g</div><div class="wm3-macro-l">Fat · '+m.fP+'%</div></div></div>'+
+(p.wantsExercise?'<div class="wm3-ex"><div style="font-size:11px;font-weight:700;margin-bottom:4px"><b>🏃 Daily Exercise Goal</b></div><div style="font-size:13px;color:var(--ink-m)">~'+s.exercise.kcal+' kcal · '+s.exercise.text+'</div></div>':'')+
+'<div style="font-size:11px;color:var(--ink-f);line-height:1.6;text-align:center">Update anytime in <strong>Settings → Health Profile</strong></div>';
+fr.innerHTML='<button class="wm3-back" id="wm-bk">← Back</button><button class="wm3-next" id="wm-nx" style="background:var(--teal)">Start tracking →</button>';
+document.getElementById('wm-bk').onclick=function(){cur=4;render();};
+document.getElementById('wm-nx').onclick=function(){var p=CA();saveProfile(p);applyToDashboard(p);var o=document.getElementById('nw-welcome-overlay');if(o){o.classList.remove('visible');setTimeout(function(){o.remove();},400);}if(typeof showToast==='function')showToast('Your plan is ready!','#1e6b5e');};
+}}
 
-    // Step 4 — exercise
-    document.getElementById('wm-wants-ex').addEventListener('click', function () {
-      setTimeout(function () {
-        var v = getSelVal('wm-wants-ex');
-        document.getElementById('wm-ex-detail').style.display = v === 'yes' ? 'block' : 'none';
-        valStep4();
-      }, 10);
-    });
-    document.getElementById('wm-ex-intensity').addEventListener('click', function () { setTimeout(valStep4, 10); });
-    document.getElementById('wm-next-4').addEventListener('click', function () { showResults(); goStep(5); });
-    document.getElementById('wm-back-4').addEventListener('click', function () { goStep(3); });
+function O(v,e,l){return'<div class="wm3-o" data-val="'+v+'"><div class="wm3-o-em">'+e+'</div><div class="wm3-o-lb">'+l+'</div></div>';}
+function OD(v,e,l,d){return'<div class="wm3-o" data-val="'+v+'"><div class="wm3-o-em">'+e+'</div><div class="wm3-o-lb">'+l+'</div><div class="wm3-o-ds">'+d+'</div></div>';}
+function W(id){var g=document.getElementById(id);if(!g)return;g.addEventListener('click',function(e){var o=e.target.closest('.wm3-o');if(!o)return;g.querySelectorAll('.wm3-o').forEach(function(x){x.classList.remove('on');});o.classList.add('on');});}
+function SV(id){var s=document.querySelector('#'+id+' .wm3-o.on');return s?s.getAttribute('data-val'):null;}
+function V2(){var n=document.getElementById('wm-nx');if(n)n.disabled=!(SV('wg')&&document.getElementById('wm-dob').value&&document.getElementById('wm-h').value&&document.getElementById('wm-w').value);}
+function V3(){var n=document.getElementById('wm-nx');if(n)n.disabled=!(SV('wa')&&SV('wgo'));}
+function V4(){var w=SV('we'),n=document.getElementById('wm-nx');if(!w){n.disabled=true;return;}n.disabled=w==='yes'?!SV('wei'):false;}
+function CA(){return{displayName:(document.getElementById('wm-name')||{}).value||_un,gender:SV('wg')||'other',dateOfBirth:(document.getElementById('wm-dob')||{}).value||'',heightCm:parseFloat((document.getElementById('wm-h')||{}).value)||170,weightKg:parseFloat((document.getElementById('wm-w')||{}).value)||70,activityLevel:SV('wa')||'moderately_active',goal:SV('wgo')||'maintain',wantsExercise:SV('we')==='yes',exerciseIntensity:SV('wei')||'moderate'};}
 
-    // Step 5 — finish
-    document.getElementById('wm-finish').addEventListener('click', function () {
-      var p = collectAll();
-      saveProfile(p);
-      applyToDashboard(p);
-      overlay.classList.remove('visible');
-      setTimeout(function () { overlay.remove(); }, 300);
-      if (typeof showToast === 'function') showToast('Your plan is ready!', '#1e6b5e');
-    });
-  }
-
-  function goStep(n) {
-    for (var i = 1; i <= 5; i++) {
-      var pg = document.getElementById('wm-p' + i);
-      if (pg) pg.style.display = i === n ? 'block' : 'none';
-      var st = document.getElementById('wm-s' + i);
-      if (st) st.className = 'wm-step' + (i < n ? ' done' : i === n ? ' active' : '');
-    }
-  }
-
-  function wireOptionGroup(id) {
-    var g = document.getElementById(id);
-    if (!g) return;
-    g.addEventListener('click', function (e) {
-      var opt = e.target.closest('.wm-option');
-      if (!opt) return;
-      g.querySelectorAll('.wm-option').forEach(function (o) { o.classList.remove('selected'); });
-      opt.classList.add('selected');
-    });
-  }
-
-  function getSelVal(id) {
-    var s = document.querySelector('#' + id + ' .wm-option.selected');
-    return s ? s.getAttribute('data-val') : null;
-  }
-
-  function valStep2() {
-    document.getElementById('wm-next-2').disabled = !(getSelVal('wm-gender') && document.getElementById('wm-dob').value && document.getElementById('wm-height').value && document.getElementById('wm-weight').value);
-  }
-  function valStep3() {
-    document.getElementById('wm-next-3').disabled = !(getSelVal('wm-activity') && getSelVal('wm-goal'));
-  }
-  function valStep4() {
-    var wants = getSelVal('wm-wants-ex');
-    if (!wants) { document.getElementById('wm-next-4').disabled = true; return; }
-    if (wants === 'no') { document.getElementById('wm-next-4').disabled = false; return; }
-    document.getElementById('wm-next-4').disabled = !getSelVal('wm-ex-intensity');
-  }
-
-  function collectAll() {
-    return {
-      displayName: (document.getElementById('wm-name') || {}).value || '',
-      gender: getSelVal('wm-gender') || 'other',
-      dateOfBirth: (document.getElementById('wm-dob') || {}).value || '',
-      heightCm: parseFloat((document.getElementById('wm-height') || {}).value) || 170,
-      weightKg: parseFloat((document.getElementById('wm-weight') || {}).value) || 70,
-      activityLevel: getSelVal('wm-activity') || 'moderately_active',
-      goal: getSelVal('wm-goal') || 'maintain',
-      wantsExercise: getSelVal('wm-wants-ex') === 'yes',
-      exerciseIntensity: getSelVal('wm-ex-intensity') || 'moderate'
-    };
-  }
-
-  function showResults() {
-    var p = collectAll();
-    var s = computeAll(p);
-
-    document.getElementById('wm-res-target').textContent = s.target.toLocaleString();
-    document.getElementById('wm-res-bmi').textContent = s.bmi;
-    document.getElementById('wm-res-bmr').textContent = s.bmr.toLocaleString();
-    document.getElementById('wm-res-tdee').textContent = s.tdee.toLocaleString();
-
-    // Macros
-    var m = s.macros;
-    document.getElementById('wm-res-macros').innerHTML =
-      '<div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:6px">Daily Macro Targets</div>' +
-      '<div class="wm-macro-row">' +
-        '<div class="wm-macro-chip"><div class="wm-macro-val" style="color:#d4956a">' + m.proteinG + 'g</div><div class="wm-macro-lbl">Protein · ' + m.proteinPct + '%</div></div>' +
-        '<div class="wm-macro-chip"><div class="wm-macro-val" style="color:#2f8f7f">' + m.carbsG + 'g</div><div class="wm-macro-lbl">Carbs · ' + m.carbsPct + '%</div></div>' +
-        '<div class="wm-macro-chip"><div class="wm-macro-val" style="color:#7aaad4">' + m.fatG + 'g</div><div class="wm-macro-lbl">Fat · ' + m.fatPct + '%</div></div>' +
-      '</div>';
-
-    // Exercise
-    var exEl = document.getElementById('wm-res-exercise');
-    if (p.wantsExercise) {
-      exEl.innerHTML = '<div style="background:var(--teal-lll);border:1px solid var(--teal-ll);border-radius:10px;padding:12px 14px">' +
-        '<div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">🏃 Daily Exercise Goal</div>' +
-        '<div style="font-size:13px;color:var(--ink)">~' + s.exercise.kcalPerDay + ' kcal · ' + s.exercise.suggestion + '</div></div>';
-    } else {
-      exEl.innerHTML = '<div style="font-size:11px;color:var(--ink-f);text-align:center">No exercise target — you can enable this later in Settings.</div>';
-    }
-  }
-
-  // ── Init ─────────────────────────────────────────────────────
-  function init() {
-    injectStyles();
-    patchSettings();
-    var profile = getProfile();
-    if (isProfileComplete(profile)) {
-      applyToDashboard(profile);
-    } else {
-      buildModal();
-    }
-  }
-
-  // Expose
-  window._nwShowWelcomeModal = function () { var p = getProfile(); if (!isProfileComplete(p)) buildModal(); };
-  window._nwGetProfile = getProfile;
-  window._nwApplyProfile = applyToDashboard;
-  window._nwComputeProfile = computeAll;
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else setTimeout(init, 300);
-
+// ── Init ──
+function init(){injectStyles();patchSettings();var p=getProfile();if(isProfileComplete(p))applyToDashboard(p);else buildModal();}
+window._nwShowWelcomeModal=function(){var p=getProfile();if(!isProfileComplete(p))buildModal();};
+window._nwGetProfile=getProfile;window._nwApplyProfile=applyToDashboard;window._nwComputeProfile=computeAll;
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else setTimeout(init,300);
 })();
