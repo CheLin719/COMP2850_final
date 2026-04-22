@@ -54,6 +54,20 @@ function recalcS(){var p=readSP();if(!p.dateOfBirth||!p.heightCm||!p.weightKg)re
 // MODAL UI — v3 Complete Redesign
 // ══════════════════════════════════════════════════════════════
 var STEPS=5,cur=1,_un='',_ini='';
+// ── Bug fix: persist input data across steps ──
+var _draft={displayName:'',gender:null,dateOfBirth:'',heightCm:'',weightKg:'',activityLevel:null,goal:null,wantsExercise:null,exerciseIntensity:null};
+function saveCurrent(){
+if(cur===1){var n=document.getElementById('wm-name');if(n)_draft.displayName=n.value.trim();}
+else if(cur===2){_draft.gender=SV('wg');var d=document.getElementById('wm-dob');if(d)_draft.dateOfBirth=d.value;var h=document.getElementById('wm-h');if(h)_draft.heightCm=h.value;var w=document.getElementById('wm-w');if(w)_draft.weightKg=w.value;}
+else if(cur===3){_draft.activityLevel=SV('wa');_draft.goal=SV('wgo');}
+else if(cur===4){_draft.wantsExercise=SV('we');_draft.exerciseIntensity=SV('wei');}
+}
+function restoreCurrent(){
+if(cur===1){var n=document.getElementById('wm-name');if(n&&_draft.displayName)n.value=_draft.displayName;}
+else if(cur===2){if(_draft.gender){var g=document.querySelector('#wg .wm3-o[data-val="'+_draft.gender+'"]');if(g){document.querySelectorAll('#wg .wm3-o').forEach(function(x){x.classList.remove('on');});g.classList.add('on');}}var d=document.getElementById('wm-dob');if(d&&_draft.dateOfBirth)d.value=_draft.dateOfBirth;var h=document.getElementById('wm-h');if(h&&_draft.heightCm)h.value=_draft.heightCm;var w=document.getElementById('wm-w');if(w&&_draft.weightKg)w.value=_draft.weightKg;setTimeout(V2,20);}
+else if(cur===3){if(_draft.activityLevel){var a=document.querySelector('#wa .wm3-o[data-val="'+_draft.activityLevel+'"]');if(a){document.querySelectorAll('#wa .wm3-o').forEach(function(x){x.classList.remove('on');});a.classList.add('on');}}if(_draft.goal){var go=document.querySelector('#wgo .wm3-o[data-val="'+_draft.goal+'"]');if(go){document.querySelectorAll('#wgo .wm3-o').forEach(function(x){x.classList.remove('on');});go.classList.add('on');}}setTimeout(V3,20);}
+else if(cur===4){if(_draft.wantsExercise){var we=document.querySelector('#we .wm3-o[data-val="'+_draft.wantsExercise+'"]');if(we){document.querySelectorAll('#we .wm3-o').forEach(function(x){x.classList.remove('on');});we.classList.add('on');}if(_draft.wantsExercise==='yes'){var exd=document.getElementById('wm-exd');if(exd)exd.style.display='block';if(_draft.exerciseIntensity){var ei=document.querySelector('#wei .wm3-o[data-val="'+_draft.exerciseIntensity+'"]');if(ei){document.querySelectorAll('#wei .wm3-o').forEach(function(x){x.classList.remove('on');});ei.classList.add('on');}}}}setTimeout(V4,20);}
+}
 function injectStyles(){if(document.getElementById('nw-wm-css'))return;var s=document.createElement('style');s.id='nw-wm-css';
 s.textContent='\
 #nw-welcome-overlay{position:fixed;inset:0;z-index:99999;background:rgba(10,20,16,0.6);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .4s}\
@@ -109,6 +123,7 @@ if(document.getElementById('nw-welcome-overlay'))return;
 injectStyles();
 _un=(typeof NW!=='undefined'&&NW.auth)?NW.auth.name:'User';
 _ini=_un.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().substring(0,2);
+_draft.displayName=_un;
 var ov=document.createElement('div');ov.id='nw-welcome-overlay';
 ov.innerHTML='<div id="nw-wm"><div class="wm3-bar"><div class="wm3-bar-fill" id="wm-bar" style="width:20%"></div></div><div class="wm3-head"><div class="wm3-tag" id="wm-tag"></div><div class="wm3-title" id="wm-title"></div><div class="wm3-sub" id="wm-sub"></div></div><div class="wm3-body" id="wm-body"></div><div class="wm3-foot"><div class="wm3-fl" id="wm-fl"></div><div class="wm3-fr" id="wm-fr"></div></div></div>';
 document.body.appendChild(ov);
@@ -136,21 +151,21 @@ if(cur===1){
 bd.innerHTML='<div class="wm3-av"><div class="wm3-av-pic" id="wm-av">'+_ini+'</div><div><div class="wm3-av-name" id="wm-avn">'+_un+'</div><div class="wm3-av-hint">This name appears on comments, ratings, and messages with professionals. You can change it later in Settings → Personal Details.</div></div></div><div class="wm3-field"><span class="wm3-label">Display Name</span><input type="text" class="wm3-input" id="wm-name" value="'+_un+'"></div>';
 fr.innerHTML='<button class="wm3-next" id="wm-nx">Continue →</button>';
 document.getElementById('wm-name').addEventListener('input',function(){var v=this.value.trim();document.getElementById('wm-avn').textContent=v||'User';document.getElementById('wm-av').textContent=v?v.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().substring(0,2):'?';});
-document.getElementById('wm-nx').onclick=function(){cur=2;render();};
+document.getElementById('wm-nx').onclick=function(){saveCurrent();cur=2;render();restoreCurrent();};
 
 }else if(cur===2){
 bd.innerHTML='<div class="wm3-field"><span class="wm3-label">Gender</span><div class="wm3-opts c3" id="wg">'+O('male','👨','Male')+O('female','👩','Female')+O('other','🤝','Other')+'</div></div><div class="wm3-field"><span class="wm3-label">Date of Birth</span><input type="date" class="wm3-input" id="wm-dob" max="'+new Date().toISOString().split('T')[0]+'"></div><div class="wm3-row"><div class="wm3-field"><span class="wm3-label">Height (cm)</span><input type="number" class="wm3-input" id="wm-h" placeholder="170" min="100" max="250"></div><div class="wm3-field"><span class="wm3-label">Weight (kg)</span><input type="number" class="wm3-input" id="wm-w" placeholder="70" min="30" max="300" step="0.1"></div></div>';
 fr.innerHTML='<button class="wm3-back" id="wm-bk">← Back</button><button class="wm3-next" id="wm-nx" disabled>Next →</button>';
 W('wg');['wm-dob','wm-h','wm-w'].forEach(function(i){document.getElementById(i).addEventListener('input',V2);});document.getElementById('wg').addEventListener('click',function(){setTimeout(V2,10);});
-document.getElementById('wm-bk').onclick=function(){cur=1;render();};
-document.getElementById('wm-nx').onclick=function(){cur=3;render();};
+document.getElementById('wm-bk').onclick=function(){saveCurrent();cur=1;render();restoreCurrent();};
+document.getElementById('wm-nx').onclick=function(){saveCurrent();cur=3;render();restoreCurrent();};
 
 }else if(cur===3){
 bd.innerHTML='<div class="wm3-field"><span class="wm3-label">How active are you?</span><div class="wm3-opts c2" id="wa">'+OD('sedentary','🪑','Sedentary','Desk job, little exercise')+OD('lightly_active','🚶','Lightly Active','Exercise 1–3 days/week')+OD('moderately_active','🏃','Moderately Active','Exercise 3–5 days/week')+OD('very_active','🏋️','Very Active','Hard exercise 6–7 days')+'</div></div><div class="wm3-field"><span class="wm3-label">What\'s your goal?</span><div class="wm3-opts c3" id="wgo">'+O('lose','📉','Lose Weight')+O('maintain','⚖️','Maintain')+O('gain','💪','Gain Muscle')+'</div></div>';
 fr.innerHTML='<button class="wm3-back" id="wm-bk">← Back</button><button class="wm3-next" id="wm-nx" disabled>Next →</button>';
 W('wa');W('wgo');document.getElementById('wa').addEventListener('click',function(){setTimeout(V3,10);});document.getElementById('wgo').addEventListener('click',function(){setTimeout(V3,10);});
-document.getElementById('wm-bk').onclick=function(){cur=2;render();};
-document.getElementById('wm-nx').onclick=function(){cur=4;render();};
+document.getElementById('wm-bk').onclick=function(){saveCurrent();cur=2;render();restoreCurrent();};
+document.getElementById('wm-nx').onclick=function(){saveCurrent();cur=4;render();restoreCurrent();};
 
 }else if(cur===4){
 bd.innerHTML='<div class="wm3-field"><span class="wm3-label">Would you like a daily exercise target?</span><div class="wm3-opts c2" id="we">'+O('yes','✅','Yes please')+O('no','⏭️','Skip for now')+'</div></div><div id="wm-exd" style="display:none"><div class="wm3-field"><span class="wm3-label">Preferred intensity</span><div class="wm3-opts c3" id="wei">'+OD('light','🧘','Light','Walking, yoga')+OD('moderate','🏊','Moderate','Jogging, cycling')+OD('intense','🔥','Intense','HIIT, weights')+'</div></div></div>';
@@ -158,8 +173,8 @@ fr.innerHTML='<button class="wm3-back" id="wm-bk">← Back</button><button class
 W('we');W('wei');
 document.getElementById('we').addEventListener('click',function(){setTimeout(function(){var v=SV('we');document.getElementById('wm-exd').style.display=v==='yes'?'block':'none';V4();},10);});
 document.getElementById('wei').addEventListener('click',function(){setTimeout(V4,10);});
-document.getElementById('wm-bk').onclick=function(){cur=3;render();};
-document.getElementById('wm-nx').onclick=function(){cur=5;render();};
+document.getElementById('wm-bk').onclick=function(){saveCurrent();cur=3;render();restoreCurrent();};
+document.getElementById('wm-nx').onclick=function(){saveCurrent();cur=5;render();};
 
 }else if(cur===5){
 var p=CA(),s=computeAll(p),m=s.macros;
@@ -168,7 +183,7 @@ bd.innerHTML='<div class="wm3-hero"><div class="wm3-hero-big">'+s.target.toLocal
 (p.wantsExercise?'<div class="wm3-ex"><div style="font-size:11px;font-weight:700;margin-bottom:4px"><b>🏃 Daily Exercise Goal</b></div><div style="font-size:13px;color:var(--ink-m)">~'+s.exercise.kcal+' kcal · '+s.exercise.text+'</div></div>':'')+
 '<div style="font-size:11px;color:var(--ink-f);line-height:1.6;text-align:center">Update anytime in <strong>Settings → Health Profile</strong></div>';
 fr.innerHTML='<button class="wm3-back" id="wm-bk">← Back</button><button class="wm3-next" id="wm-nx" style="background:var(--teal)">Start tracking →</button>';
-document.getElementById('wm-bk').onclick=function(){cur=4;render();};
+document.getElementById('wm-bk').onclick=function(){cur=4;render();restoreCurrent();};
 document.getElementById('wm-nx').onclick=function(){var p=CA();saveProfile(p);applyToDashboard(p);var o=document.getElementById('nw-welcome-overlay');if(o){o.classList.remove('visible');setTimeout(function(){o.remove();},400);}if(typeof showToast==='function')showToast('Your plan is ready!','#1e6b5e');};
 }}
 
@@ -179,7 +194,7 @@ function SV(id){var s=document.querySelector('#'+id+' .wm3-o.on');return s?s.get
 function V2(){var n=document.getElementById('wm-nx');if(n)n.disabled=!(SV('wg')&&document.getElementById('wm-dob').value&&document.getElementById('wm-h').value&&document.getElementById('wm-w').value);}
 function V3(){var n=document.getElementById('wm-nx');if(n)n.disabled=!(SV('wa')&&SV('wgo'));}
 function V4(){var w=SV('we'),n=document.getElementById('wm-nx');if(!w){n.disabled=true;return;}n.disabled=w==='yes'?!SV('wei'):false;}
-function CA(){return{displayName:(document.getElementById('wm-name')||{}).value||_un,gender:SV('wg')||'other',dateOfBirth:(document.getElementById('wm-dob')||{}).value||'',heightCm:parseFloat((document.getElementById('wm-h')||{}).value)||170,weightKg:parseFloat((document.getElementById('wm-w')||{}).value)||70,activityLevel:SV('wa')||'moderately_active',goal:SV('wgo')||'maintain',wantsExercise:SV('we')==='yes',exerciseIntensity:SV('wei')||'moderate'};}
+function CA(){return{displayName:_draft.displayName||_un,gender:_draft.gender||'other',dateOfBirth:_draft.dateOfBirth||'',heightCm:parseFloat(_draft.heightCm)||170,weightKg:parseFloat(_draft.weightKg)||70,activityLevel:_draft.activityLevel||'moderately_active',goal:_draft.goal||'maintain',wantsExercise:_draft.wantsExercise==='yes',exerciseIntensity:_draft.exerciseIntensity||'moderate'};}
 
 // ── Init ──
 function init(){injectStyles();patchSettings();var p=getProfile();if(isProfileComplete(p))applyToDashboard(p);else buildModal();}
