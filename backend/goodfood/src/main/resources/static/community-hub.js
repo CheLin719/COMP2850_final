@@ -476,15 +476,12 @@
       card.classList.add(dir === 'left' ? 'gone-left' : 'gone-right');
     }
     if (dir === 'right') {
-      // Bind!
-      boundExpert = EXPERTS[currentCard].id;
+      var exp = EXPERTS[currentCard];
+      boundExpert = exp.id;
       saveBound();
-      setTimeout(function () {
-        renderTab();
-        if (typeof showToast === 'function') showToast('✓ Bound to ' + EXPERTS[currentCard - currentCard].name, '#1e6b5e');
-      }, 400);
-      // Show toast with correct name
-      var expName = EXPERTS[currentCard].name;
+      // ── Write bind request so pro_community.html can read it ──
+      _writeBindRequest(exp);
+      var expName = exp.name;
       currentCard++;
       setTimeout(function () {
         renderTab();
@@ -495,6 +492,28 @@
     currentCard++;
     setTimeout(renderTab, 400);
   };
+
+  function _writeBindRequest(exp) {
+    try {
+      var BIND_KEY = 'nw-bind-requests';
+      var all = JSON.parse(localStorage.getItem(BIND_KEY) || '[]');
+      var userName = _userName();
+      var userInitials = _userInitials();
+      var userId = (typeof NW !== 'undefined' && NW.auth) ? ('u-' + (NW.auth.userId || Date.now())) : ('u-' + Date.now());
+      // Don't duplicate
+      if (all.find(function(r){ return r.proId === exp.id && r.userId === userId; })) return;
+      all.push({
+        proId:        exp.id,
+        userId:       userId,
+        userName:     userName,
+        userInitials: userInitials,
+        userGoal:     'Weight Management',
+        time:         'Just now',
+        status:       'pending'
+      });
+      localStorage.setItem(BIND_KEY, JSON.stringify(all));
+    } catch(e) {}
+  }
 
   window._chUnbind = function () {
     if (!confirm('Unbind from your current nutritionist?')) return;

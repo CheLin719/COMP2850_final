@@ -15,15 +15,33 @@
  * ══════════════════════════════════════════════════════════════
  */
 
-// ── 0. 鉴权守卫 ───────────────────────────────────────────────
-(function () {
+// ── 0. 鉴权守卫（异步，避免 sessionStorage role 为空时死循环）──
+(async function () {
   if (!NW.auth.isLoggedIn()) {
-    window.location.href = 'index.html';
+    window.location.replace('index.html');
     return;
   }
-  if (!NW.auth.isPro()) {
-    window.location.href = 'dashboard.html';
+  // 同步 role 已知时快速判断
+  if (NW.auth.role && NW.auth.role !== 'professional') {
+    window.location.replace('dashboard.html');
+    return;
   }
+  // role 未知或为空时，异步验证（避免无后端环境死循环）
+  if (!NW.auth.role) {
+    try {
+      var me = await NW.getMe();
+      if (me && me.role !== 'professional') {
+        window.location.replace('dashboard.html');
+        return;
+      }
+    } catch (e) {
+      // 无后端 / 网络错误 → 允许页面显示，不跳转
+      console.warn('[NW] auth check skipped (no backend):', e.message);
+    }
+  }
+  // 显示页面
+  document.body.style.opacity = '1';
+  document.body.style.transition = 'opacity 0.2s';
 })();
 
 // ── 全局：API 客户数据缓存（id → 客户对象，id 为后端 userId 字符串）
