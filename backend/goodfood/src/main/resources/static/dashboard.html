@@ -456,7 +456,8 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 <a class="sn-item" onclick="switchPage('plan',this)" href="#"><span class="sn-icon">📊</span> <span class="sn-text">Recipe Compare</span></a>
 <a class="sn-item" onclick="switchPage('planner',this)" href="#"><span class="sn-icon">🧠</span> <span class="sn-text">Meal Planner</span></a>
 <div style="height:1px;background:var(--fog);margin:8px 24px"></div>
-<a class="sn-item" href="community.html"><span class="sn-icon">💬</span> <span class="sn-text">Community</span></a>
+<a class="sn-item" onclick="switchPage('mypro',this)" href="#" id="sn-mypro"><span class="sn-icon">🩺</span> <span class="sn-text">My Nutritionist</span></a>
+<a class="sn-item" onclick="switchPage('community',this)" href="#"><span class="sn-icon">💬</span> <span class="sn-text">Community</span></a>
 </aside>
 
 <div class="main" id="main-content" role="main">
@@ -854,6 +855,15 @@ body.dark-mode .mp-picker-item:hover { background:#1e3028; }
 body.dark-mode #mp-picker-overlay > div { background:#142420; }
 
 </style>
+<!-- ── MY NUTRITIONIST PAGE ── -->
+<div class="page" id="page-mypro" role="tabpanel" aria-label="My Nutritionist">
+  <div class="page-header">
+    <div class="page-title">My <em>Nutritionist</em></div>
+    <div class="page-date" id="mypro-subtitle">Connect with a professional to get personalised advice</div>
+  </div>
+  <div id="mypro-content"></div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 /* Exercise Chart */
@@ -1060,6 +1070,7 @@ function commitFoodEntries(){
   foodAdded.forEach(item=>mealLog[mealKey].push(item));
   renderMealLog();
   updateDonut();
+  updateCalorieTrend();
   showToast('✓ '+foodAdded.length+' item'+(foodAdded.length>1?'s':'')+' added','#1e6b5e');
   foodAdded=[];
 }
@@ -1095,7 +1106,7 @@ function renderMealLog(){
     el.innerHTML=h;
   });
 }
-function deleteMeal(key,idx){mealLog[key].splice(idx,1);renderMealLog();updateDonut();}
+function deleteMeal(key,idx){mealLog[key].splice(idx,1);renderMealLog();updateDonut();updateCalorieTrend();}
 
 // ── Donut ─────────────────────────────────────────────────────────────────────
 function updateDonut(){
@@ -1733,6 +1744,17 @@ function goToday(){
 // ══════════════════════════════════════════════════════════════
 var calorieTrendData = [0, 0, 0, 0, 0, 0, 0];
 var _calorieTrendChart = null;
+
+function updateCalorieTrend(){
+  if(!_calorieTrendChart) return;
+  // today is index 6 (Sun col) — compute total kcal from mealLog
+  var todayKcal = 0;
+  Object.values(mealLog).forEach(function(arr){ arr.forEach(function(e){ todayKcal += e.kcal; }); });
+  calorieTrendData[6] = todayKcal;
+  _calorieTrendChart.data.datasets[0].data = calorieTrendData.slice();
+  _calorieTrendChart.update();
+}
+
 function initCalorieTrendChart(){
   const ctx = document.getElementById('calorieTrendChart');
   if(!ctx) return;
@@ -2854,5 +2876,209 @@ function clearAllFilters(){
 <script src="patch_dashboard.js"></script>
 <script src="welcome-modal.js"></script>
 <script src="nw-tour.js"></script>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// NourishWell — My Nutritionist Page
+// Reads bound expert from localStorage (written by community-hub.js)
+// and accepted status from nw-bind-requests
+// ══════════════════════════════════════════════════════════════
+(function() {
+
+var EXPERTS_INFO = {
+  "dr-rivera": { name:"Dr. Ana Rivera", title:"Registered Dietitian", specialty:"Weight Management & Sports Nutrition", avatar:"DR", color:"#2f8f7f", bio:"PhD in Clinical Nutrition · 12 years experience · University of Leeds" },
+  "dr-chen":   { name:"Dr. James Chen", title:"Clinical Nutritionist", specialty:"Gut Health & Metabolic Disorders", avatar:"JC", color:"#7aaad4", bio:"MSc Nutritional Medicine · 8 years experience · NHS Registered" },
+  "sarah-k":   { name:"Sarah Kowalski", title:"Nutrition Coach", specialty:"Plant-Based & Lifestyle Nutrition", avatar:"SK", color:"#d4956a", bio:"BSc Dietetics · 5 years experience · Certified Health Coach" },
+  "dr-patel":  { name:"Dr. Priya Patel", title:"Endocrinology & Nutrition", specialty:"Diabetes & Hormonal Health", avatar:"PP", color:"#e07b78", bio:"MD Endocrinology · 15 years experience · NICE Advisor" },
+  "marcus-j":  { name:"Marcus Johnson", title:"Performance Nutritionist", specialty:"Athletic Performance & Recovery", avatar:"MJ", color:"#7c3aed", bio:"MSc Sports Science · 7 years experience · Team GB Consultant" }
+};
+
+// Demo messages from pro (shown when bound + accepted)
+var DEMO_MESSAGES = [
+  { from:"pro", text:"Hi! I have reviewed your food diary from this week. Your protein intake is consistently below target — let us work on that together.", time:"Today, 09:14" },
+  { from:"pro", text:"I have scheduled a check-in for next Monday at 10am. Does that work for you? I will send a confirmation shortly.", time:"Yesterday, 17:32" },
+  { from:"user", text:"That works perfectly, thank you! Should I keep logging everything in the app beforehand?", time:"Yesterday, 18:05" },
+  { from:"pro", text:"Yes please — the more detail the better. Focus especially on meal timing and portion sizes. See you Monday!", time:"Yesterday, 18:41" }
+];
+
+var DEMO_APPTS = [
+  { date:"Mon 28 Apr", time:"10:00 AM", type:"Check-in Review", status:"confirmed" },
+  { date:"Mon 12 May", time:"10:00 AM", type:"Monthly Assessment", status:"pending" }
+];
+
+function getUserId() {
+  try { var s = sessionStorage.getItem("nw-session"); return s ? JSON.parse(s).userId : "guest"; } catch(e) { return "guest"; }
+}
+
+function getBoundExpert() {
+  try { return localStorage.getItem("nw-" + getUserId() + "-bound-expert") || ""; } catch(e) { return ""; }
+}
+
+function getBindStatus(proId) {
+  try {
+    var all = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
+    var req = all.find(function(r){ return r.proId === proId; });
+    return req ? req.status : "none";
+  } catch(e) { return "none"; }
+}
+
+function renderMyPro() {
+  var el = document.getElementById("mypro-content");
+  var sub = document.getElementById("mypro-subtitle");
+  if (!el) return;
+
+  var boundId = getBoundExpert();
+
+  // ── NOT BOUND ──
+  if (!boundId) {
+    if (sub) sub.textContent = "Connect with a professional to get personalised advice";
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px;text-align:center">
+        <div style="font-size:56px;margin-bottom:16px">🩺</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:24px;font-style:italic;color:var(--ink);margin-bottom:8px">No nutritionist yet</div>
+        <div style="font-size:14px;color:var(--ink-f);max-width:360px;line-height:1.7;margin-bottom:28px">Connect with a qualified nutrition professional to get personalised advice, meal feedback, and ongoing support tailored to your goals.</div>
+        <button onclick="switchPage('community', document.getElementById('sn-community')); setTimeout(function(){ if(window._chSwitchTab) window._chSwitchTab('findpro', document.querySelector('.ch-tab:nth-child(3)')); }, 300);"
+          style="padding:13px 28px;background:var(--ink);color:#fff;border:none;border-radius:10px;font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px">
+          🔍 Find a Nutritionist
+        </button>
+      </div>`;
+    return;
+  }
+
+  var status = getBindStatus(boundId);
+  var exp = EXPERTS_INFO[boundId] || { name:"Your Nutritionist", title:"", specialty:"", avatar:"?", color:"#2f8f7f", bio:"" };
+
+  // ── PENDING ──
+  if (status === "pending" || status === "none") {
+    if (sub) sub.textContent = "Request sent — waiting for your nutritionist to confirm";
+    el.innerHTML = `
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="width:64px;height:64px;border-radius:50%;background:${exp.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">${exp.avatar}</div>
+          <div>
+            <div style="font-size:17px;font-weight:700;color:var(--ink)">${exp.name}</div>
+            <div style="font-size:12px;color:var(--ink-f);margin-top:2px">${exp.title}</div>
+            <div style="font-size:11px;color:var(--ink-f);margin-top:1px;font-family:'JetBrains Mono',monospace">${exp.bio}</div>
+          </div>
+        </div>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">⏳</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#92400e">Request pending</div>
+            <div style="font-size:12px;color:#78350f;margin-top:2px">Your connection request has been sent. Once ${exp.name.split(' ')[0]} accepts, you will see their messages and appointments here.</div>
+          </div>
+        </div>
+        <button onclick="window._nwUnbind && window._nwUnbind()" style="margin-top:16px;padding:8px 16px;background:transparent;color:var(--ink-f);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">Cancel request</button>
+      </div>`;
+    return;
+  }
+
+  // ── ACCEPTED ──
+  if (sub) sub.textContent = "Your personalised nutrition support";
+  var msgsHtml = DEMO_MESSAGES.map(function(m) {
+    var isMe = m.from === "user";
+    return `<div style="display:flex;justify-content:${isMe?"flex-end":"flex-start"};margin-bottom:10px">
+      <div style="max-width:75%;background:${isMe?"var(--ink)":"var(--paper)"};color:${isMe?"#fff":"var(--ink)"};padding:10px 14px;border-radius:${isMe?"14px 14px 4px 14px":"14px 14px 14px 4px"};font-size:13px;line-height:1.55">
+        ${m.text}
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;opacity:.5;margin-top:4px;text-align:right">${m.time}</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  var apptsHtml = DEMO_APPTS.map(function(a) {
+    var badge = a.status === "confirmed"
+      ? `<span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:8px;background:var(--teal-lll);color:var(--teal)">✓ Confirmed</span>`
+      : `<span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:8px;background:#fffbeb;color:#92400e">Pending</span>`;
+    return `<div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--fog)">
+      <div style="width:42px;height:42px;border-radius:8px;background:var(--teal-lll);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📅</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--ink)">${a.type}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);margin-top:2px">${a.date} · ${a.time}</div>
+      </div>
+      ${badge}
+    </div>`;
+  }).join("");
+
+  el.innerHTML = `
+    <!-- Pro card -->
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="width:64px;height:64px;border-radius:50%;background:${exp.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">${exp.avatar}</div>
+        <div style="flex:1">
+          <div style="font-size:17px;font-weight:700;color:var(--ink)">${exp.name}</div>
+          <div style="font-size:12px;color:var(--ink-f);margin-top:2px">${exp.title} · ${exp.specialty}</div>
+          <div style="font-size:11px;color:var(--ink-f);margin-top:1px;font-family:'JetBrains Mono',monospace">${exp.bio}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 10px;border-radius:8px;background:var(--teal-lll);color:var(--teal)">✓ Connected</span>
+          <button onclick="window._nwUnbind && window._nwUnbind()" style="padding:5px 10px;background:transparent;color:var(--ink-f);border:1px solid var(--border);border-radius:6px;font-size:10px;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">Disconnect</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <!-- Messages -->
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Messages</div>
+        <div style="max-height:280px;overflow-y:auto;margin-bottom:12px">${msgsHtml}</div>
+        <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid var(--fog)">
+          <input id="mypro-msg-inp" type="text" placeholder="Send a message..." style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;outline:none;background:var(--paper);color:var(--ink)">
+          <button onclick="window._nwSendProMsg()" style="padding:8px 14px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer">Send</button>
+        </div>
+      </div>
+
+      <!-- Appointments -->
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 4px 16px rgba(10,20,16,0.04)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Upcoming Appointments</div>
+        ${apptsHtml}
+        <div style="padding-top:14px;font-size:12px;color:var(--ink-f)">Appointments are set by your nutritionist and will appear here automatically.</div>
+      </div>
+    </div>`;
+}
+
+// Unbind action
+window._nwUnbind = function() {
+  try {
+    var uid = getUserId();
+    localStorage.removeItem("nw-" + uid + "-bound-expert");
+    // Update bind request status to declined
+    var all = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
+    all = all.map(function(r){ return r.userId === ("u-" + uid) ? Object.assign({}, r, {status:"declined"}) : r; });
+    localStorage.setItem("nw-bind-requests", JSON.stringify(all));
+  } catch(e) {}
+  renderMyPro();
+  if (typeof showToast === "function") showToast("Disconnected from nutritionist");
+};
+
+// Send message stub
+window._nwSendProMsg = function() {
+  var inp = document.getElementById("mypro-msg-inp");
+  var text = inp ? inp.value.trim() : "";
+  if (!text) return;
+  DEMO_MESSAGES.push({ from:"user", text:text, time:"Just now" });
+  inp.value = "";
+  renderMyPro();
+};
+
+// Re-render when page becomes active (so status updates are reflected)
+var _origSwitchPagePro = window.switchPage;
+window.switchPage = function(p, el) {
+  if (_origSwitchPagePro) _origSwitchPagePro(p, el);
+  if (p === "mypro") setTimeout(renderMyPro, 50);
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Also listen for localStorage changes (e.g., pro accepts from another tab)
+  window.addEventListener("storage", function(e) {
+    if (e.key === "nw-bind-requests") {
+      var active = document.getElementById("page-mypro");
+      if (active && active.classList.contains("active")) renderMyPro();
+    }
+  });
+});
+
+})();
+</script>
+
 </body>
 </html>

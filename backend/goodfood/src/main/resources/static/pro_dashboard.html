@@ -478,7 +478,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div id="proAvatarMenu" style="display:none;position:absolute;top:50px;right:0;background:#fff;border:1px solid #d4dfd8;border-radius:10px;min-width:180px;box-shadow:0 12px 40px rgba(10,20,16,0.12);overflow:hidden;z-index:100">
         <a href="#" onclick="event.stopPropagation();openProSettings('personal')" style="display:block;padding:11px 16px;font-size:13px;color:#0a1410;text-decoration:none;border-bottom:1px solid #f5f7f5">Personal Details</a>
         <a href="#" onclick="event.stopPropagation();openProSettings('preferences')" style="display:block;padding:11px 16px;font-size:13px;color:#0a1410;text-decoration:none;border-bottom:1px solid #f5f7f5">Preferences</a>
-        <a href="#" onclick="event.stopPropagation();event.preventDefault();window.location.replace('index.html')" style="display:block;padding:11px 16px;font-size:13px;color:#c0392b;text-decoration:none">Log Out</a>
+        <a href="#" onclick="event.stopPropagation();event.preventDefault();(typeof NW!=='undefined'&&NW.logout?NW.logout():null);window.location.replace('index.html')" style="display:block;padding:11px 16px;font-size:13px;color:#c0392b;text-decoration:none">Log Out</a>
       </div>
     </div>
   </div>
@@ -492,16 +492,19 @@ body.dark-mode .shortcuts-modal { background: #142420; }
     <span class="sn-name">Dashboard</span>
   </a>
 
-  <a class="sn-item" href="pro_community.html" style="margin-bottom:2px">
+  <a class="sn-item" id="sn-pro-community" onclick="selectClient('community',this)" href="#" style="margin-bottom:2px">
     <span style="font-size:16px">💬</span>
     <span class="sn-name">Community</span>
+    <span id="pro-bind-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:#dc2626;margin-left:4px"></span>
   </a>
   <div class="sn-divider"></div>
   <div class="sn-section-label" style="margin-top:4px">My Clients</div>
   <div style="padding:6px 16px 2px">
     <label for="client-search-input" class="sr-only">Search clients by name</label>
-    <input type="search" id="client-search-input" placeholder="Search clients..." aria-label="Search clients by name" oninput="filterClients(this.value)"
-      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="nw-client-search"
+    <input type="text" id="client-search-input" placeholder="Search clients..." aria-label="Search clients by name"
+      autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"
+      readonly onfocus="this.removeAttribute('readonly')" onblur="if(!this.value)this.setAttribute('readonly','')"
+      oninput="filterClients(this.value)"
       style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:11px;font-family:'Bricolage Grotesque',sans-serif;color:var(--ink);outline:none;background:var(--paper)">
   </div>
 
@@ -1556,6 +1559,9 @@ function renderScoreRing(c) {
   </div>
 </div>
 
+<!-- ── PRO COMMUNITY PAGE ── -->
+<div class="page" id="page-community" role="tabpanel" aria-label="Community Hub"></div>
+
 <!-- Toast -->
 <div id="proToast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;font-family:'Bricolage Grotesque',sans-serif"></div>
 
@@ -1970,6 +1976,407 @@ document.addEventListener('keydown',function(e){
 });
 </script>
 <script src="api.js"></script>
-    <script src="patch_index.js"></script>
+<script src="patch_pro_dashboard.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    if (document.body.style.opacity !== '1') {
+      document.body.style.opacity = '1';
+    }
+  }, 800);
+});
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// NourishWell Pro — Community Hub (embedded in pro_dashboard)
+// Uses template literals (backticks) to avoid quote-escape issues.
+// ══════════════════════════════════════════════════════════════
+(function() {
+'use strict';
+
+var PRO_NAME = "Dr. Rivera";
+var PRO_INITIALS = "DR";
+var PRO_ID = "dr-rivera";
+var BIND_KEY = "nw-bind-requests";
+
+var NOW = Date.now();
+var PRO_POSTS = [
+  { id:"pp1", author:"Rose C.", initials:"RC", isPro:false, time:NOW-1800000,
+    text:"Just hit my protein target for the first time this week! 🎉 Any tips for keeping it consistent?",
+    likes:12, liked:false,
+    comments:[
+      {author:"Dr. Ana Rivera",initials:"AR",isPro:true,text:"Amazing progress Rose! Try prepping protein-rich snacks — boiled eggs, Greek yoghurt, or edamame. Consistency comes from removing friction.",time:NOW-1200000},
+      {author:"Tom W.",initials:"TW",isPro:false,text:"Same here! I started batch-cooking chicken on Sundays — game changer.",time:NOW-600000}
+    ]},
+  { id:"pp2", author:"Alex M.", initials:"AM", isPro:false, time:NOW-7200000,
+    text:"Struggling with sugar cravings in the evening. What healthier alternatives actually satisfy the craving?",
+    likes:8, liked:false,
+    comments:[
+      {author:"Sarah Kowalski",initials:"SK",isPro:true,text:"Evening cravings often signal you need more fibre and protein at dinner. Try dark chocolate (70%+) with nuts, or frozen banana ice cream.",time:NOW-5400000}
+    ]},
+  { id:"pp3", author:"Dr. James Chen", initials:"JC", isPro:true, time:NOW-18000000,
+    text:"📚 Quick tip: Fermented foods like kimchi, kefir, and sauerkraut can significantly improve gut diversity. Even a small daily serving makes a difference.",
+    likes:24, liked:false, comments:[]},
+  { id:"pp4", author:"Meera K.", initials:"MK", isPro:false, time:NOW-43200000,
+    text:"How accurate are calorie counts on food labels? Been meticulously tracking but the numbers seem off sometimes.",
+    likes:15, liked:false, comments:[]},
+  { id:"pp5", author:"Sam T.", initials:"ST", isPro:false, time:NOW-86400000,
+    text:"Made the Mediterranean Quinoa Bowl from the NourishWell recipes yesterday — absolutely delicious and so filling for only 420 kcal! 🥗",
+    likes:19, liked:false, comments:[]},
+  { id:"pp6", author:"Li W.", initials:"LW", isPro:false, time:NOW-172800000,
+    text:"Is it true that eating after 8pm leads to weight gain? I work late shifts and cannot really eat dinner before then.",
+    likes:11, liked:false,
+    comments:[
+      {author:"Dr. Ana Rivera",initials:"AR",isPro:true,text:"This is largely a myth. Total calorie intake matters more than timing. For shift workers, have your main meal before your shift and a lighter meal afterwards.",time:NOW-162000000}
+    ]}
+];
+
+var proActiveTab = "feed";
+var QUICK_REPLIES = [
+  "Great progress! Keep it up 💪",
+  "Consistency is more important than perfection",
+  "Remember to stay hydrated throughout the day",
+  "Focus on getting protein at every meal",
+  "Happy to discuss this at our next session",
+  "Your body needs adequate rest too — do not skip rest days"
+];
+
+function _ago(ms){var s=Math.floor((Date.now()-ms)/1000);if(s<60)return "just now";if(s<3600)return Math.floor(s/60)+"m ago";if(s<86400)return Math.floor(s/3600)+"h ago";return Math.floor(s/86400)+"d ago";}
+function _esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML;}
+
+// ── Bind requests ──
+function loadBindRequests(){
+  try{
+    var saved=localStorage.getItem(BIND_KEY);
+    if(!saved){
+      var seed=[
+        {proId:PRO_ID,userId:"u-demo-1",userName:"Alex Kim",userInitials:"AK",userGoal:"Lose Weight",time:"1 hour ago",status:"pending"},
+        {proId:PRO_ID,userId:"u-demo-2",userName:"Jordan Taylor",userInitials:"JT",userGoal:"Gain Muscle",time:"3 hours ago",status:"pending"}
+      ];
+      localStorage.setItem(BIND_KEY,JSON.stringify(seed));
+      return seed;
+    }
+    return JSON.parse(saved).filter(function(r){return r.proId===PRO_ID;});
+  }catch(e){return [];}
+}
+function saveBindRequests(reqs){
+  try{
+    var saved=localStorage.getItem(BIND_KEY);
+    var all=saved?JSON.parse(saved):[];
+    var others=all.filter(function(r){return r.proId!==PRO_ID;});
+    localStorage.setItem(BIND_KEY,JSON.stringify(others.concat(reqs)));
+  }catch(e){}
+}
+function pendingBindCount(){return loadBindRequests().filter(function(r){return r.status==="pending";}).length;}
+
+function strToColor(s){
+  var p=["#2f8f7f","#7aaad4","#b8621f","#e07b78","#7c3aed","#d4956a"];
+  var h=0;
+  for(var i=0;i<s.length;i++) h=s.charCodeAt(i)+((h<<5)-h);
+  return p[Math.abs(h)%p.length];
+}
+
+window._proChTab = function(tab, btn) {
+  proActiveTab = tab;
+  document.querySelectorAll(".pro-ch-tab").forEach(function(t){t.classList.remove("active");});
+  if(btn) btn.classList.add("active");
+  renderProCommunity();
+};
+
+function renderProCommunity() {
+  var el = document.getElementById("pro-ch-content");
+  if (!el) return;
+  if (proActiveTab === "feed")     el.innerHTML = renderProFeed();
+  else if (proActiveTab === "askpro") el.innerHTML = renderProAskPro();
+  else if (proActiveTab === "clients") el.innerHTML = renderProClients();
+  else if (proActiveTab === "bind")   el.innerHTML = renderBindRequests();
+}
+
+function renderProFeed() {
+  var html = `
+    <div style="background:linear-gradient(135deg,#f5f3ff,var(--white));border:1.5px solid rgba(124,58,237,0.15);border-radius:16px;padding:18px 20px;margin-bottom:20px;box-shadow:0 4px 16px rgba(124,58,237,0.04)">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#7c3aed;background:#ede9fe;border-radius:6px;padding:3px 8px;display:inline-block;margin-bottom:10px">✓ Posting as verified professional — your replies show a PRO badge</div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:36px;height:36px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${PRO_INITIALS}</div>
+        <textarea id="pro-ch-compose" placeholder="Share expert advice, a nutrition tip, or a weekly challenge..." rows="2" style="flex:1;border:1.5px solid rgba(124,58,237,0.2);border-radius:10px;padding:10px 14px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;color:var(--ink);resize:none;outline:none;background:var(--white)"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+        <button onclick="window._proChPost()" style="padding:9px 22px;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;cursor:pointer">Post as Pro →</button>
+      </div>
+    </div>`;
+  PRO_POSTS.forEach(function(p){html += renderProPost(p);});
+  return html;
+}
+
+function renderProAskPro() {
+  var filtered = PRO_POSTS.filter(function(p){return p.comments.some(function(c){return c.isPro;});});
+  if (!filtered.length) return `<div style="text-align:center;padding:48px 20px"><div style="font-size:42px;margin-bottom:8px">✅</div><div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px">All caught up!</div><div style="font-size:12px;color:var(--ink-f)">No posts with expert replies yet.</div></div>`;
+  var html = "";
+  filtered.forEach(function(p){html += renderProPost(p);});
+  return html;
+}
+
+function renderProClients() {
+  var clientData = [
+    {name:"Rose Campbell",initials:"RC",color:"#2f8f7f",goal:"Weight loss"},
+    {name:"James Tang",initials:"JT",color:"#7aaad4",goal:"Muscle gain"},
+    {name:"Sara Lim",initials:"SL",color:"#e07b78",goal:"Fat cut"},
+    {name:"Mike Walsh",initials:"MW",color:"#b8621f",goal:"Maintain"},
+    {name:"Priya Kapoor",initials:"PK",color:"#7c3aed",goal:"Lean gain"}
+  ];
+  var html = "";
+  clientData.forEach(function(cl){
+    var posts = PRO_POSTS.filter(function(p){return p.initials===cl.initials && !p.isPro;});
+    html += `<div style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--fog)">
+        <div style="width:36px;height:36px;border-radius:50%;background:${cl.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">${cl.initials}</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--ink)">${cl.name}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f)">${cl.goal} · ${posts.length} post${posts.length!==1?"s":""}</div>
+        </div>
+      </div>`;
+    if (!posts.length) html += `<div style="font-size:12px;color:var(--ink-f);font-style:italic;padding:8px 0">No community posts yet</div>`;
+    else posts.forEach(function(p){html += renderProPost(p);});
+    html += `</div>`;
+  });
+  return html;
+}
+
+function renderBindRequests() {
+  var reqs = loadBindRequests();
+  var pending = reqs.filter(function(r){return r.status==="pending";});
+  var handled = reqs.filter(function(r){return r.status!=="pending";});
+  var html = `<div style="background:#f5f3ff;border:1.5px solid rgba(124,58,237,0.15);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+    <span style="font-size:20px">🔗</span>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--ink)">Client bind requests</div>
+      <div style="font-size:11px;color:var(--ink-f);margin-top:2px">Users who chose you in Find a Pro. Accept to add them as your client.</div>
+    </div>
+  </div>`;
+  if (!reqs.length) return html + `<div style="text-align:center;padding:48px 20px"><div style="font-size:42px;margin-bottom:8px">🔗</div><div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px">No requests yet</div><div style="font-size:12px;color:var(--ink-f)">When users choose you in Find a Pro, their requests appear here.</div></div>`;
+
+  function cardHtml(r){
+    var col = strToColor(r.userId);
+    var actions = "";
+    if (r.status === "pending") {
+      actions = `<div style="display:flex;flex-direction:column;gap:6px">
+        <button onclick="window._proAcceptBind('${r.userId}')" style="padding:8px 18px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">✓ Accept</button>
+        <button onclick="window._proDeclineBind('${r.userId}')" style="padding:8px 18px;background:transparent;color:var(--ink-f);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">Decline</button>
+      </div>`;
+    } else if (r.status === "accepted") {
+      actions = `<div style="padding:8px 18px;background:var(--teal-lll);color:var(--teal);border:1px solid var(--teal-ll);border-radius:8px;font-size:12px;font-weight:600;font-family:'Bricolage Grotesque',sans-serif;text-align:center">✓ Client</div>`;
+    } else {
+      actions = `<div style="padding:8px 18px;font-size:12px;color:var(--ink-f);font-family:'Bricolage Grotesque',sans-serif">Declined</div>`;
+    }
+    return `<div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px rgba(10,20,16,0.04);display:flex;align-items:center;gap:16px">
+      <div style="width:52px;height:52px;border-radius:50%;background:${col};color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">${_esc(r.userInitials)}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:var(--ink)">${_esc(r.userName)}</div>
+        <div style="font-size:11px;color:var(--ink-f);margin-top:3px;font-family:'JetBrains Mono',monospace">Requested ${_esc(r.time)}</div>
+        <span style="display:inline-block;margin-top:5px;font-size:10px;padding:2px 8px;border-radius:8px;background:var(--teal-lll);color:var(--teal);font-family:'JetBrains Mono',monospace">${_esc(r.userGoal)}</span>
+      </div>
+      ${actions}
+    </div>`;
+  }
+  if (pending.length) html += `<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">${pending.length} pending</div>` + pending.map(cardHtml).join("");
+  if (handled.length) html += `<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin:20px 0 10px">${handled.length} handled</div>` + handled.map(cardHtml).join("");
+  return html;
+}
+
+function renderProPost(p) {
+  var hasPro = p.comments.some(function(c){return c.isPro;});
+  var borderLeft = hasPro ? "3px solid var(--teal)" : "1px solid var(--border)";
+  var proBadge = p.isPro ? `<span style="font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 7px;border-radius:10px;background:var(--teal);color:#fff">PRO</span>` : "";
+  var repliedBadge = hasPro ? `<span style="font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 7px;border-radius:10px;background:var(--teal-lll);color:var(--teal)">✓ Pro replied</span>` : "";
+
+  var commentsHtml = "";
+  p.comments.forEach(function(cm){
+    var cmPro = cm.isPro ? `<span style="font-family:'JetBrains Mono',monospace;font-size:7px;padding:1px 5px;border-radius:8px;background:#7c3aed;color:#fff">PRO</span>` : "";
+    commentsHtml += `<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--fog)">
+      <div style="width:26px;height:26px;border-radius:50%;background:${cm.isPro?"#7c3aed":"var(--ink-m)"};color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${_esc(cm.initials)}</div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:4px">${_esc(cm.author)}${cmPro}</div>
+        <div style="font-size:12px;color:var(--ink-m);margin-top:2px">${_esc(cm.text)}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f);margin-top:2px">${_ago(cm.time)}</div>
+      </div>
+    </div>`;
+  });
+
+  var quickRepliesHtml = QUICK_REPLIES.map(function(qr){
+    return `<button onclick="window._proFillReply('${p.id}', this)" data-qr="${_esc(qr)}" style="font-size:11px;padding:4px 10px;border-radius:16px;border:1px solid rgba(124,58,237,0.2);background:#fff;color:var(--ink-m);cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">${_esc(qr)}</button>`;
+  }).join("");
+
+  return `<div style="background:var(--white);border:1px solid var(--border);border-left:${borderLeft};border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(10,20,16,0.03)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:${p.isPro?"#7c3aed":"var(--ink)"};color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">${_esc(p.initials)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px">${_esc(p.author)}${proBadge}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f)">${_ago(p.time)}</div>
+      </div>
+      ${repliedBadge}
+    </div>
+    <div style="font-size:14px;color:var(--ink);line-height:1.65;margin-bottom:14px">${_esc(p.text)}</div>
+    <div style="display:flex;gap:12px;padding-top:12px;border-top:1px solid var(--fog)">
+      <button style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px"><span style="font-size:14px">${p.liked?"❤️":"🤍"}</span> ${p.likes}</button>
+      <button onclick="window._proToggleComments('${p.id}')" style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px"><span style="font-size:14px">💬</span> ${p.comments.length}</button>
+      <button onclick="window._proOpenReply('${p.id}')" style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#7c3aed;background:#f5f3ff;border:none;cursor:pointer;padding:4px 10px;border-radius:6px;font-weight:600">✍️ Reply as Pro</button>
+    </div>
+    <div id="pro-comments-${p.id}" style="display:none;margin-top:12px;padding:12px 14px;background:var(--paper);border-radius:10px">
+      ${commentsHtml}
+      <div id="pro-reply-box-${p.id}" style="display:none;margin-top:10px">
+        <div style="background:#f5f3ff;border-radius:8px;padding:8px 12px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:5px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#7c3aed;width:100%;margin-bottom:4px">Quick replies</div>
+          ${quickRepliesHtml}
+        </div>
+        <div style="display:flex;gap:8px">
+          <textarea id="pro-reply-inp-${p.id}" rows="2" placeholder="Write your professional reply..." style="flex:1;padding:8px 12px;border:1.5px solid rgba(124,58,237,0.2);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;outline:none;resize:none;background:var(--white)"></textarea>
+          <button onclick="window._proSubmitReply('${p.id}')" style="padding:8px 16px;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;align-self:flex-end;font-family:'Bricolage Grotesque',sans-serif">Reply as Pro</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+window._proChPost = function() {
+  var inp = document.getElementById("pro-ch-compose");
+  var text = inp ? inp.value.trim() : "";
+  if (!text) return;
+  PRO_POSTS.unshift({id:"pro-"+Date.now(),author:PRO_NAME,initials:PRO_INITIALS,isPro:true,time:Date.now(),text:text,likes:0,liked:false,comments:[]});
+  renderProCommunity();
+  if(typeof proToast==="function") proToast("Posted as Pro ✓","#7c3aed");
+};
+
+window._proToggleComments = function(postId) {
+  var el = document.getElementById("pro-comments-"+postId);
+  if (el) el.style.display = el.style.display==="none" ? "block" : "none";
+};
+
+window._proOpenReply = function(postId) {
+  var comments = document.getElementById("pro-comments-"+postId);
+  if (comments) comments.style.display = "block";
+  var box = document.getElementById("pro-reply-box-"+postId);
+  if (box) {
+    box.style.display = box.style.display==="none" ? "block" : "none";
+    if (box.style.display==="block") {
+      var inp = document.getElementById("pro-reply-inp-"+postId);
+      if (inp) inp.focus();
+    }
+  }
+};
+
+window._proFillReply = function(postId, btnEl) {
+  var inp = document.getElementById("pro-reply-inp-"+postId);
+  if (inp && btnEl) { inp.value = btnEl.getAttribute("data-qr") || ""; inp.focus(); }
+};
+
+window._proSubmitReply = function(postId) {
+  var inp = document.getElementById("pro-reply-inp-"+postId);
+  var text = inp ? inp.value.trim() : "";
+  if (!text) return;
+  var post = PRO_POSTS.find(function(p){return p.id===postId;});
+  if (!post) return;
+  post.comments.push({author:PRO_NAME,initials:PRO_INITIALS,isPro:true,text:text,time:Date.now()});
+  renderProCommunity();
+  if(typeof proToast==="function") proToast("Reply posted ✓","#7c3aed");
+};
+
+window._proAcceptBind = function(userId) {
+  var reqs = loadBindRequests();
+  var req = reqs.find(function(r){return r.userId===userId;});
+  if (!req) return;
+  req.status = "accepted";
+  saveBindRequests(reqs);
+  try{
+    var clients = JSON.parse(localStorage.getItem("nw-pro-accepted-clients")||"[]");
+    if(!clients.find(function(c){return c.userId===userId;})){
+      clients.push({userId:userId,name:req.userName,initials:req.userInitials,goal:req.userGoal,acceptedAt:new Date().toISOString()});
+      localStorage.setItem("nw-pro-accepted-clients",JSON.stringify(clients));
+    }
+  }catch(e){}
+  updateBindDot();
+  renderProCommunity();
+  if(typeof proToast==="function") proToast("✓ "+req.userName+" added as your client","#1e6b5e");
+};
+
+window._proDeclineBind = function(userId) {
+  var reqs = loadBindRequests();
+  var req = reqs.find(function(r){return r.userId===userId;});
+  if (!req) return;
+  req.status = "declined";
+  saveBindRequests(reqs);
+  updateBindDot();
+  renderProCommunity();
+  if(typeof proToast==="function") proToast("Request declined");
+};
+
+function updateBindDot() {
+  var n = pendingBindCount();
+  var dot = document.getElementById("pro-bind-dot");
+  if (dot) dot.style.display = n > 0 ? "inline-block" : "none";
+  var badge = document.getElementById("pro-bind-badge");
+  if (badge) { badge.textContent = n; badge.style.display = n > 0 ? "" : "none"; }
+}
+
+function initProCommunity() {
+  var page = document.getElementById("page-community");
+  if (!page || page.dataset.init) return;
+  page.dataset.init = "1";
+
+  if (typeof NW !== "undefined" && NW.auth && NW.auth.name) {
+    PRO_NAME = NW.auth.name;
+    PRO_INITIALS = PRO_NAME.split(" ").map(function(w){return(w[0]||"").toUpperCase();}).join("").substring(0,2) || "DR";
+  }
+
+  var pending = pendingBindCount();
+  var badgeHtml = pending > 0
+    ? `<span id="pro-bind-badge" style="background:#7c3aed;color:#fff;font-size:8px;padding:1px 6px;border-radius:10px;margin-left:4px">${pending}</span>`
+    : `<span id="pro-bind-badge" style="display:none;background:#7c3aed;color:#fff;font-size:8px;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>`;
+
+  page.innerHTML = `<div class="page-header">
+    <div class="page-title" style="font-family:'Instrument Serif',serif;font-size:28px;font-style:italic;color:var(--ink);letter-spacing:-0.02em;display:flex;align-items:center;gap:12px">
+      Community <em>Hub</em>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:10px;background:#ede9fe;color:#7c3aed;font-style:normal">Pro View</span>
+    </div>
+    <div style="font-size:13px;color:var(--ink-f);margin-top:4px">Engage with the community, answer questions, and manage client requests</div>
+  </div>
+  <div style="display:flex;gap:4px;margin-bottom:24px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:4px;box-shadow:0 2px 8px rgba(10,20,16,0.03)">
+    <button class="pro-ch-tab active" onclick="window._proChTab('feed',this)" style="flex:1;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;border-radius:8px;cursor:pointer;border:none;background:transparent;text-align:center">📢 All Posts</button>
+    <button class="pro-ch-tab" onclick="window._proChTab('askpro',this)" style="flex:1;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;border-radius:8px;cursor:pointer;border:none;background:transparent;text-align:center">❓ Answered</button>
+    <button class="pro-ch-tab" onclick="window._proChTab('clients',this)" style="flex:1;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;border-radius:8px;cursor:pointer;border:none;background:transparent;text-align:center">👥 My Clients</button>
+    <button class="pro-ch-tab" onclick="window._proChTab('bind',this)" style="flex:1;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;border-radius:8px;cursor:pointer;border:none;background:transparent;text-align:center">🔗 Bind Requests ${badgeHtml}</button>
+  </div>
+  <div id="pro-ch-content"></div>`;
+
+  var style = document.createElement("style");
+  style.textContent = ".pro-ch-tab{color:var(--ink-f)}.pro-ch-tab.active{background:var(--ink)!important;color:#fff!important}";
+  document.head.appendChild(style);
+
+  renderProCommunity();
+}
+
+// Hook selectClient for community page
+var _origSelectClientPro = window.selectClient;
+window.selectClient = function(id, el) {
+  if (id === "community") {
+    document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});
+    var pg = document.getElementById("page-community");
+    if (pg) pg.classList.add("active");
+    document.querySelectorAll(".sn-item").forEach(function(i){i.classList.remove("active");});
+    if (el) el.classList.add("active");
+    initProCommunity();
+    updateBindDot();
+    return;
+  }
+  if (_origSelectClientPro) _origSelectClientPro(id, el);
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+  setTimeout(updateBindDot, 500);
+});
+
+})();
+</script>
+
 </body>
 </html>
