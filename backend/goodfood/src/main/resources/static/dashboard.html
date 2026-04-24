@@ -457,7 +457,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 <a class="sn-item" onclick="switchPage('planner',this)" href="#"><span class="sn-icon">🧠</span> <span class="sn-text">Meal Planner</span></a>
 <div style="height:1px;background:var(--fog);margin:8px 24px"></div>
 <a class="sn-item" onclick="switchPage('mypro',this)" href="#" id="sn-mypro"><span class="sn-icon">🩺</span> <span class="sn-text">My Nutritionist</span></a>
-<a class="sn-item" onclick="switchPage('community',this)" href="#"><span class="sn-icon">💬</span> <span class="sn-text">Community</span></a>
+<a class="sn-item" id="sn-community" onclick="switchPage('community',this)" href="#"><span class="sn-icon">💬</span> <span class="sn-text">Community</span></a>
 </aside>
 
 <div class="main" id="main-content" role="main">
@@ -980,10 +980,16 @@ function closeCompareSelect(){
 }
 function switchPage(p,el){
   closeSettings();
+  var pg=document.getElementById('page-'+p);
+  if(!pg){
+    // page not injected yet (e.g. community-hub.js not ready) — retry once after short delay
+    setTimeout(function(){ var pg2=document.getElementById('page-'+p); if(pg2){ document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');}); pg2.classList.add('active'); document.querySelectorAll('.sn-item').forEach(function(i){i.classList.remove('active');}); if(el) el.classList.add('active'); } }, 150);
+    return;
+  }
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
+  pg.classList.add('active');
   document.querySelectorAll('.sn-item').forEach(i=>i.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   if(p==='favourites') renderFavouritesPage();
   if(p==='plan') renderComparePage();
 }
@@ -1910,6 +1916,7 @@ document.addEventListener('DOMContentLoaded', function(){
   loadState();
   loadCustomRecipes();
   initCalorieTrendChart();
+  updateCalorieTrend(); // sync existing mealLog into chart on load
   // Set date picker to today
   var picker = document.getElementById('diary-date-picker');
   if(picker) picker.value = new Date().toISOString().split('T')[0];

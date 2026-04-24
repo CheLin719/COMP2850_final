@@ -540,7 +540,10 @@
     var origSwitch = window.switchPage;
     window.switchPage = function (p, el) {
       origSwitch(p, el);
-      if (p === 'community') renderTab();
+      if (p === 'community') {
+        // Small delay to allow retry timer in switchPage to complete if needed
+        setTimeout(function() { renderTab(); }, 200);
+      }
     };
   }
 
