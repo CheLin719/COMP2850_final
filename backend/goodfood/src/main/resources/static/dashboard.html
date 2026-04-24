@@ -2920,11 +2920,12 @@ function getUserId() {
 
 function getBoundExpert() {
   try {
-    var uid = getUserId();
-    // community-hub.js uses key: nw-{userId}-community-bound-expert
-    return localStorage.getItem("nw-" + uid + "-community-bound-expert")
-        || localStorage.getItem("nw-community-bound-expert")
-        || "";
+    // Must match community-hub.js _key() logic exactly:
+    // NW.auth.userId exists → "nw-{userId}-community-bound-expert"
+    // NW.auth.userId missing → "nw-community-bound-expert"
+    var u = (typeof NW !== "undefined" && NW.auth) ? NW.auth.userId : "";
+    var key = u ? "nw-" + u + "-community-bound-expert" : "nw-community-bound-expert";
+    return localStorage.getItem(key) || "";
   } catch(e) { return ""; }
 }
 
@@ -3054,7 +3055,9 @@ function renderMyPro() {
 window._nwUnbind = function() {
   try {
     var uid = getUserId();
-    localStorage.removeItem("nw-" + uid + "-community-bound-expert"); localStorage.removeItem("nw-community-bound-expert");
+    var u2 = (typeof NW !== "undefined" && NW.auth) ? NW.auth.userId : "";
+    var unbindKey = u2 ? "nw-" + u2 + "-community-bound-expert" : "nw-community-bound-expert";
+    localStorage.removeItem(unbindKey);
     // Update bind request status to declined
     var all = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
     all = all.map(function(r){ return r.userId === ("u-" + uid) ? Object.assign({}, r, {status:"declined"}) : r; });
