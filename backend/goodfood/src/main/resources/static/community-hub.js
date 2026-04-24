@@ -485,7 +485,18 @@
       currentCard++;
       setTimeout(function () {
         renderTab();
-        if (typeof showToast === 'function') showToast('✓ ' + expName + ' is now your nutritionist!', '#1e6b5e');
+        // Show persistent toast with link to My Nutritionist page
+        var toastEl = document.getElementById('toast');
+        if (toastEl) {
+          toastEl.innerHTML = '<span>✓ ' + expName + ' is now your nutritionist!</span> <button onclick="switchPage(\'mypro\',document.getElementById(\'sn-mypro\'));this.parentElement.style.display=\'none\'" style="margin-left:12px;padding:5px 14px;background:#fff;color:#1e6b5e;border:none;border-radius:6px;font-family:\'Bricolage Grotesque\',sans-serif;font-size:11px;font-weight:600;cursor:pointer">View →</button>';
+          toastEl.style.background = '#1e6b5e';
+          toastEl.style.display = 'flex';
+          toastEl.style.alignItems = 'center';
+          toastEl.style.opacity = '1';
+          setTimeout(function(){ toastEl.style.opacity = '0'; setTimeout(function(){ toastEl.style.display = 'none'; }, 400); }, 6000);
+        } else if (typeof showToast === 'function') {
+          showToast('✓ ' + expName + ' is now your nutritionist!', '#1e6b5e');
+        }
       }, 450);
       return;
     }

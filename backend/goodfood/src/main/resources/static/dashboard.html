@@ -2919,7 +2919,13 @@ function getUserId() {
 }
 
 function getBoundExpert() {
-  try { return localStorage.getItem("nw-" + getUserId() + "-bound-expert") || ""; } catch(e) { return ""; }
+  try {
+    var uid = getUserId();
+    // community-hub.js uses key: nw-{userId}-community-bound-expert
+    return localStorage.getItem("nw-" + uid + "-community-bound-expert")
+        || localStorage.getItem("nw-community-bound-expert")
+        || "";
+  } catch(e) { return ""; }
 }
 
 function getBindStatus(proId) {
@@ -3048,7 +3054,7 @@ function renderMyPro() {
 window._nwUnbind = function() {
   try {
     var uid = getUserId();
-    localStorage.removeItem("nw-" + uid + "-bound-expert");
+    localStorage.removeItem("nw-" + uid + "-community-bound-expert"); localStorage.removeItem("nw-community-bound-expert");
     // Update bind request status to declined
     var all = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
     all = all.map(function(r){ return r.userId === ("u-" + uid) ? Object.assign({}, r, {status:"declined"}) : r; });

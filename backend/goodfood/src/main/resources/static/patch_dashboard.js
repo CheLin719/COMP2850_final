@@ -353,12 +353,12 @@ async function _loadDiaryForDate(dateStr) {
     });
 
     renderMealLog();
-    updateDonut();
+    updateDonut(); if(typeof updateCalorieTrend==='function') updateCalorieTrend();
   } catch (e) {
     console.warn('[NW] _loadDiaryForDate failed:', e.message);
     Object.keys(mealLog).forEach(k => { mealLog[k] = []; });
     renderMealLog();
-    updateDonut();
+    updateDonut(); if(typeof updateCalorieTrend==='function') updateCalorieTrend();
   }
 }
 
@@ -387,7 +387,7 @@ window.commitFoodEntries = async function () {
   // 乐观更新 UI
   foodAdded.forEach(item => mealLog[frontKey].push(item));
   renderMealLog();
-  updateDonut();
+  updateDonut(); if(typeof updateCalorieTrend==='function') updateCalorieTrend();
   showToast('✓ ' + foodAdded.length + ' item' + (foodAdded.length > 1 ? 's' : '') + ' added', '#1e6b5e');
   const toPost = [...foodAdded];
   foodAdded = [];
@@ -429,7 +429,7 @@ window.deleteMeal = async function (key, idx) {
   // 乐观删除
   mealLog[key].splice(idx, 1);
   renderMealLog();
-  updateDonut();
+  updateDonut(); if(typeof updateCalorieTrend==='function') updateCalorieTrend();
 
   if (backendId) {
     try {
