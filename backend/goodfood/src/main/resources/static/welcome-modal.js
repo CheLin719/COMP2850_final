@@ -13,6 +13,7 @@ function isProfileComplete(p){return p&&p.gender&&p.heightCm&&p.weightKg&&p.acti
 function calcAge(d){var b=new Date(d),t=new Date(),a=t.getFullYear()-b.getFullYear(),m=t.getMonth()-b.getMonth();if(m<0||(m===0&&t.getDate()<b.getDate()))a--;return Math.max(a,1);}
 function calcBMI(w,h){return+(w/((h/100)*(h/100))).toFixed(1);}
 function bmiCat(b){return b<18.5?'Underweight':b<25?'Normal':b<30?'Overweight':'Obese';}
+/** Calculate Basal Metabolic Rate using Mifflin-St Jeor equation */
 function calcBMR(w,h,a,g){return g==='female'?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;}
 var ACT={sedentary:1.2,lightly_active:1.375,moderately_active:1.55,very_active:1.725};
 var ACT_L={sedentary:'Sedentary',lightly_active:'Lightly Active',moderately_active:'Moderately Active',very_active:'Very Active'};
@@ -197,6 +198,7 @@ function V4(){var w=SV('we'),n=document.getElementById('wm-nx');if(!w){n.disable
 function CA(){return{displayName:_draft.displayName||_un,gender:_draft.gender||'other',dateOfBirth:_draft.dateOfBirth||'',heightCm:parseFloat(_draft.heightCm)||170,weightKg:parseFloat(_draft.weightKg)||70,activityLevel:_draft.activityLevel||'moderately_active',goal:_draft.goal||'maintain',wantsExercise:_draft.wantsExercise==='yes',exerciseIntensity:_draft.exerciseIntensity||'moderate'};}
 
 // ── Init ──
+/** Initialise welcome modal and check if profile setup is needed */
 function init(){injectStyles();patchSettings();var p=getProfile();if(isProfileComplete(p))applyToDashboard(p);else buildModal();}
 window._nwShowWelcomeModal=function(){var p=getProfile();if(!isProfileComplete(p))buildModal();};
 window._nwGetProfile=getProfile;window._nwApplyProfile=applyToDashboard;window._nwComputeProfile=computeAll;

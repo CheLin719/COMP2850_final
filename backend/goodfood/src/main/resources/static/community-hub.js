@@ -18,10 +18,12 @@
   'use strict';
 
   // ── Utility ────────────────────────────────────────────────────
+  /** Generate localStorage key scoped to current user ID */
   function _key(k) {
     var u = (typeof NW !== 'undefined' && NW.auth) ? NW.auth.userId : '';
     return u ? 'nw-' + u + '-community-' + k : 'nw-community-' + k;
   }
+  /** Escape HTML entities in user text to prevent XSS */
   function _escHtml(s) {
     if (typeof escapeHtml === 'function') return escapeHtml(s);
     var d = document.createElement('div'); d.textContent = s; return d.innerHTML;
@@ -223,6 +225,7 @@
   }
 
   // ── Inject Nav + Page ──────────────────────────────────────────
+  /** Inject community hub navigation into dashboard sidebar */
   function injectNav() {
     var nav = document.querySelector('.side-nav');
     if (!nav || document.getElementById('sn-community')) return;
@@ -263,6 +266,7 @@
   };
 
   // ── Render: Feed ───────────────────────────────────────────────
+  /** Render all community posts in the feed */
   function renderFeed(filterProOnly) {
     var posts = filterProOnly
       ? POSTS.filter(function (p) { return p.comments.some(function (c) { return c.isPro; }); })
@@ -289,6 +293,7 @@
     return html;
   }
 
+  /** Render a single post card with replies */
   function renderPost(p) {
     var hasPro = p.comments.some(function (c) { return c.isPro; });
     var html = '<div class="ch-post" data-post-id="' + p.id + '">'

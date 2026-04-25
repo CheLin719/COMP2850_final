@@ -25,7 +25,7 @@
     const me = await NW.getMe();
     // token 有效 → 检查角色
     // Exception: if coming from pro dashboard ("Switch to User View"), allow pro to stay
-    var fromPro = false;
+    const fromPro = false;
     try { fromPro = sessionStorage.getItem('nw-from-pro') === '1'; } catch(e) {}
     if (me.role === 'professional' && !fromPro) {
       window.location.replace('pro_dashboard.html');
@@ -45,6 +45,7 @@
 // ══════════════════════════════════════════════════════════════
 // 1. 食谱：从 API 拉取并合并进 RECIPES
 // ══════════════════════════════════════════════════════════════
+/** Fetch recipes from API and merge into frontend RECIPES object */
 async function fetchAndMergeRecipes() {
   try {
     const apiRecipes = await NW.recipes.getAll();
@@ -88,6 +89,7 @@ async function fetchAndMergeRecipes() {
 // ══════════════════════════════════════════════════════════════
 // 2. 收藏：从 API 初始化，覆盖 toggleFav
 // ══════════════════════════════════════════════════════════════
+/** Initialise favourites from API, replacing localStorage data */
 async function initFavourites() {
   try {
     const data = await NW.favourites.get(); // [{ recipeId, recipe }]
@@ -112,6 +114,7 @@ async function initFavourites() {
 
 // 覆盖 toggleFav（原函数在 dashboard.html 里定义）
 var _origToggleFav_api = window.toggleFav;
+/** Toggle recipe favourite status via API with optimistic UI update */
 window.toggleFav = async function (id, heart) {
   const numericId = window.RECIPES[id]?._numericId || parseInt(id, 10);
   const wasOn = favourites.has(id);
@@ -150,10 +153,11 @@ window.toggleFav = async function (id, heart) {
 // ══════════════════════════════════════════════════════════════
 // 找到原评分提交逻辑（dashboard.html 里用 recipeRatings 存 localStorage）
 // 覆盖为 API 调用
-var _nwRatingTarget = null; // 记录当前打分的 recipeId（字符串 key）
+const _nwRatingTarget = null; // 记录当前打分的 recipeId（字符串 key）
 
 // 拦截 setRating 点击（如果 dashboard 用的是全局函数）
 var _origSetRating = window.setRating;
+/** Intercept rating click to track target recipe ID */
 window.setRating = function (recipeId, score) {
   _nwRatingTarget = recipeId;
   if (_origSetRating) _origSetRating(recipeId, score);
@@ -161,6 +165,7 @@ window.setRating = function (recipeId, score) {
 
 // 覆盖评分提交（dashboard 里 submitRating 函数）
 var _origSubmitRating = window.submitRating;
+/** Submit recipe rating to API (overrides localStorage version) */
 window.submitRating = async function (recipeId) {
   const score = recipeRatings[recipeId] || 0;
   if (!score) {
@@ -190,6 +195,7 @@ window.submitRating = async function (recipeId) {
 // 4. 评论：覆盖 submitComment，loadComments 也从 API 取
 // ══════════════════════════════════════════════════════════════
 var _origSubmitComment = window.submitComment;
+/** Submit recipe comment to API with XSS validation */
 window.submitComment = async function (recipeId) {
   const input = document.getElementById('commentInput');
   const text = (input ? input.value : '').trim();
@@ -216,6 +222,7 @@ window.submitComment = async function (recipeId) {
   }
 };
 
+/** Load comments for a recipe from API and render */
 async function loadCommentsFromAPI(recipeKey, numericId) {
   try {
     const data = await NW.comments.get(numericId); // [{ id, user, text, createdAt }]
@@ -248,7 +255,7 @@ async function loadCommentsFromAPI(recipeKey, numericId) {
 (function () {
   // dashboard.html 已经覆盖了一次 openRecipeDetail（加评分+评论UI）
   // 这里用 _dashOrigOpen 保存当前版本，然后替换为新版本
-  var _dashOrigOpen = window.openRecipeDetail;
+  const _dashOrigOpen = window.openRecipeDetail;
   window.openRecipeDetail = async function (id) {
     // 临时恢复，防止递归
     window.openRecipeDetail = _dashOrigOpen;
@@ -314,6 +321,7 @@ window.loadDiaryHistory = async function () {
 
 // 覆盖 loadDateDiary（切换日期时调用）
 var _origLoadDateDiary = window.loadDateDiary;
+/** Load food diary for a specific date from API */
 window.loadDateDiary = async function (dateStr) {
   // 保存当前日期（不再需要 saveDiaryForDate 写 localStorage）
   currentDiaryDate = dateStr;
@@ -329,6 +337,7 @@ window.loadDateDiary = async function (dateStr) {
   if (picker) picker.value = dateStr;
 };
 
+/** Internal: fetch diary entries for date and populate mealLog */
 async function _loadDiaryForDate(dateStr) {
   try {
     const data = await NW.diary.get(dateStr);
@@ -367,6 +376,7 @@ async function _loadDiaryForDate(dateStr) {
 
 // 覆盖 commitFoodEntries（添加食物）
 var _origCommitFoodEntries_api = window.commitFoodEntries;
+/** Save added food items to API with optimistic UI update */
 window.commitFoodEntries = async function () {
   if (!foodAdded.length) return;
 
@@ -425,6 +435,7 @@ window.commitFoodEntries = async function () {
 
 // 覆盖 deleteMeal（删除单条日记条目）
 var _origDeleteMeal = window.deleteMeal;
+/** Delete a single diary entry via API with optimistic removal */
 window.deleteMeal = async function (key, idx) {
   const entry = mealLog[key] && mealLog[key][idx];
   const backendId = entry ? entry._id : null;
@@ -453,6 +464,7 @@ window.saveDiaryForDate = function () {};
 
 // exLog 里每个 entry 保留 _id 字段
 var _origCloseExPanel = window.closeExPanel;
+/** Close exercise panel and save exercises to API */
 window.closeExPanel = async function () {
   if (exAdded.length > 0) {
     const now = new Date();
@@ -490,6 +502,7 @@ window.closeExPanel = async function () {
 
 // 覆盖 deleteEx
 var _origDeleteEx = window.deleteEx;
+/** Delete a single exercise entry via API */
 window.deleteEx = async function (idx) {
   const entry = exLog[idx];
   const backendId = entry ? entry._id : null;
@@ -510,6 +523,7 @@ window.deleteEx = async function (idx) {
 // 8. 覆盖 loadState：原来读 localStorage，现在改为 API 初始化
 // ══════════════════════════════════════════════════════════════
 var _origLoadState = window.loadState;
+/** Initialise app state from API (recipes, favourites, diary) */
 window.loadState = async function () {
   // 保留 dark mode（不涉及后端）
   try {

@@ -146,6 +146,8 @@ body.dark-mode{--paper:#0d1a14;--white:#142420;--ink:#e8f0ec;--ink-s:#d0ddd4;--i
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link" style="position:absolute;top:-40px;left:0;background:var(--teal);color:#fff;padding:8px 16px;z-index:99999;font-size:14px;font-weight:600;border-radius:0 0 8px 0;transition:top .2s">Skip to main content</a>
+<style>.skip-link:focus{top:0 !important;}</style>
 
 <!-- TOP NAV (matches pro_dashboard exactly) -->
 <nav class="top-nav" role="navigation" aria-label="Main navigation">
@@ -725,29 +727,29 @@ function renderBindTab() {
     var actions = '';
     if (r.status === 'pending') {
       actions = '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">' +
-        '<button onclick="acceptBind('' + r.userId + '')" style="padding:9px 20px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;transition:background .2s" onmouseover="this.style.background='var(--ink)'" onmouseout="this.style.background='var(--teal)'">✓ Accept</button>' +
-        '<button onclick="declineBind('' + r.userId + '')" style="padding:9px 20px;background:transparent;color:var(--ink-f);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;transition:all .2s" onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-f)'">Decline</button>' +
+        '<button onclick="acceptBind(\'' + r.userId + '\')" style="padding:9px 20px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:background .2s">✓ Accept</button>' +
+        '<button onclick="declineBind(\'' + r.userId + '\')" style="padding:9px 20px;background:transparent;color:var(--ink-f);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s">Decline</button>' +
         '</div>';
     } else if (r.status === 'accepted') {
-      actions = '<div style="padding:9px 20px;background:var(--teal-lll);color:var(--teal);border:1px solid var(--teal-ll);border-radius:8px;font-size:12px;font-weight:600;font-family:'Bricolage Grotesque',sans-serif;text-align:center">✓ Client</div>';
+      actions = '<div style="padding:9px 20px;background:var(--teal-lll);color:var(--teal);border:1px solid var(--teal-ll);border-radius:8px;font-size:12px;font-weight:600;text-align:center">✓ Client</div>';
     } else {
-      actions = '<div style="padding:9px 20px;font-size:12px;color:var(--ink-f);font-family:'Bricolage Grotesque',sans-serif">Declined</div>';
+      actions = '<div style="padding:9px 20px;font-size:12px;color:var(--ink-f)">Declined</div>';
     }
     return '<div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px rgba(10,20,16,0.04);display:flex;align-items:center;gap:16px" id="bind-card-' + r.userId + '">' +
       '<div style="width:52px;height:52px;border-radius:50%;background:' + color + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">' + esc(r.userInitials) + '</div>' +
       '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--ink)">' + esc(r.userName) + '</div>' +
-      '<div style="font-size:11px;color:var(--ink-f);margin-top:3px;font-family:'JetBrains Mono',monospace">Requested ' + esc(r.time) + '</div>' +
-      '<span style="display:inline-block;margin-top:5px;font-size:10px;padding:2px 8px;border-radius:8px;background:var(--teal-lll);color:var(--teal);font-family:'JetBrains Mono',monospace">' + esc(r.userGoal) + '</span></div>' +
+      '<div style="font-size:11px;color:var(--ink-f);margin-top:3px;font-family:monospace">Requested ' + esc(r.time) + '</div>' +
+      '<span style="display:inline-block;margin-top:5px;font-size:10px;padding:2px 8px;border-radius:8px;background:var(--teal-lll);color:var(--teal);font-family:monospace">' + esc(r.userGoal) + '</span></div>' +
       actions + '</div>';
   }
 
   var html = '';
   if (pending.length) {
-    html += '<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">' + pending.length + ' pending</div>';
+    html += '<div style="font-family:monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">' + pending.length + ' pending</div>';
     html += pending.map(cardHtml).join('');
   }
   if (handled.length) {
-    html += '<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin:20px 0 10px">' + handled.length + ' handled</div>';
+    html += '<div style="font-family:monospace;font-size:9px;color:var(--ink-f);letter-spacing:.08em;text-transform:uppercase;margin:20px 0 10px">' + handled.length + ' handled</div>';
     html += handled.map(cardHtml).join('');
   }
   el.innerHTML = html;

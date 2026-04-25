@@ -526,7 +526,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:9px;height:2px;background:#b8621f"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b8878">Target</span></div>
     </div>
   </div>
-  <div style="position:relative;width:100%;height:148px"><canvas id="calorieTrendChart" aria-label="Weekly calorie intake trend chart" role="img"></canvas></div>
+  <div style="position:relative;width:100%;height:148px"><canvas id="calorieTrendChart" aria-label="Calorie intake trend chart" role="img" aria-label="Weekly calorie intake trend chart" role="img"></canvas></div>
 </div>
 
 </div><!-- end page-record -->
@@ -655,7 +655,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 <div style="background:var(--white);border-radius:20px;width:520px;max-width:90vw;max-height:80vh;overflow:hidden;box-shadow:0 24px 80px rgba(10,20,16,0.2);display:flex;flex-direction:column">
   <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
     <div style="font-family:'Instrument Serif',serif;font-size:22px;font-style:italic;color:var(--ink)">Add to <em id="mp-picker-meal">Breakfast</em></div>
-    <button onclick="mpClosePicker()" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:none;background:var(--paper);color:var(--ink-m)">✕</button>
+    <button onclick="mpClosePicker()" aria-label="Close recipe picker" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:none;background:var(--paper);color:var(--ink-m)">✕</button>
   </div>
   <div style="padding:12px 24px;border-bottom:1px solid var(--border)">
     <input type="text" id="mp-picker-search" placeholder="Search recipes..." oninput="mpFilterPicker(this.value)" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;outline:none">
@@ -766,7 +766,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 <div class="meal-picker-item" onclick="selectMealSlot(this,'🌙 Evening Snack')">🌙 Evening Snack</div>
 </div>
 </div>
-<button onclick="closeFoodPanel()" style="padding:9px 22px;background:#0a1410;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">Done</button>
+<button onclick="closeFoodPanel()" aria-label="Close food panel" style="padding:9px 22px;background:#0a1410;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">Done</button>
 </div>
 </div>
 </div>
@@ -776,7 +776,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 <div id="exPanel" style="position:fixed;top:0;right:0;bottom:0;width:460px;background:#fff;z-index:2001;box-shadow:-8px 0 40px rgba(0,0,0,0.15);display:none;flex-direction:column">
 <div style="padding:18px 22px;border-bottom:1px solid #d4dfd8;display:flex;justify-content:space-between;align-items:center">
 <div style="font-family:'Instrument Serif',serif;font-size:20px;font-style:italic;color:#0a1410">Log Exercise</div>
-<button onclick="closeExPanel()" style="width:32px;height:32px;border-radius:6px;border:none;background:#f5f7f5;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+<button onclick="closeExPanel()" aria-label="Close exercise panel" style="width:32px;height:32px;border-radius:6px;border:none;background:#f5f7f5;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
 </div>
 <div style="padding:10px 22px;border-bottom:1px solid #d4dfd8"><input type="text" placeholder="Search exercise..." style="width:100%;padding:9px 12px;border:1px solid #d4dfd8;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;outline:none" onfocus="this.style.boxShadow='0 1px 4px rgba(10,20,16,0.08)'" onblur="this.style.boxShadow='none'"></div>
 <div style="padding:8px 22px;border-bottom:1px solid #d4dfd8;display:flex;gap:5px;flex-wrap:wrap">
@@ -1104,7 +1104,7 @@ function renderMealLog(){
       const entries=mealLog[sec.key];
       if(!entries.length) h+=`<div class="mc-empty">Nothing logged</div>`;
       else entries.forEach((e,i)=>{
-        h+=`<div class="mc-row"><span class="mc-time">${e.time}</span><span class="mc-name">${e.name}</span><span class="mc-kcal">${e.kcal}</span><span onclick="deleteMeal('${sec.key}',${i})" style="cursor:pointer;font-size:10px;color:#6b8878;margin-left:6px;opacity:.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">✕</span></div>`;
+        h+=`<div class="mc-row"><span class="mc-time">${escapeHtml(e.time)}</span><span class="mc-name">${escapeHtml(e.name)}</span><span class="mc-kcal">${e.kcal}</span><span onclick="deleteMeal('${sec.key}',${i})" style="cursor:pointer;font-size:10px;color:#6b8878;margin-left:6px;opacity:.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">✕</span></div>`;
       });
       h+=`</div>`;
     });
@@ -1234,7 +1234,7 @@ function renderExerciseLog(){
   el.innerHTML=exLog.map((e,i)=>`
     <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f5f7f5">
       <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6b8878;min-width:40px">${e.time}</span>
-      <span style="flex:1;font-size:12px;font-weight:600;color:#0a1410">${e.name}</span>
+      <span style="flex:1;font-size:12px;font-weight:600;color:#0a1410">${escapeHtml(e.name)}</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#3d5448">${e.kcal} kcal/h</span>
       <span onclick="deleteEx(${i})" style="cursor:pointer;font-size:10px;color:#6b8878;opacity:.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">✕</span>
     </div>`).join('');

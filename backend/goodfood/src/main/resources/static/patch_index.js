@@ -122,6 +122,7 @@ if (NW.auth.isLoggedIn()) {
 })();
 
 // ── 密码前端验证（与后端 PasswordValidator 一致）───────────────
+/** Validate password meets strength requirements (8+ chars, upper, lower, digit, special) */
 function isPasswordValid(pw) {
   return pw.length >= 8 &&
     /[A-Z]/.test(pw) &&
@@ -131,6 +132,7 @@ function isPasswordValid(pw) {
 }
 
 // ── 覆盖 handleLogin ──────────────────────────────────────────
+/** Handle login form submission via API */
 window.handleLogin = async function () {
   const email = document.getElementById('login-email').value.trim();
   const pw    = document.getElementById('login-password').value;
@@ -172,6 +174,7 @@ window.handleLogin = async function () {
 };
 
 // ── 覆盖 handleRegister ───────────────────────────────────────
+/** Handle registration form submission via API */
 window.handleRegister = async function () {
   const first = document.getElementById('reg-first').value.trim();
   const last  = document.getElementById('reg-last').value.trim();
@@ -245,6 +248,7 @@ window.handleRegister = async function () {
 };
 
 // ── goToDashboard 保持原逻辑（由 success overlay 按钮调用）────
+/** Redirect to appropriate dashboard after successful auth */
 window.goToDashboard = function () {
   window.location.href = window._redirectTo || 'dashboard.html';
 };

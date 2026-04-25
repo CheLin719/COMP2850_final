@@ -29,7 +29,7 @@
   // role 未知或为空时，异步验证（避免无后端环境死循环）
   if (!NW.auth.role) {
     try {
-      var me = await NW.getMe();
+      const me = await NW.getMe();
       if (me && me.role !== 'professional') {
         window.location.replace('dashboard.html');
         return;
@@ -50,6 +50,7 @@ const _apiClients = {};
 // ══════════════════════════════════════════════════════════════
 // 1. 启动时拉取客户列表，动态更新侧边栏 + clients 对象
 // ══════════════════════════════════════════════════════════════
+/** Fetch client list from API and update sidebar + overview */
 async function initProDashboard() {
   try {
     const list = await NW.clients.getAll();
@@ -86,6 +87,7 @@ async function initProDashboard() {
   }
 }
 
+/** Update overview table with API client data */
 function _updateOverviewStats(list) {
   // 找 overview 页里的状态表格（如果存在）
   const tbody = document.querySelector('#clientsTable tbody, .overview-table tbody');
@@ -107,6 +109,7 @@ function _updateOverviewStats(list) {
 // 2. 覆盖 selectClient：在切换客户时从 API 拉取数据
 // ══════════════════════════════════════════════════════════════
 var _origSelectClient = window.selectClient;
+/** Load client data from API when switching client view */
 window.selectClient = async function (id, el) {
   // overview 不走 API
   if (id === 'overview') {
@@ -185,6 +188,7 @@ window.selectClient = async function (id, el) {
   }
 };
 
+/** Build 30-day calorie trend array from API diary data */
 function _buildCalorieTrend(c, meals) {
   // 按日期汇总 kcal，生成最近 30 天数组
   const kcalByDate = {};
@@ -201,6 +205,7 @@ function _buildCalorieTrend(c, meals) {
 // 3. 覆盖 sendMessage：调用 /api/messages POST
 // ══════════════════════════════════════════════════════════════
 var _origSendMessage = window.sendMessage;
+/** Send message to client via API with optimistic UI update */
 window.sendMessage = async function () {
   const box = document.getElementById('chatInputBox');
   const text = (box ? box.value : '').trim();
@@ -239,6 +244,7 @@ window.sendMessage = async function () {
 // 4. 覆盖 confirmAppt：调用 /api/appointments POST
 // ══════════════════════════════════════════════════════════════
 var _origConfirmAppt = window.confirmAppt;
+/** Book appointment via API with optimistic UI update */
 window.confirmAppt = async function () {
   if (!currentClient) { closeApptModal(); return; }
 
@@ -277,6 +283,7 @@ window.confirmAppt = async function () {
 // 5. 覆盖 toggleApptStatus：调用 /api/appointments/:id PATCH
 // ══════════════════════════════════════════════════════════════
 var _origToggleApptStatus = window.toggleApptStatus;
+/** Toggle appointment confirmed/pending status via API */
 window.toggleApptStatus = async function (idx) {
   if (!currentClient) return;
   const appts = clients[currentClient].appointments;

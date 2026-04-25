@@ -350,6 +350,7 @@
     });
   }
 
+  /** Render current tour slide with illustration and text */
   function renderSlide() {
     var s = slides[currentSlide];
     document.getElementById('nw-tour-illust').innerHTML = s.illustration();
@@ -370,6 +371,7 @@
     }).join('');
   }
 
+  /** Advance to next tour slide */
   function nextSlide() {
     if (currentSlide < slides.length - 1) {
       currentSlide++;
@@ -379,6 +381,7 @@
     }
   }
 
+  /** Close tour overlay and mark as seen in localStorage */
   function closeTour() {
     localStorage.setItem(tourKey(), '1');
     if (overlay) {
@@ -428,6 +431,7 @@
   }
 
   // ── Hook startTour button ────────────────────────────────────
+  /** Start the guided tour overlay for subscriber dashboard */
   window.startTour = function () {
     buildTour();
   };

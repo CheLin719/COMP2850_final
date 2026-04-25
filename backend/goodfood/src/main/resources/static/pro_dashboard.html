@@ -500,7 +500,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">Rose Campbell</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">62kg · Active</div>
     </div>
-    <span class="sn-status warn" onclick="cycleStatus('rose', this)">⚡ Low protein</span>
+    <span class="sn-status warn" onclick="cycleStatus('rose', this)" aria-label="Client status">⚡ Low protein</span>
   </a>
 
   <a class="sn-item" onclick="selectClient('james', this)" data-client="james" href="#">
@@ -509,7 +509,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">James Tang</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">78kg · Bulking</div>
     </div>
-    <span class="sn-status ok" onclick="cycleStatus('james', this)">✓ On track</span>
+    <span class="sn-status ok" onclick="cycleStatus('james', this)" aria-label="Client status">✓ On track</span>
   </a>
 
   <a class="sn-item" onclick="selectClient('sara', this)" data-client="sara" href="#">
@@ -518,7 +518,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">Sara Lim</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">55kg · Cut</div>
     </div>
-    <span class="sn-status urgent" onclick="cycleStatus('sara', this)">! Missed 3 days</span>
+    <span class="sn-status urgent" onclick="cycleStatus('sara', this)" aria-label="Client status">! Missed 3 days</span>
   </a>
 
   <a class="sn-item" onclick="selectClient('mike', this)" data-client="mike" href="#">
@@ -527,7 +527,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">Mike Walsh</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">90kg · Maintain</div>
     </div>
-    <span class="sn-status ok" onclick="cycleStatus('mike', this)">✓ On track</span>
+    <span class="sn-status ok" onclick="cycleStatus('mike', this)" aria-label="Client status">✓ On track</span>
   </a>
 
   <a class="sn-item" onclick="selectClient('priya', this)" data-client="priya" href="#">
@@ -536,7 +536,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">Priya Kapoor</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">58kg · Lean gain</div>
     </div>
-    <span class="sn-status warn" onclick="cycleStatus('priya', this)">⚡ Review due</span>
+    <span class="sn-status warn" onclick="cycleStatus('priya', this)" aria-label="Client status">⚡ Review due</span>
   </a>
 </aside>
 
@@ -686,7 +686,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
         <div class="chart-card">
           <div class="cc-title">Calorie Intake — 30 Days</div>
           <div class="cc-sub">vs daily target</div>
-          <div style="position:relative;height:160px"><canvas id="calorieTrendChart"></canvas></div>
+          <div style="position:relative;height:160px"><canvas id="calorieTrendChart" aria-label="Client calorie intake trend chart" role="img"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="cc-title">Exercise Frequency</div>
@@ -1138,8 +1138,8 @@ function renderChat(c) {
     <div class="msg ${m.from === 'pro' ? 'sent' : 'recv'}">
       ${m.from === 'client' ? `<div class="msg-avatar" style="background:${c.color}">${c.initials}</div>` : ''}
       <div>
-        <div class="msg-bubble">${m.text}</div>
-        <div class="msg-time">${m.time}</div>
+        <div class="msg-bubble">${escapeHtml(m.text)}</div>
+        <div class="msg-time">${escapeHtml(m.time)}</div>
       </div>
       ${m.from === 'pro' ? `<div class="msg-avatar" style="background:var(--pro)">DR</div>` : ''}
     </div>`).join('');
@@ -1261,7 +1261,7 @@ function openMailPanel() {
           <div class="mail-msg-name">${clientNames[id]}${m.unread ? ' <span style="width:6px;height:6px;border-radius:50%;background:#dc2626;display:inline-block;margin-left:4px"></span>' : ''}</div>
           <div class="mail-msg-time">${m.time}</div>
         </div>
-        <div class="mail-msg-preview">${m.text}</div>
+        <div class="mail-msg-preview">${escapeHtml(m.text)}</div>
       </div>
     </div>`;
   }).join('');
@@ -1830,7 +1830,7 @@ function mt(icon,label){return '<div style="background:var(--white);border:1px s
 var ptI=0,ptOverlay=null;
 function proTourKey(){var u=(typeof NW!=="undefined"&&NW.auth)?NW.auth.userId:"";return u?"nw-"+u+"-pro-tour-seen":"nw-pro-tour-seen";}
 
-function startTour(){
+window.startTour=function(){
   if(document.getElementById("pro-tour-overlay"))return;
   ptI=0;
   ptOverlay=document.createElement("div");
