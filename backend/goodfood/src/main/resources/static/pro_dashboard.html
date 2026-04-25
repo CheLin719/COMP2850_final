@@ -1193,14 +1193,14 @@ function renderPlan(c) {
 }
 
 function renderAppointments(c) {
-  document.getElementById('apptList').innerHTML = c.appointments.map(a =>
+  document.getElementById('apptList').innerHTML = (c.appointments||[]).map(a =>
     `<div class="appt-card">
       <div class="appt-time"><div class="at-hour">${a.time}</div><div class="at-label">${a.date}</div></div>
       <div class="appt-info"><div class="ai-name">${c.name}</div><div class="ai-type">${a.type}</div></div>
       <span class="appt-status ${a.status}">${a.status === 'confirmed' ? '✓ Confirmed' : '⏳ Pending'}</span>
     </div>`).join('');
 
-  document.getElementById('sessionHistory').innerHTML = c.history.map(h =>
+  document.getElementById('sessionHistory').innerHTML = (c.history||[]).map(h =>
     `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--fog)">
       <div style="width:7px;height:7px;border-radius:50%;background:var(--teal-ll);flex-shrink:0;margin-top:4px"></div>
       <div style="font-size:12px;color:var(--ink-m)">${h}</div>
@@ -1368,7 +1368,7 @@ function toggleApptStatus(idx) {
 
 // Override renderAppointments to add toggle + delete
 function renderAppointments(c) {
-  document.getElementById('apptList').innerHTML = c.appointments.map((a, i) =>
+  document.getElementById('apptList').innerHTML = (c.appointments||[]).map((a, i) =>
     `<div class="appt-card" onclick="toggleApptStatus(${i})">
       <div class="appt-time"><div class="at-hour">${a.time}</div><div class="at-label">${a.date}</div></div>
       <div class="appt-info"><div class="ai-name">${c.name}</div><div class="ai-type">${a.type}</div></div>
@@ -1376,7 +1376,7 @@ function renderAppointments(c) {
       <span tabindex="0" role="button" onclick="event.stopPropagation();deleteAppt(${i})" style="font-size:11px;color:var(--ink-f);cursor:pointer;margin-left:6px;opacity:.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">✕</span>
     </div>`).join('');
 
-  document.getElementById('sessionHistory').innerHTML = c.history.map(h =>
+  document.getElementById('sessionHistory').innerHTML = (c.history||[]).map(h =>
     `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--fog)">
       <div style="width:7px;height:7px;border-radius:50%;background:var(--teal-ll);flex-shrink:0;margin-top:4px"></div>
       <div style="font-size:12px;color:var(--ink-m)">${h}</div>
