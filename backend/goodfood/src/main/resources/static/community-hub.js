@@ -515,7 +515,7 @@
       var all = JSON.parse(localStorage.getItem(BIND_KEY) || '[]');
       var userName = _userName();
       var userInitials = _userInitials();
-      var userId = (typeof NW !== 'undefined' && NW.auth) ? ('u-' + (NW.auth.userId || Date.now())) : ('u-' + Date.now());
+      var userId = (typeof NW !== 'undefined' && NW.auth && NW.auth.userId) ? String(NW.auth.userId) : ('local-' + Date.now());
       // Don't duplicate
       if (all.find(function(r){ return r.proId === exp.id && r.userId === userId; })) return;
       all.push({
