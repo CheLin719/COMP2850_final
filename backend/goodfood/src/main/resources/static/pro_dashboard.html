@@ -218,33 +218,19 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 /* Tour */
 .tour-trigger-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:1px solid rgba(124,58,237,0.3);background:rgba(124,58,237,0.1);color:rgba(255,255,255,0.85);cursor:pointer;font-size:11px;font-weight:600;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:.02em;transition:all .2s}
 .tour-trigger-btn:hover{background:rgba(124,58,237,0.22);border-color:rgba(124,58,237,0.5);color:#fff}
-.tour-dim-svg{position:fixed;inset:0;width:100%;height:100%;z-index:8000;display:none;pointer-events:all}
-.tour-highlight{position:fixed;z-index:8001;border-radius:12px;pointer-events:none;transition:all .35s cubic-bezier(.4,0,.2,1);display:none}
-.tour-highlight.on{display:block;box-shadow:0 0 0 3px #7c3aed,0 0 0 7px rgba(124,58,237,0.3),0 0 24px rgba(124,58,237,0.15);animation:tourPulsePro 2s ease-in-out infinite}
-@keyframes tourPulsePro{0%,100%{box-shadow:0 0 0 3px #7c3aed,0 0 0 7px rgba(124,58,237,0.3),0 0 24px rgba(124,58,237,0.15)}50%{box-shadow:0 0 0 4px #7c3aed,0 0 0 10px rgba(124,58,237,0.2),0 0 32px rgba(124,58,237,0.1)}}
-.tour-card{position:fixed;z-index:8002;background:#fff;border-radius:14px;padding:20px 22px;width:340px;box-shadow:0 12px 40px rgba(10,20,16,0.3),0 0 0 1px rgba(124,58,237,0.15);display:none;pointer-events:all;transition:opacity .25s,transform .25s,left .3s,top .3s}
-.tour-card.on{display:block}
-@keyframes tourCardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.tour-card::before{content:'';position:absolute;width:12px;height:12px;background:#fff;transform:rotate(45deg);box-shadow:-1px -1px 0 rgba(124,58,237,0.1)}
-.tour-card[data-pos="bottom"]::before{top:-6px;left:28px}
-.tour-card[data-pos="top"]::before{bottom:-6px;left:28px;box-shadow:1px 1px 0 rgba(124,58,237,0.1)}
-.tour-card[data-pos="right"]::before{left:-6px;top:20px}
-.tour-card[data-pos="left"]::before{right:-6px;top:20px;box-shadow:1px -1px 0 rgba(124,58,237,0.1)}
-.tour-card[data-pos="center"]::before{display:none}
-.tour-step-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--pro);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.tour-step-label::after{content:'';flex:1;height:1px;background:var(--pro-ll)}
-.tour-card-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;line-height:1.3}
-.tour-card-body{font-size:13px;color:var(--ink-m);line-height:1.65;margin-bottom:16px}
-.tour-card-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
-.tour-progress{display:flex;gap:4px;align-items:center}
-.tour-pip{width:16px;height:3px;border-radius:2px;background:var(--fog);transition:all .3s}
-.tour-pip.done{background:var(--pro)}
-.tour-pip.active{background:var(--pro);width:22px}
-.tour-actions{display:flex;gap:8px;align-items:center;margin-left:auto}
-.tour-skip-btn{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-f);background:none;border:none;cursor:pointer;padding:6px 10px;border-radius:6px;transition:all .2s}
-.tour-skip-btn:hover{color:var(--ink);background:var(--paper)}
-.tour-next-btn{font-size:12px;font-weight:600;padding:8px 18px;border-radius:8px;border:none;background:var(--pro);color:#fff;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
-.tour-next-btn:hover{background:var(--pro-l)}
+#pro-tour-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:99998;background:rgba(10,20,16,0.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+#pro-tour-overlay.visible{opacity:1}
+#pro-tour-card{background:var(--white,#fff);border-radius:24px;width:520px;max-width:92vw;height:480px;max-height:88vh;box-shadow:0 32px 80px rgba(10,20,16,0.3);display:flex;flex-direction:column;transform:scale(0.95);transition:transform .3s}
+#pro-tour-overlay.visible #pro-tour-card{transform:scale(1)}
+#pro-tour-illust{background:linear-gradient(135deg,#f5f3ff,var(--paper,#f5f7f5));border-bottom:1px solid var(--fog,#dce6e0);padding:20px 28px;height:180px;min-height:180px;max-height:180px;display:flex;align-items:center;justify-content:center;border-radius:24px 24px 0 0;overflow:hidden}
+#pro-tour-body{padding:24px 28px 16px;flex:1;overflow-y:auto}
+#pro-tour-title{font-family:'Instrument Serif',serif;font-size:22px;font-style:italic;color:var(--ink,#0a1410);margin-bottom:8px}
+#pro-tour-text{font-size:13px;color:var(--ink-m,#3d5448);line-height:1.65}
+#pro-tour-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 28px 22px;border-top:1px solid var(--fog,#dce6e0);flex-shrink:0}
+.pro-tour-pips{display:flex;gap:3px;align-items:center;flex-shrink:0}
+.pro-tour-pip{width:14px;height:3px;border-radius:2px;background:var(--fog,#dce6e0);transition:all .3s}
+.pro-tour-pip.done{background:var(--pro,#7c3aed)}
+.pro-tour-pip.active{background:var(--pro,#7c3aed);width:22px}
 
 /* ── DARK MODE ── */
 body.dark-mode { --paper:#0d1a14; --white:#142420; --ink:#e8f0ec; --ink-s:#d0ddd4; --ink-m:#a8bfb0; --ink-f:#7a9488; --border:#2a3e34; --fog:#1e3028; }
@@ -1818,148 +1804,60 @@ function proSettingsSaved(btn) {
 }
 </script>
 
-<svg class="tour-dim-svg" id="tSvg" style="position:fixed;inset:0;width:100%;height:100%;z-index:8000;display:none;pointer-events:all">
-  <defs><mask id="tMask"><rect width="100%" height="100%" fill="white"/><rect id="tHole" rx="12" fill="black"/></mask></defs>
-  <rect width="100%" height="100%" fill="rgba(10,20,16,0.82)" mask="url(#tMask)"/>
-</svg>
-<div class="tour-highlight" id="tHL"></div>
-<div class="tour-card" id="tCard" data-pos="bottom">
-  <div class="tour-step-label" id="tLabel"></div>
-  <div class="tour-card-title" id="tTitle"></div>
-  <div class="tour-card-body" id="tBody"></div>
-  <div class="tour-card-foot">
-    <div class="tour-progress" id="tPips"></div>
-    <div class="tour-actions">
-      <button class="tour-skip-btn" onclick="tEnd()">Skip</button>
-      <button class="tour-next-btn" id="tBtn" onclick="tNext()">Next <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    </div>
-  </div>
-</div>
 <script>
-var tSteps=[
-  {title:'Welcome to NourishWell Pro 🌿',body:"You're in the professional dashboard — manage clients, track their progress, and provide personalised guidance. Let's take a quick tour.",sel:null,pos:'center',onEnter:null},
-  {title:'Your Client List',body:'All your clients are listed here with colour-coded status badges. You can search and click any name to open their full profile.',sel:'.side-nav',pos:'right',onEnter:null},
-  {title:'Client Snapshot',body:'This table gives you an at-a-glance overview — goals, average calories, protein intake, exercise frequency, and current status. Click any row to open that client.',sel:'.overview-grid',pos:'top',onEnter:null},
-  {title:'Client Profile',body:"We've opened Rose Campbell's profile. You can see her weight, height, goal, and age at a glance. Use the Message and Edit Plan buttons for quick actions.",sel:'#clientHeader',pos:'bottom',onEnter:function(){selectClientFromTable('rose');}},
-  {title:'Data Analysis',body:"The Data Analysis tab shows calorie trends, BMI gauge, macro breakdown, exercise frequency, and an overall health score — everything you need to monitor progress.",sel:'.tab-item:nth-child(1)',pos:'bottom',onEnter:function(){var t=document.querySelectorAll('.tab-item');switchTab('analytics',t[0]);}},
-  {title:'Messages & Quick Tags',body:"The Messages tab lets you send advice directly. Use quick-tag buttons like 'Great progress' or 'Protein reminder' — you can edit before sending.",sel:'.tab-item:nth-child(2)',pos:'bottom',onEnter:function(){var t=document.querySelectorAll('.tab-item');switchTab('chat',t[1]);}},
-  {title:'Fitness Plan',body:'The Fitness Plan tab lets you set personalised meal and training plans — calorie targets, exercise schedules, and dietary notes for each client.',sel:'.tab-item:nth-child(3)',pos:'bottom',onEnter:function(){var t=document.querySelectorAll('.tab-item');switchTab('plan',t[2]);}},
-  {title:'Appointments',body:'The Appointments tab lets you book and manage consultation sessions — upcoming, completed, and cancelled appointments are all tracked here.',sel:'.tab-item:nth-child(4)',pos:'bottom',onEnter:function(){var t=document.querySelectorAll('.tab-item');switchTab('appointments',t[3]);}},
-  {title:'Community Hub',body:'The Community page is where you engage with subscribers — post expert advice, answer questions, and build trust with the community. Your posts get a PRO badge automatically.',sel:'#sn-pro-community',pos:'right',onEnter:function(){selectClient('community',document.getElementById('sn-pro-community'));}},
-  {title:'Community Tabs',body:'Use the tabs to filter: All Posts shows everything, Answered shows posts you have replied to, My Clients shows only your clients posts, and Bind Requests shows new client connection requests.',sel:'.pro-ch-tab',pos:'bottom',onEnter:null},
-  {title:'Bind Requests',body:'When a subscriber chooses you in Find a Pro, their request appears here. Accept to add them as your client, or decline. Accepted clients appear in your sidebar.',sel:'.pro-ch-tab:nth-child(4)',pos:'bottom',onEnter:function(){window._proChTab('bind',document.querySelectorAll('.pro-ch-tab')[3]);}},
-  {title:'Switch to User View',body:'Click here to switch to your own subscriber dashboard — see your personal food diary, nutritional trends, and meal plans as a regular user. The first time you switch, you will set up your personal health profile.',sel:'.switch-btn',pos:'bottom',onEnter:function(){selectClient('overview',document.querySelector('.sn-item'));}},
-  {title:'Help & Messages',body:"The Help button opens the full Q&A page. The envelope icon shows unread client messages. Replay this tour any time with the Tour button. You're all set!",sel:'#helpMailGroup',pos:'bottom',onEnter:null}
+(function(){
+var proSlides = [
+  { title:"Welcome to NourishWell Pro", body:"You are in the professional dashboard — manage clients, track their progress, and provide personalised guidance. Let us take a quick tour.",
+    illust:function(){return '<div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:20px 0"><div style="font-size:40px">🌿</div><div style="text-align:left"><div style="font-family:Instrument Serif,serif;font-size:24px;font-style:italic;color:var(--ink)">Professional</div><div style="font-family:Instrument Serif,serif;font-size:24px;font-style:italic;color:#7c3aed"><em>Dashboard</em></div></div></div>';}},
+  { title:"Your Client List", body:"All your clients are listed in the sidebar with colour-coded status badges — green for on track, amber for warnings, red for missed days. Click any name to open their full profile.",
+    illust:function(){return '<div style="display:flex;flex-direction:column;gap:6px;padding:10px 0">'+mc("RC","Rose C.","#2f8f7f","Active")+mc("JT","James T.","#7aaad4","Bulking")+mc("SL","Sara L.","#e07b78","Missed 3d")+'</div>';}},
+  { title:"Client Snapshot", body:"The overview table gives you an at-a-glance summary — goals, average calories, protein intake, exercise frequency, and current status. Click any row to open that client.",
+    illust:function(){return '<div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 14px"><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;font-size:9px;font-family:JetBrains Mono,monospace;font-weight:700;color:var(--ink);margin-bottom:8px"><span>Client</span><span>Goal</span><span>Avg kcal</span><span>Status</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;font-size:9px;color:var(--ink-f)"><span>Rose C.</span><span>Weight loss</span><span>1,920</span><span style="color:#b8621f">Low protein</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;font-size:9px;color:var(--ink-f);margin-top:4px"><span>James T.</span><span>Muscle gain</span><span>2,850</span><span style="color:#2f8f7f">On track</span></div></div>';}},
+  { title:"Client Profile & Tabs", body:"Each client profile has four tabs: Data Analysis (calorie trends, BMI, macros), Messages (send advice with quick-tag buttons), Fitness Plan (meal and training plans), and Appointments (book and manage sessions).",
+    illust:function(){return '<div style="display:flex;gap:8px;justify-content:center;padding:10px 0;flex-wrap:wrap">'+mt("📊","Analysis")+mt("💬","Messages")+mt("📋","Plan")+mt("📅","Appts")+'</div>';}},
+  { title:"Community Hub", body:"Engage with the community — post expert advice, answer subscriber questions, and manage client connection requests. Your posts automatically get a PRO badge.",
+    illust:function(){return '<div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 0"><div style="width:42px;height:42px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">DR</div><div style="flex:1;max-width:260px"><div style="background:var(--white);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--ink)">Great progress on your protein targets this week! Keep it up 💪</div></div></div>';}},
+  { title:"Bind Requests", body:"When a subscriber chooses you in Find a Pro, their request appears in the Bind Requests tab. Accept to add them as your client, or decline.",
+    illust:function(){return '<div style="display:flex;align-items:center;gap:14px;padding:10px 0;justify-content:center"><div style="width:48px;height:48px;border-radius:50%;background:#7aaad4;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700">AK</div><div><div style="font-size:13px;font-weight:700;color:var(--ink)">Alex Kim</div><div style="font-size:10px;color:var(--ink-f);font-family:JetBrains Mono,monospace">Requested 1h ago</div></div><div style="display:flex;gap:6px"><div style="padding:6px 14px;background:var(--teal);color:#fff;border-radius:6px;font-size:10px;font-weight:600">✓ Accept</div><div style="padding:6px 14px;border:1px solid var(--border);border-radius:6px;font-size:10px;color:var(--ink-f)">Decline</div></div></div>';}},
+  { title:"Switch to User View", body:"Click Switch to User View in the top bar to access your own subscriber dashboard. The first time you switch, you will set up your personal health profile.",
+    illust:function(){return '<div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:20px 0"><div style="padding:10px 20px;background:var(--ink);color:#fff;border-radius:10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;font-family:Bricolage Grotesque,sans-serif"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 4h9M7 1l3 3-3 3M13 10H4M7 7l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Switch to User View</div></div>';}},
+  { title:"You are all set!", body:"Use the Help button for FAQs, the envelope icon for client messages, and replay this tour any time with the Tour button. Happy advising!",
+    illust:function(){return '<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:8px">🎉</div><div style="font-family:Instrument Serif,serif;font-size:20px;font-style:italic;color:var(--ink)">Ready to go</div></div>';}}
 ];
-var tI=0,tBusy=false;
+function mc(ini,name,col,st){return '<div style="display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 12px"><div style="width:28px;height:28px;border-radius:50%;background:'+col+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">'+ini+'</div><div style="flex:1;font-size:11px;font-weight:600;color:var(--ink)">'+name+'</div><div style="font-size:9px;font-family:JetBrains Mono,monospace;color:var(--ink-f)">'+st+'</div></div>';}
+function mt(icon,label){return '<div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-align:center;min-width:80px"><div style="font-size:18px;margin-bottom:4px">'+icon+'</div><div style="font-size:9px;font-weight:600;color:var(--ink)">'+label+'</div></div>';}
 
-function tClear(){
-  var hole=document.getElementById('tHole');
-  var hl=document.getElementById('tHL');
-  hole.setAttribute('width',0);hole.setAttribute('height',0);
-  hl.classList.remove('on');hl.style.display='none';
-}
-
-function tPlace(){
-  var s=tSteps[tI];
-  var hl=document.getElementById('tHL');
-  var card=document.getElementById('tCard');
-  var hole=document.getElementById('tHole');
-
-  // Update text
-  document.getElementById('tLabel').textContent='Step '+(tI+1)+' of '+tSteps.length;
-  document.getElementById('tTitle').textContent=s.title;
-  document.getElementById('tBody').textContent=s.body;
-  document.getElementById('tBtn').innerHTML=tI===tSteps.length-1?'Done ✓':'Next <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  document.getElementById('tPips').innerHTML=tSteps.map(function(_,i){return '<div class="tour-pip'+(i<tI?' done':'')+(i===tI?' active':'')+'"></div>';}).join('');
-
-  if(s.sel){
-    var el=document.querySelector(s.sel);
-    if(el){
-      var r=el.getBoundingClientRect(),pad=8;
-      var hx=r.left-pad,hy=r.top-pad,hw=r.width+pad*2,hh=r.height+pad*2;
-      hole.setAttribute('x',hx);hole.setAttribute('y',hy);hole.setAttribute('width',hw);hole.setAttribute('height',hh);
-      hl.style.cssText='display:block;left:'+hx+'px;top:'+hy+'px;width:'+hw+'px;height:'+hh+'px';
-      hl.classList.add('on');
-      var cw=340,ch=card.offsetHeight||200,gap=16,vw=window.innerWidth,vh=window.innerHeight;
-      var cx,cy,pos=s.pos||'bottom';
-      if(pos==='right'&&r.right+gap+cw<vw){cx=r.right+gap;cy=Math.max(12,Math.min(r.top,vh-ch-12));}
-      else if(pos==='left'&&r.left-gap-cw>0){cx=r.left-gap-cw;cy=Math.max(12,Math.min(r.top,vh-ch-12));}
-      else if(pos==='top'&&r.top-gap-ch>60){cx=Math.max(12,Math.min(r.left,vw-cw-12));cy=r.top-gap-ch;}
-      else{cx=Math.max(12,Math.min(r.left,vw-cw-12));cy=r.bottom+gap;pos='bottom';}
-      card.setAttribute('data-pos',pos);
-      card.style.left=cx+'px';card.style.top=cy+'px';
-      card.style.transform='none';
-    } else {
-      tClear();
-      card.setAttribute('data-pos','center');
-      card.style.left='50%';card.style.top='50%';card.style.transform='translate(-50%,-50%)';
-    }
-  } else {
-    tClear();
-    card.setAttribute('data-pos','center');
-    card.style.left='50%';card.style.top='50%';card.style.transform='translate(-50%,-50%)';
-  }
-}
+var ptI=0,ptOverlay=null;
+function proTourKey(){var u=(typeof NW!=="undefined"&&NW.auth)?NW.auth.userId:"";return u?"nw-"+u+"-pro-tour-seen":"nw-pro-tour-seen";}
 
 function startTour(){
-  tI=0;
-  var card=document.getElementById('tCard');
-  // 1. Hide card completely
-  card.classList.remove('on');
-  card.style.visibility='hidden';
-  card.style.opacity='0';
-  tClear();
-  // 2. Reset page to overview
-  selectClient('overview',document.querySelector('.sn-item'));
-  window.scrollTo({top:0});
-  // 3. Show overlay
-  document.getElementById('tSvg').style.display='block';
-  document.body.style.overflow='hidden';
-  // 4. Wait for DOM to settle, then render step 1 and show
-  setTimeout(function(){
-    tPlace();
-    card.classList.add('on');
-    card.style.visibility='visible';
-    card.style.opacity='1';
-  },50);
+  if(document.getElementById("pro-tour-overlay"))return;
+  ptI=0;
+  ptOverlay=document.createElement("div");
+  ptOverlay.id="pro-tour-overlay";
+  ptOverlay.innerHTML='<div id="pro-tour-card"><div id="pro-tour-illust"></div><div id="pro-tour-body"><div id="pro-tour-title"></div><div id="pro-tour-text"></div></div><div id="pro-tour-footer"><div class="pro-tour-pips" id="pro-tour-pips"></div><div class="pro-tour-counter" style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-f);letter-spacing:.04em" id="pro-tour-counter"></div><div style="display:flex;gap:12px;align-items:center"><button style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-f);background:none;border:none;cursor:pointer;padding:6px 12px;border-radius:6px" id="pro-tour-skip">Skip tour</button><button style="font-size:12px;font-weight:600;padding:9px 22px;border-radius:8px;border:none;background:#7c3aed;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px" id="pro-tour-next">Next →</button></div></div></div>';
+  document.body.appendChild(ptOverlay);
+  document.getElementById("pro-tour-skip").addEventListener("click",ptClose);
+  document.getElementById("pro-tour-next").addEventListener("click",ptNext);
+  ptOverlay.addEventListener("click",function(e){if(e.target===ptOverlay)ptClose();});
+  ptRender();
+  requestAnimationFrame(function(){requestAnimationFrame(function(){ptOverlay.classList.add("visible");});});
 }
-
-function tNext(){
-  if(tI>=tSteps.length-1){tEnd();return;}
-  tI++;
-  var card=document.getElementById('tCard');
-  var s=tSteps[tI];
-  // 1. Hide card + highlight instantly
-  card.style.visibility='hidden';
-  tClear();
-  // 2. Execute onEnter (page navigation)
-  if(s.onEnter) s.onEnter();
-  window.scrollTo({top:0});
-  // 3. Wait for DOM to update, then position and show
-  setTimeout(function(){
-    tPlace();
-    card.style.visibility='visible';
-  },60);
+function ptRender(){
+  var s=proSlides[ptI];
+  document.getElementById("pro-tour-illust").innerHTML=s.illust();
+  document.getElementById("pro-tour-title").textContent=s.title;
+  document.getElementById("pro-tour-text").textContent=s.body;
+  document.getElementById("pro-tour-counter").textContent=(ptI+1)+" / "+proSlides.length;
+  var isLast=ptI===proSlides.length-1;
+  document.getElementById("pro-tour-next").innerHTML=isLast?"Get started ✓":"Next →";
+  document.getElementById("pro-tour-skip").style.display=isLast?"none":"block";
+  document.getElementById("pro-tour-pips").innerHTML=proSlides.map(function(_,i){var cls="pro-tour-pip";if(i<ptI)cls+=" done";if(i===ptI)cls+=" active";return '<div class="'+cls+'"></div>';}).join("");
 }
-
-function tEnd(){
-  var card=document.getElementById('tCard');
-  card.classList.remove('on');
-  card.style.visibility='hidden';
-  card.style.opacity='0';
-  document.getElementById('tSvg').style.display='none';
-  tClear();
-  document.body.style.overflow='';
-  selectClient('overview',document.querySelector('.sn-item'));
-  window.scrollTo({top:0});
-}
-
-document.getElementById('tSvg').addEventListener('click',function(e){
-  var card=document.getElementById('tCard');
-  var cr=card.getBoundingClientRect();
-  if(e.clientX<cr.left||e.clientX>cr.right||e.clientY<cr.top||e.clientY>cr.bottom) tEnd();
-});
+function ptNext(){if(ptI<proSlides.length-1){ptI++;ptRender();}else ptClose();}
+function ptClose(){localStorage.setItem(proTourKey(),"1");if(ptOverlay){ptOverlay.classList.remove("visible");setTimeout(function(){if(ptOverlay){ptOverlay.remove();ptOverlay=null;}},300);}}
+document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){if(!localStorage.getItem(proTourKey()))startTour();},800);});
+})();
 </script>
 
 
