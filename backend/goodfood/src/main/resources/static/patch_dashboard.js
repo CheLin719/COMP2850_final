@@ -25,7 +25,7 @@
     const me = await NW.getMe();
     // token 有效 → 检查角色
     // Exception: if coming from pro dashboard ("Switch to User View"), allow pro to stay
-    const fromPro = false;
+    var fromPro = false;
     try { fromPro = sessionStorage.getItem('nw-from-pro') === '1'; } catch(e) {}
     if (me.role === 'professional' && !fromPro) {
       window.location.replace('pro_dashboard.html');

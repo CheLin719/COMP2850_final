@@ -950,16 +950,20 @@ function selectClientFromTable(id) {
 }
 
 function renderClientHeader(c) {
+  var w = c.weight || '—';
+  var h = c.height || '—';
+  var g = c.goal || c.stats?.goal || '—';
+  var a = c.age || '—';
   document.getElementById('clientHeader').innerHTML = `
     <div class="client-header">
       <div class="ch-avatar" style="background:${c.color}">${c.initials}</div>
       <div>
         <div class="ch-name">${c.name}</div>
         <div class="ch-meta">
-          <span class="ch-tag">⚖️ ${c.weight}kg</span>
-          <span class="ch-tag">📏 ${c.height}cm</span>
-          <span class="ch-tag">🎯 ${c.goal}</span>
-          <span class="ch-tag">🎂 Age ${c.age}</span>
+          <span class="ch-tag">⚖️ ${w}${w !== '—' ? 'kg' : ''}</span>
+          <span class="ch-tag">📏 ${h}${h !== '—' ? 'cm' : ''}</span>
+          <span class="ch-tag">🎯 ${g}</span>
+          <span class="ch-tag">🎂 Age ${a}</span>
         </div>
       </div>
       <div class="ch-actions">
@@ -970,7 +974,7 @@ function renderClientHeader(c) {
 }
 
 function renderStats(c) {
-  const bmi = (c.weight / ((c.height / 100) ** 2)).toFixed(1);
+  const bmi = (c.weight && c.height) ? (c.weight / ((c.height / 100) ** 2)).toFixed(1) : '—';
   document.getElementById('statsRow').innerHTML = `
     <div class="stat-card">
       <div class="sc-label">Avg Daily Kcal</div>
@@ -999,7 +1003,7 @@ function renderStats(c) {
 }
 
 function renderBMI(c) {
-  const bmi = c.weight / ((c.height / 100) ** 2);
+  const bmi = (c.weight && c.height) ? c.weight / ((c.height / 100) ** 2) : 0;
   const bmiVal = bmi.toFixed(1);
   const ranges = [
     { label: 'Underweight', min: 0,    max: 18.5, color: '#7aaad4', bg: 'rgba(122,170,212,0.12)' },
@@ -1039,7 +1043,7 @@ function renderBMI(c) {
 
       <!-- 2-col stats -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${[['Height', c.height + ' cm'], ['Weight', c.weight + ' kg']].map(([l,v]) =>
+        ${[['Height', (c.height || '—') + (c.height ? ' cm' : '')], ['Weight', (c.weight || '—') + (c.weight ? ' kg' : '')]].map(([l,v]) =>
           `<div style="background:var(--paper);border-radius:8px;padding:10px 12px">
             <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f);text-transform:uppercase;letter-spacing:.06em">${l}</div>
             <div style="font-size:15px;font-weight:700;color:var(--ink);margin-top:3px">${v}</div>
@@ -1066,6 +1070,7 @@ function renderMacros(c) {
 }
 
 function renderCalorieTrend(c) {
+  if (!c.calorie_trend || !c.calorie_trend.length) { if(calChart){calChart.destroy();calChart=null;} return; }
   if (calChart) calChart.destroy();
   const labels = Array.from({ length: 30 }, (_, i) => {
     const d = new Date(); d.setDate(d.getDate() - 29 + i);
@@ -2194,10 +2199,10 @@ window._proAcceptBind = function(userId) {
   req.status = "accepted";
   saveBindRequests(reqs);
   try{
-    var clients = JSON.parse(localStorage.getItem("nw-pro-accepted-clients")||"[]");
-    if(!clients.find(function(c){return c.userId===userId;})){
-      clients.push({userId:userId,name:req.userName,initials:req.userInitials,goal:req.userGoal,acceptedAt:new Date().toISOString()});
-      localStorage.setItem("nw-pro-accepted-clients",JSON.stringify(clients));
+    var acceptedList = JSON.parse(localStorage.getItem("nw-pro-accepted-clients")||"[]");
+    if(!acceptedList.find(function(c){return c.userId===userId;})){
+      acceptedList.push({userId:userId,name:req.userName,initials:req.userInitials,goal:req.userGoal,acceptedAt:new Date().toISOString()});
+      localStorage.setItem("nw-pro-accepted-clients",JSON.stringify(acceptedList));
     }
   }catch(e){}
   updateBindDot();
@@ -2212,6 +2217,10 @@ window._proAcceptBind = function(userId) {
       name: req.userName || "New Client",
       initials: ini,
       color: color,
+      weight: null,
+      height: null,
+      age: null,
+      goal: req.userGoal || "General",
       stats: { goal: req.userGoal || "General", avg_kcal: 0, protein: "—", exercise_days: 0, bmi: "—", score: "—", status: "New" },
       calorie_trend: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       messages: [],
