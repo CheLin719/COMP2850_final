@@ -1003,9 +1003,9 @@ function renderStats(c) {
     </div>
     <div class="stat-card">
       <div class="sc-label">Log Streak</div>
-      <div class="sc-value">${c.stats.streak}<span style="font-size:14px;font-weight:400;color:var(--ink-f)"> days</span></div>
+      <div class="sc-value">${c.stats.streak || 0}<span style="font-size:14px;font-weight:400;color:var(--ink-f)"> days</span></div>
       <div class="sc-sub">Consecutive logging</div>
-      <div class="sc-trend ${c.stats.streak >= 10 ? 'up' : 'neutral'}">${c.stats.streak >= 14 ? '🔥 On fire' : c.stats.streak >= 7 ? '✓ Consistent' : '~ Building habit'}</div>
+      <div class="sc-trend ${(c.stats.streak||0) >= 10 ? 'up' : 'neutral'}">${(c.stats.streak||0) >= 14 ? '🔥 On fire' : (c.stats.streak||0) >= 7 ? '✓ Consistent' : '~ Building habit'}</div>
     </div>`;
 }
 
@@ -1061,7 +1061,7 @@ function renderBMI(c) {
 }
 
 function renderMacros(c) {
-  if (!c.macros) { document.getElementById("macroTable").innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--ink-f);font-size:13px\">No macro data available</div>"; return; }
+  if (!c.macros) { var _mb=document.getElementById("macroBreakdown"); if(_mb) _mb.innerHTML="<div style=\"text-align:center;padding:24px;color:var(--ink-f);font-size:13px\">No macro data available</div>"; return; }
   const m = c.macros;
   const rows = Object.entries(m).map(([name, d]) => {
     const pct = Math.min(d.actual / (d.target * 1.2) * 100, 100);
@@ -1128,7 +1128,7 @@ function renderExerciseChart(c) {
 }
 
 function renderScoreRing(c) {
-  if (!c.scores) { document.getElementById("scoreRing").innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--ink-f);font-size:13px\">No score data</div>"; return; }
+  if (!c.scores) { return; }
   const total = Math.round(Object.values(c.scores).reduce((a, b) => a + b, 0) / Object.keys(c.scores).length);
   const color = total >= 80 ? '#1e6b5e' : total >= 60 ? '#b8621f' : '#dc2626';
   const pct = total / 100;
@@ -1165,7 +1165,7 @@ function renderChat(c) {
 }
 
 function renderPlan(c) {
-  if (!c.plan) { document.getElementById("planGrid").innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--ink-f);font-size:13px\">No fitness plan set yet</div>"; return; }
+  if (!c.plan && !c.meals) { var _mp=document.getElementById("mealPlanRows"); if(_mp) _mp.innerHTML="<div style=\"text-align:center;padding:24px;color:var(--ink-f);font-size:13px\">No fitness plan set yet</div>"; var _tp=document.getElementById("trainingPlanRows"); if(_tp) _tp.innerHTML=""; var _pt=document.getElementById("planTargets"); if(_pt) _pt.innerHTML=""; return; }
   const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   const mealColors = [c.color, '#7aaad4', '#b8621f', '#2f8f7f', '#7c3aed', '#e07b78', '#d4956a'];
   document.getElementById('mealPlanRows').innerHTML = days.map((d, i) =>
@@ -1503,7 +1503,7 @@ function toggleScoreDetail(key, el) {
 
 // ── Override renderScoreRing to add clickable rows ────────────────────────────
 function renderScoreRing(c) {
-  if (!c.scores) { document.getElementById("scoreRing").innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--ink-f);font-size:13px\">No score data</div>"; return; }
+  if (!c.scores) { return; }
   const total = Math.round(Object.values(c.scores).reduce((a, b) => a + b, 0) / Object.keys(c.scores).length);
   const color = total >= 80 ? '#1e6b5e' : total >= 60 ? '#b8621f' : '#dc2626';
   const pct = total / 100;
