@@ -2914,6 +2914,58 @@ var DEMO_APPTS = [
   { date:"Mon 12 May", time:"10:00 AM", type:"Monthly Assessment", status:"pending" }
 ];
 
+// Real messages from API (replaces DEMO_MESSAGES when API is available)
+var _myProMessages = DEMO_MESSAGES.slice(); // start with demo, replaced by API data
+var _myProMsgsLoaded = false;
+var _myProAppts = DEMO_APPTS.slice();
+
+/** Load messages from API between current user and their pro */
+async function _loadProMessages(boundProId) {
+  if (typeof NW === "undefined" || !NW.messages) return;
+  // Find the pro userId from bind requests
+  var proUserId = null;
+  try {
+    var reqs = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
+    var myReq = reqs.find(function(r){ return r.proId === boundProId && r.status === "accepted"; });
+    if (myReq && myReq.proUserId) proUserId = myReq.proUserId;
+  } catch(e){}
+  if (!proUserId) return;
+
+  try {
+    var msgs = await NW.messages.get(proUserId);
+    if (Array.isArray(msgs) && msgs.length > 0) {
+      var myId = NW.auth.userId ? String(NW.auth.userId) : "";
+      _myProMessages = msgs.map(function(m) {
+        return {
+          from: String(m.senderId) === myId ? "user" : "pro",
+          text: m.text,
+          time: m.createdAt ? new Date(m.createdAt).toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}) : ""
+        };
+      });
+      renderMyPro();
+    }
+  } catch(e) {
+    console.warn("[NW] load pro messages failed:", e.message);
+    // Keep demo messages as fallback
+  }
+
+  // Also load appointments
+  try {
+    var appts = await NW.appointments.getAll();
+    if (Array.isArray(appts) && appts.length > 0) {
+      var myAppts = appts.filter(function(a) { return String(a.clientId) === String(NW.auth.userId) || String(a.proId) === proUserId; });
+      if (myAppts.length > 0) {
+        _myProAppts = myAppts.map(function(a) {
+          var d = a.date ? new Date(a.date) : new Date();
+          var dateStr = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()] + " " + d.getDate() + " " + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()];
+          return { date: dateStr, time: a.time || "", type: a.type || "Check-in", status: a.status || "pending" };
+        });
+        renderMyPro();
+      }
+    }
+  } catch(e) {}
+}
+
 function getUserId() {
   try { var s = sessionStorage.getItem("nw-session"); return s ? JSON.parse(s).userId : "guest"; } catch(e) { return "guest"; }
 }
@@ -2990,7 +3042,14 @@ function renderMyPro() {
 
   // ── ACCEPTED ──
   if (sub) sub.textContent = "Your personalised nutrition support";
-  var msgsHtml = DEMO_MESSAGES.map(function(m) {
+
+  // Load messages from API if not yet loaded
+  if (!_myProMsgsLoaded) {
+    _myProMsgsLoaded = true;
+    _loadProMessages(boundId);
+  }
+
+  var msgsHtml = _myProMessages.map(function(m) {
     var isMe = m.from === "user";
     return `<div style="display:flex;justify-content:${isMe?"flex-end":"flex-start"};margin-bottom:10px">
       <div style="max-width:75%;background:${isMe?"var(--ink)":"var(--paper)"};color:${isMe?"#fff":"var(--ink)"};padding:10px 14px;border-radius:${isMe?"14px 14px 4px 14px":"14px 14px 14px 4px"};font-size:13px;line-height:1.55">
@@ -3000,7 +3059,7 @@ function renderMyPro() {
     </div>`;
   }).join("");
 
-  var apptsHtml = DEMO_APPTS.map(function(a) {
+  var apptsHtml = _myProAppts.map(function(a) {
     var badge = a.status === "confirmed"
       ? `<span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:8px;background:var(--teal-lll);color:var(--teal)">✓ Confirmed</span>`
       : `<span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:8px;background:#fffbeb;color:#92400e">Pending</span>`;
@@ -3067,21 +3126,39 @@ window._nwUnbind = function() {
   if (typeof showToast === "function") showToast("Disconnected from nutritionist");
 };
 
-// Send message stub
-window._nwSendProMsg = function() {
+// Send message via API
+window._nwSendProMsg = async function() {
   var inp = document.getElementById("mypro-msg-inp");
   var text = inp ? inp.value.trim() : "";
   if (!text) return;
-  DEMO_MESSAGES.push({ from:"user", text:text, time:"Just now" });
   inp.value = "";
+
+  // Find the pro's userId from bind requests
+  var boundId = getBoundExpert();
+  var proUserId = null;
+  try {
+    var reqs = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
+    var myReq = reqs.find(function(r){ return r.proId === boundId && r.status === "accepted"; });
+    if (myReq && myReq.proUserId) proUserId = myReq.proUserId;
+  } catch(e){}
+
+  // Optimistic UI update
+  _myProMessages.push({ from:"user", text:text, time:"Just now" });
   renderMyPro();
+
+  // Send via API if possible
+  if (typeof NW !== "undefined" && NW.messages && proUserId) {
+    try {
+      await NW.messages.send(proUserId, text);
+    } catch(e) { console.warn("[NW] send to pro failed:", e.message); }
+  }
 };
 
 // Re-render when page becomes active (so status updates are reflected)
 var _origSwitchPagePro = window.switchPage;
 window.switchPage = function(p, el) {
   if (_origSwitchPagePro) _origSwitchPagePro(p, el);
-  if (p === "mypro") setTimeout(renderMyPro, 50);
+  if (p === "mypro") { _myProMsgsLoaded = false; setTimeout(renderMyPro, 50); }
 };
 
 document.addEventListener("DOMContentLoaded", function() {

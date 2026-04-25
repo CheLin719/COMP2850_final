@@ -786,6 +786,9 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 </div>
 
 <script>
+/** Sanitise user text before inserting into DOM */
+function escapeHtml(s){if(!s)return '';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
 // ── CLIENT DATA ──
 const clients = {
   rose: {

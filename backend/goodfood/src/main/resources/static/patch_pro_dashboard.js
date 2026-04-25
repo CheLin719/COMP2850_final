@@ -1,87 +1,99 @@
 /**
  * NourishWell — pro_dashboard.html API Patch
  * ══════════════════════════════════════════════════════════════
- * 在 pro_dashboard.html 底部 </body> 前引入（api.js 必须先加载）：
- *   <script src="api.js"></script>
- *   <script src="patch_pro_dashboard.js"></script>
- *
- * 覆盖策略：
- *  - 页面加载时：从 /api/clients 拉取客户列表，重建 clients 对象
- *  - selectClient：加载客户 diary + 消息 + 预约
- *  - sendMessage：调用 /api/messages POST
- *  - confirmAppt：调用 /api/appointments POST
- *  - toggleApptStatus：调用 /api/appointments/:id PATCH
- *  - 图表/BMI/score 展示逻辑保留原逻辑（后端暂无这些字段，用后端数据拼接）
+ * Overrides:
+ *  - initProDashboard: fetch clients from API, match to sidebar (static + bind)
+ *  - selectClient: load diary/messages/appointments from API
+ *  - sendMessage: POST to /api/messages
+ *  - confirmAppt: POST to /api/appointments
+ *  - toggleApptStatus: PATCH /api/appointments/:id
  * ══════════════════════════════════════════════════════════════
  */
 
-// ── 0. 鉴权守卫（异步，避免 sessionStorage role 为空时死循环）──
+// ── 0. Auth guard ──
 (async function () {
-  if (!NW.auth.isLoggedIn()) {
-    window.location.replace('index.html');
-    return;
-  }
-  // 同步 role 已知时快速判断
-  if (NW.auth.role && NW.auth.role !== 'professional') {
-    window.location.replace('dashboard.html');
-    return;
-  }
-  // role 未知或为空时，异步验证（避免无后端环境死循环）
+  if (!NW.auth.isLoggedIn()) { window.location.replace('index.html'); return; }
+  if (NW.auth.role && NW.auth.role !== 'professional') { window.location.replace('dashboard.html'); return; }
   if (!NW.auth.role) {
     try {
-      const me = await NW.getMe();
-      if (me && me.role !== 'professional') {
-        window.location.replace('dashboard.html');
-        return;
-      }
-    } catch (e) {
-      // 无后端 / 网络错误 → 允许页面显示，不跳转
-      console.warn('[NW] auth check skipped (no backend):', e.message);
-    }
+      var me = await NW.getMe();
+      if (me && me.role !== 'professional') { window.location.replace('dashboard.html'); return; }
+    } catch (e) { console.warn('[NW] auth check skipped:', e.message); }
   }
-  // 显示页面
   document.body.style.opacity = '1';
   document.body.style.transition = 'opacity 0.2s';
 })();
 
-// ── 全局：API 客户数据缓存（id → 客户对象，id 为后端 userId 字符串）
-const _apiClients = {};
+/** API client cache: backend userId → client object */
+var _apiClients = {};
 
 // ══════════════════════════════════════════════════════════════
-// 1. 启动时拉取客户列表，动态更新侧边栏 + clients 对象
+// 1. Init: fetch client list, map to frontend clients object
 // ══════════════════════════════════════════════════════════════
 /** Fetch client list from API and update sidebar + overview */
 async function initProDashboard() {
   try {
-    const list = await NW.clients.getAll();
-    // list: [{ userId, name, email, stats: { lastDiaryDate, diaryCount, status } }]
+    var list = await NW.clients.getAll();
 
-    list.forEach(client => {
-      const id = String(client.userId);
+    list.forEach(function(client) {
+      var id = String(client.userId);
       _apiClients[id] = client;
 
-      // 如果前端 clients 对象里已有同名的（静态数据），做 id 映射
-      const matchKey = Object.keys(clients).find(
-        k => clients[k].name && clients[k].name.toLowerCase() === (client.name || '').toLowerCase()
-      );
+      // Try to match by name to static sidebar clients (rose, james, etc.)
+      var matchKey = Object.keys(clients).find(function(k) {
+        return clients[k].name && clients[k].name.toLowerCase() === (client.name || '').toLowerCase();
+      });
       if (matchKey) {
-        // 给静态数据对象打上后端 id
         clients[matchKey]._apiId = id;
         clients[matchKey]._apiClient = client;
       }
+
+      // Also match bind_* clients (dynamically added via acceptBind)
+      var bindKey = Object.keys(clients).find(function(k) {
+        return k.indexOf('bind_') === 0 && clients[k]._apiId === id;
+      });
+      if (bindKey) {
+        clients[bindKey]._apiClient = client;
+        // Update name if API has a better one
+        if (client.name) clients[bindKey].name = client.name;
+      }
+
+      // If no match at all but this is a bound client, create entry
+      if (!matchKey && !bindKey) {
+        // Check if this user is in nw-pro-accepted-clients
+        try {
+          var accepted = JSON.parse(localStorage.getItem('nw-pro-accepted-clients') || '[]');
+          var found = accepted.find(function(a) { return String(a.userId) === id; });
+          if (found) {
+            var newKey = 'bind_' + id;
+            if (!clients[newKey]) {
+              var ini = (client.name || '').split(' ').map(function(w) { return (w[0] || '').toUpperCase(); }).join('').substring(0, 2) || '??';
+              clients[newKey] = {
+                name: client.name || 'Client',
+                initials: ini,
+                color: '#7c3aed',
+                stats: { goal: found.goal || 'General', avg_kcal: 0, protein: '—', exercise_days: 0, bmi: '—', score: '—', status: 'Active' },
+                calorie_trend: [],
+                messages: [],
+                appointments: [],
+                _apiId: id,
+                _apiClient: client
+              };
+            }
+          }
+        } catch (e) {}
+      }
     });
 
-    // 更新侧边栏：为每个 .sn-item[data-client] 标记 apiId
-    document.querySelectorAll('.sn-item[data-client]').forEach(item => {
-      const localKey = item.getAttribute('data-client');
+    // Update sidebar data-api-id attributes
+    document.querySelectorAll('.sn-item[data-client]').forEach(function(item) {
+      var localKey = item.getAttribute('data-client');
       if (clients[localKey] && clients[localKey]._apiId) {
         item.setAttribute('data-api-id', clients[localKey]._apiId);
       }
     });
 
-    // 更新 overview 页的客户状态表格（如果有）
     _updateOverviewStats(list);
-
   } catch (e) {
     console.warn('[NW] initProDashboard failed:', e.message);
   }
@@ -89,189 +101,173 @@ async function initProDashboard() {
 
 /** Update overview table with API client data */
 function _updateOverviewStats(list) {
-  // 找 overview 页里的状态表格（如果存在）
-  const tbody = document.querySelector('#clientsTable tbody, .overview-table tbody');
+  var tbody = document.querySelector('#clientsTable tbody, .overview-table tbody');
   if (!tbody) return;
-  tbody.innerHTML = list.map(c => {
-    const s = c.stats || {};
-    const statusClass = s.status === 'active' ? 'green' : s.status === 'warning' ? 'amber' : 'red';
-    return `<tr onclick="selectClientFromTable('${c.userId}')" style="cursor:pointer">
-      <td>${c.name}</td>
-      <td>${c.email}</td>
-      <td>${s.diaryCount || 0} entries</td>
-      <td>${s.lastDiaryDate || '—'}</td>
-      <td><span class="status-dot ${statusClass}"></span> ${s.status || 'unknown'}</td>
-    </tr>`;
+  tbody.innerHTML = list.map(function(c) {
+    var s = c.stats || {};
+    var statusClass = s.status === 'active' ? 'green' : s.status === 'warning' ? 'amber' : 'red';
+    return '<tr onclick="selectClientFromTable(\'' + c.userId + '\')" style="cursor:pointer">'
+      + '<td>' + escapeHtml(c.name) + '</td>'
+      + '<td>' + escapeHtml(c.email) + '</td>'
+      + '<td>' + (s.diaryCount || 0) + ' entries</td>'
+      + '<td>' + (s.lastDiaryDate || '—') + '</td>'
+      + '<td><span class="status-dot ' + statusClass + '"></span> ' + (s.status || 'unknown') + '</td>'
+      + '</tr>';
   }).join('');
 }
 
 // ══════════════════════════════════════════════════════════════
-// 2. 覆盖 selectClient：在切换客户时从 API 拉取数据
+// 2. Override selectClient: fetch data from API
 // ══════════════════════════════════════════════════════════════
 var _origSelectClient = window.selectClient;
 /** Load client data from API when switching client view */
 window.selectClient = async function (id, el) {
-  // overview 不走 API
   if (id === 'overview') {
     if (_origSelectClient) _origSelectClient(id, el);
     return;
   }
 
-  // 先执行原始 UI 切换逻辑（展示 loading 状态）
+  // Execute original UI switch
   if (_origSelectClient) _origSelectClient(id, el);
 
-  const apiId = clients[id]?._apiId;
-  if (!apiId) return; // 没有映射到后端 id，保留静态数据
+  // Get API id — works for both static clients and bind_* clients
+  var apiId = clients[id] ? clients[id]._apiId : null;
+  if (!apiId) return;
 
-  // 并行拉取消息 + 预约 + 日记摘要
-  const today = new Date().toISOString().split('T')[0];
-  const monthAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().split('T')[0];
+  var today = new Date().toISOString().split('T')[0];
+  var monthAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().split('T')[0];
 
-  const [messagesRes, appointmentsRes, diaryRes] = await Promise.allSettled([
+  var results = await Promise.allSettled([
     NW.messages.get(apiId),
     NW.appointments.getAll(),
     NW.clients.getDiary(apiId, monthAgo, today)
   ]);
 
-  const c = clients[id];
+  var c = clients[id];
+  var messagesRes = results[0];
+  var appointmentsRes = results[1];
+  var diaryRes = results[2];
 
-  // ── 消息 ──────────────────────────────────────────────────
+  // ── Messages ──
   if (messagesRes.status === 'fulfilled') {
-    const msgs = messagesRes.value || [];
-    c.messages = msgs.map(m => ({
-      from: String(m.senderId) === apiId ? 'client' : 'pro',
-      text: m.text,
-      time: m.createdAt
-        ? new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : '',
-      _id: m.id
-    }));
-    // 同步到 mailMessages 供邮件图标用
+    var msgs = messagesRes.value || [];
+    c.messages = msgs.map(function(m) {
+      return {
+        from: String(m.senderId) === apiId ? 'client' : 'pro',
+        text: m.text,
+        time: m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+        _id: m.id
+      };
+    });
     if (window.mailMessages && window.mailMessages[id] !== undefined) {
       window.mailMessages[id] = c.messages
-        .filter(m => m.from === 'client')
-        .map(m => ({ from: id, text: m.text, time: m.time, unread: false }));
+        .filter(function(m) { return m.from === 'client'; })
+        .map(function(m) { return { from: id, text: m.text, time: m.time, unread: false }; });
     }
-    renderChat(c);
+    if (typeof renderChat === 'function') renderChat(c);
   }
 
-  // ── 预约 ──────────────────────────────────────────────────
+  // ── Appointments ──
   if (appointmentsRes.status === 'fulfilled') {
-    const all = appointmentsRes.value || [];
-    // 筛选属于当前客户的
-    const mine = all.filter(a => String(a.clientId) === apiId || String(a.proId) === NW.auth.userId);
-    c._appointments_api = mine; // 缓存带 id 的原始数据
-    c.appointments = mine.map(a => ({
-      _id:    a.id,
-      time:   a.time,
-      date:   a.date,
-      type:   a.type || 'Check-in',
-      status: a.status || 'pending'
-    }));
-    renderAppointments(c);
+    var all = appointmentsRes.value || [];
+    var mine = all.filter(function(a) { return String(a.clientId) === apiId; });
+    c._appointments_api = mine;
+    c.appointments = mine.map(function(a) {
+      return { _id: a.id, time: a.time, date: a.date, type: a.type || 'Check-in', status: a.status || 'pending' };
+    });
+    if (typeof renderAppointments === 'function') renderAppointments(c);
   }
 
-  // ── 日记摘要 ───────────────────────────────────────────────
+  // ── Diary summary ──
   if (diaryRes.status === 'fulfilled') {
-    const { meals, exercise, summary } = diaryRes.value || {};
+    var data = diaryRes.value || {};
+    var meals = data.meals;
+    var summary = data.summary;
     if (summary) {
-      // 更新 stats 展示（如果后端有 summary 数据）
-      if (summary.avgKcal)      c.stats.avg_kcal    = summary.avgKcal;
-      if (summary.avgProtein)   c.stats.protein     = summary.avgProtein;
+      if (summary.avgKcal) c.stats.avg_kcal = summary.avgKcal;
+      if (summary.avgProtein) c.stats.protein = summary.avgProtein;
       if (summary.exerciseDays) c.stats.exercise_days = summary.exerciseDays;
     }
-    // 更新热量趋势图（用最近 30 天数据）
     if (Array.isArray(meals) && meals.length > 0) {
       _buildCalorieTrend(c, meals);
     }
-    renderStats(c);
+    if (typeof renderStats === 'function') renderStats(c);
   }
 };
 
 /** Build 30-day calorie trend array from API diary data */
 function _buildCalorieTrend(c, meals) {
-  // 按日期汇总 kcal，生成最近 30 天数组
-  const kcalByDate = {};
-  meals.forEach(m => { kcalByDate[m.date] = (kcalByDate[m.date] || 0) + (m.kcal || 0); });
-  const trend = [];
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 24 * 3600 * 1000).toISOString().split('T')[0];
+  var kcalByDate = {};
+  meals.forEach(function(m) { kcalByDate[m.date] = (kcalByDate[m.date] || 0) + (m.kcal || 0); });
+  var trend = [];
+  for (var i = 29; i >= 0; i--) {
+    var d = new Date(Date.now() - i * 24 * 3600 * 1000).toISOString().split('T')[0];
     trend.push(kcalByDate[d] || 0);
   }
   c.calorie_trend = trend;
 }
 
 // ══════════════════════════════════════════════════════════════
-// 3. 覆盖 sendMessage：调用 /api/messages POST
+// 3. Override sendMessage: POST to API
 // ══════════════════════════════════════════════════════════════
 var _origSendMessage = window.sendMessage;
 /** Send message to client via API with optimistic UI update */
 window.sendMessage = async function () {
-  const box = document.getElementById('chatInputBox');
-  const text = (box ? box.value : '').trim();
+  var box = document.getElementById('chatInputBox');
+  var text = (box ? box.value : '').trim();
   if (!text) return;
 
-  const apiId = currentClient && clients[currentClient]?._apiId;
+  var apiId = currentClient && clients[currentClient] ? clients[currentClient]._apiId : null;
   if (!apiId) {
-    // 无后端映射，回退原始逻辑
     if (_origSendMessage) _origSendMessage();
     return;
   }
 
-  // 乐观更新 UI
-  const c = clients[currentClient];
-  c.messages.push({ from: 'pro', text, time: 'Just now', _id: null });
-  renderChat(c);
+  var c = clients[currentClient];
+  c.messages.push({ from: 'pro', text: text, time: 'Just now', _id: null });
+  if (typeof renderChat === 'function') renderChat(c);
   if (box) box.value = '';
-  const wrap = document.getElementById('chatMessages');
+  var wrap = document.getElementById('chatMessages');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
   try {
-    const res = await NW.messages.send(apiId, text);
-    // 回填 id
-    const entry = c.messages.find(m => m.text === text && !m._id);
+    var res = await NW.messages.send(apiId, text);
+    var entry = c.messages.find(function(m) { return m.text === text && !m._id; });
     if (entry && res && res.id) entry._id = res.id;
   } catch (e) {
     console.warn('[NW] sendMessage failed:', e.message);
-    proToast('Failed to send message', '#dc2626');
-    // 回滚
+    if (typeof proToast === 'function') proToast('Failed to send message', '#dc2626');
     c.messages.pop();
-    renderChat(c);
+    if (typeof renderChat === 'function') renderChat(c);
   }
 };
 
 // ══════════════════════════════════════════════════════════════
-// 4. 覆盖 confirmAppt：调用 /api/appointments POST
+// 4. Override confirmAppt: POST to API
 // ══════════════════════════════════════════════════════════════
 var _origConfirmAppt = window.confirmAppt;
 /** Book appointment via API with optimistic UI update */
 window.confirmAppt = async function () {
   if (!currentClient) { closeApptModal(); return; }
-
-  const date = document.getElementById('apptDate').value;
-  const time = document.getElementById('apptTime').value;
-  const type = document.getElementById('apptType').value;
+  var date = document.getElementById('apptDate').value;
+  var time = document.getElementById('apptTime').value;
+  var type = document.getElementById('apptType').value;
   if (!date || !time) { proToast('Please fill in date and time', '#dc2626'); return; }
 
-  const apiId = clients[currentClient]?._apiId;
-  if (!apiId) {
-    // 回退原始逻辑
-    if (_origConfirmAppt) _origConfirmAppt();
-    return;
-  }
+  var apiId = clients[currentClient] ? clients[currentClient]._apiId : null;
+  if (!apiId) { if (_origConfirmAppt) _origConfirmAppt(); return; }
 
-  // 乐观更新
-  const d = new Date(date);
-  const dateStr = d.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
-  const c = clients[currentClient];
-  const newAppt = { time, date: dateStr, type, status: 'pending', _id: null };
+  var d = new Date(date);
+  var dateStr = d.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  var c = clients[currentClient];
+  var newAppt = { time: time, date: dateStr, type: type, status: 'pending', _id: null };
   c.appointments.unshift(newAppt);
   closeApptModal();
-  renderAppointments(c);
+  if (typeof renderAppointments === 'function') renderAppointments(c);
   proToast('✓ Appointment booked', '#1e6b5e');
 
   try {
-    const res = await NW.appointments.create(apiId, date, time, type);
+    var res = await NW.appointments.create(apiId, date, time, type);
     if (res && res.id) newAppt._id = res.id;
   } catch (e) {
     console.warn('[NW] confirmAppt failed:', e.message);
@@ -280,29 +276,26 @@ window.confirmAppt = async function () {
 };
 
 // ══════════════════════════════════════════════════════════════
-// 5. 覆盖 toggleApptStatus：调用 /api/appointments/:id PATCH
+// 5. Override toggleApptStatus: PATCH API
 // ══════════════════════════════════════════════════════════════
 var _origToggleApptStatus = window.toggleApptStatus;
 /** Toggle appointment confirmed/pending status via API */
 window.toggleApptStatus = async function (idx) {
   if (!currentClient) return;
-  const appts = clients[currentClient].appointments;
-  const appt  = appts[idx];
+  var appts = clients[currentClient].appointments;
+  var appt = appts[idx];
   if (!appt) return;
 
-  // 乐观更新
   appt.status = appt.status === 'confirmed' ? 'pending' : 'confirmed';
-  renderAppointments(clients[currentClient]);
+  if (typeof renderAppointments === 'function') renderAppointments(clients[currentClient]);
   proToast(appt.status === 'confirmed' ? '✓ Confirmed' : 'Marked as pending');
 
   if (appt._id) {
     try {
       await NW.appointments.updateStatus(appt._id, appt.status);
     } catch (e) {
-      console.warn('[NW] toggleApptStatus failed:', e.message);
-      // 回滚
       appt.status = appt.status === 'confirmed' ? 'pending' : 'confirmed';
-      renderAppointments(clients[currentClient]);
+      if (typeof renderAppointments === 'function') renderAppointments(clients[currentClient]);
     }
   }
 };
@@ -311,7 +304,7 @@ window.toggleApptStatus = async function (idx) {
 // 6. Logout
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('a.logout').forEach(el => {
+  document.querySelectorAll('a.logout').forEach(function(el) {
     el.addEventListener('click', function (e) {
       e.preventDefault();
       NW.logout();
@@ -321,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ══════════════════════════════════════════════════════════════
-// 7. 入口：DOMContentLoaded 后初始化
+// 7. Init
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function () {
   initProDashboard();
