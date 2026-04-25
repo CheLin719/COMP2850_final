@@ -24,7 +24,10 @@
   try {
     const me = await NW.getMe();
     // token 有效 → 检查角色
-    if (me.role === 'professional') {
+    // Exception: if coming from pro dashboard ("Switch to User View"), allow pro to stay
+    var fromPro = false;
+    try { fromPro = sessionStorage.getItem('nw-from-pro') === '1'; } catch(e) {}
+    if (me.role === 'professional' && !fromPro) {
       window.location.replace('pro_dashboard.html');
       return;
     }
