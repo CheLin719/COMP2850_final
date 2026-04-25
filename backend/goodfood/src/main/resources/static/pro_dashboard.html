@@ -2199,6 +2199,36 @@ window._proAcceptBind = function(userId) {
   }catch(e){}
   updateBindDot();
   renderProCommunity();
+  // ── Dynamically add new client to sidebar + clients object ──
+  var clientKey = "bind_" + userId;
+  var colors = ["#1a7a6a","#7aaad4","#b8621f","#7c3aed","#d4956a","#b5413e"];
+  var color = colors[Math.floor(Math.random()*colors.length)];
+  var ini = req.userInitials || (req.userName||"").split(" ").map(function(w){return (w[0]||"").toUpperCase();}).join("").substring(0,2) || "??";
+  if (typeof clients !== "undefined") {
+    clients[clientKey] = {
+      name: req.userName || "New Client",
+      initials: ini,
+      color: color,
+      stats: { goal: req.userGoal || "General", avg_kcal: 0, protein: "—", exercise_days: 0, bmi: "—", score: "—", status: "New" },
+      calorie_trend: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      messages: [],
+      appointments: [],
+      _apiId: String(userId)
+    };
+  }
+  var sidebar = document.querySelector("aside");
+  if (sidebar) {
+    var newItem = document.createElement("a");
+    newItem.className = "sn-item";
+    newItem.setAttribute("data-client", clientKey);
+    newItem.setAttribute("href", "#");
+    newItem.setAttribute("onclick", "selectClient('" + clientKey + "', this)");
+    newItem.innerHTML = '<div class="sn-avatar" style="background:' + color + '" aria-hidden="true">' + ini + '</div>'
+      + '<div style="flex:1"><div class="sn-name">' + (req.userName||"New Client") + '</div>'
+      + '<div style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--ink-f)">' + (req.userGoal||"General") + '</div></div>'
+      + '<span class="sn-status ok">✓ New</span>';
+    sidebar.appendChild(newItem);
+  }
   if(typeof proToast==="function") proToast("✓ "+req.userName+" added as your client","#1e6b5e");
 };
 
@@ -2283,5 +2313,52 @@ document.addEventListener("DOMContentLoaded", function() {
 })();
 </script>
 
+<script>
+// ── Load previously accepted bind clients into sidebar on page load ──
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    try {
+      var accepted = JSON.parse(localStorage.getItem('nw-pro-accepted-clients') || '[]');
+      if (!accepted.length) return;
+      var sidebar = document.querySelector('aside');
+      if (!sidebar) return;
+      var existing = {};
+      document.querySelectorAll('.sn-item[data-client]').forEach(function(el) {
+        var name = (el.querySelector('.sn-name') || {}).textContent || '';
+        existing[name.toLowerCase()] = true;
+      });
+      var colors = ['#1a7a6a','#7aaad4','#b8621f','#7c3aed','#d4956a','#b5413e'];
+      accepted.forEach(function(ac, idx) {
+        if (existing[(ac.name||'').toLowerCase()]) return;
+        var clientKey = 'bind_' + ac.userId;
+        var color = colors[idx % colors.length];
+        var ini = ac.initials || (ac.name||'').split(' ').map(function(w){return (w[0]||'').toUpperCase();}).join('').substring(0,2) || '??';
+        if (typeof clients !== 'undefined') {
+          clients[clientKey] = {
+            name: ac.name || 'Client',
+            initials: ini,
+            color: color,
+            stats: { goal: ac.goal || 'General', avg_kcal: 0, protein: '—', exercise_days: 0, bmi: '—', score: '—', status: 'New' },
+            calorie_trend: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            messages: [],
+            appointments: [],
+            _apiId: String(ac.userId)
+          };
+        }
+        var newItem = document.createElement('a');
+        newItem.className = 'sn-item';
+        newItem.setAttribute('data-client', clientKey);
+        newItem.setAttribute('href', '#');
+        newItem.setAttribute('onclick', "selectClient('" + clientKey + "', this)");
+        newItem.innerHTML = '<div class="sn-avatar" style="background:' + color + '" aria-hidden="true">' + ini + '</div>'
+          + '<div style="flex:1"><div class="sn-name">' + (ac.name||'Client') + '</div>'
+          + '<div style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--ink-f)">' + (ac.goal||'General') + '</div></div>'
+          + '<span class="sn-status ok">✓ New</span>';
+        sidebar.appendChild(newItem);
+      });
+    } catch(e) { console.warn('[NW] load accepted clients:', e); }
+  }, 500);
+});
+</script>
 </body>
 </html>
