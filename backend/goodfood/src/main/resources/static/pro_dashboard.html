@@ -1398,6 +1398,9 @@ function openEditPlan(btn) {
   const isMeal = card.querySelector('#mealPlanRows') !== null;
   editingPlanType = isMeal ? 'meal' : 'training';
   const c = clients[currentClient];
+  // Initialize empty plan arrays for bind clients with no plan yet
+  if (!c.meals) c.meals = ['', '', '', '', '', '', ''];
+  if (!c.training) c.training = ['', '', '', '', '', '', ''];
   const items = isMeal ? c.meals : c.training;
   const days = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
 
@@ -2205,10 +2208,26 @@ window._proSubmitReply = function(postId) {
   if(typeof proToast==="function") proToast("Reply posted ✓","#7c3aed");
 };
 
-window._proAcceptBind = function(userId) {
+window._proAcceptBind = async function(userId) {
   var reqs = loadBindRequests();
   var req = reqs.find(function(r){return r.userId===userId;});
   if (!req) return;
+
+  // ── Persist binding to backend so /api/clients returns this user ──
+  if (typeof NW !== "undefined" && NW.clients && NW.clients.bind) {
+    try {
+      await NW.clients.bind(userId);
+    } catch (err) {
+      if (typeof proToast === "function") {
+        if (err && err.status === 409) proToast("⚠️ User already has a different professional", "#dc2626");
+        else if (err && err.status === 404) proToast("⚠️ User not found in backend", "#dc2626");
+        else proToast("⚠️ Bind failed: " + (err && err.message || "unknown"), "#dc2626");
+      }
+      console.warn("[NW] bind failed:", err);
+      return; // do not mark as accepted if backend bind failed
+    }
+  }
+
   req.status = "accepted";
   saveBindRequests(reqs);
   try{
@@ -2257,7 +2276,11 @@ window._proAcceptBind = function(userId) {
   if(typeof proToast==="function") proToast("✓ "+req.userName+" added as your client","#1e6b5e");
 };
 
-window._proDeclineBind = function(userId) {
+window._proDeclineBind = async function(userId) {
+  // Try to unbind from backend (best effort, don't block on failure)
+  if (typeof NW !== "undefined" && NW.clients && NW.clients.unbind) {
+    try { await NW.clients.unbind(userId); } catch(e) { /* ignore */ }
+  }
   var reqs = loadBindRequests();
   var req = reqs.find(function(r){return r.userId===userId;});
   if (!req) return;

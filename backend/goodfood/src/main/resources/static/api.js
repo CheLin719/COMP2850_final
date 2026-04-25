@@ -227,6 +227,16 @@ const NW = (function () {
       if (from && to) qs = '?from=' + from + '&to=' + to;
       else if (from)  qs = '?from=' + from;
       return req('GET', '/api/clients/' + clientId + '/diary' + qs);
+    },
+
+    // POST /api/clients/bind  { userId } → bind subscriber to current pro
+    async bind(userId) {
+      return req('POST', '/api/clients/bind', { userId: userId });
+    },
+
+    // DELETE /api/clients/:id/bind → unbind subscriber from current pro
+    async unbind(userId) {
+      return req('DELETE', '/api/clients/' + userId + '/bind');
     }
   };
 

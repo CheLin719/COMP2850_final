@@ -5,7 +5,11 @@ import com.comp2850.goodfood.user.Role
 import com.comp2850.goodfood.user.repository.UserStore
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
@@ -47,6 +51,79 @@ class ApiClientsController(
             }
     }
 
+    /**
+     * Bind a subscriber to the currently logged-in professional.
+     * Called by the pro dashboard when the professional accepts a bind request from a subscriber.
+     */
+    @PostMapping("/bind")
+    fun bindClient(
+        authentication: Authentication,
+        @RequestBody request: BindClientRequest
+    ): ApiClientResponse {
+        val currentUser = userStore.findByEmail(authentication.name)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "user not found")
+
+        if (currentUser.role != Role.HEALTH_PROFESSIONAL) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "only professionals can bind clients")
+        }
+
+        val target = userStore.findById(request.userId)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "user not found")
+
+        if (target.role != Role.SUBSCRIBER) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "target user is not a subscriber")
+        }
+
+        // Already bound to another pro? Only allow if same pro or no pro set
+        if (target.proId != null && target.proId != currentUser.id) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "user is already bound to another professional")
+        }
+
+        val updated = target.copy(proId = currentUser.id)
+        userStore.save(updated)
+
+        val diaries = diaryStore.findByUserEmail(updated.email)
+        val lastDiaryDate = diaries.maxByOrNull { it.diaryDate }?.diaryDate?.toString()
+        val diaryCount = diaries.size
+
+        return ApiClientResponse(
+            userId = updated.id,
+            name = updated.name,
+            email = updated.email,
+            stats = ApiClientStats(
+                lastDiaryDate = lastDiaryDate,
+                diaryCount = diaryCount,
+                status = toStatus(lastDiaryDate, diaryCount)
+            )
+        )
+    }
+
+    /**
+     * Unbind a subscriber from the currently logged-in professional.
+     * Called when the professional declines or removes a client.
+     */
+    @DeleteMapping("/{id}/bind")
+    fun unbindClient(
+        authentication: Authentication,
+        @PathVariable id: String
+    ) {
+        val currentUser = userStore.findByEmail(authentication.name)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "user not found")
+
+        if (currentUser.role != Role.HEALTH_PROFESSIONAL) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "only professionals can unbind clients")
+        }
+
+        val target = userStore.findById(id)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "user not found")
+
+        if (target.proId != currentUser.id) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "this user is not your client")
+        }
+
+        userStore.save(target.copy(proId = null))
+    }
+
     private fun toStatus(lastDiaryDate: String?, diaryCount: Int): String {
         return when {
             diaryCount == 0 -> "inactive"
@@ -67,4 +144,8 @@ data class ApiClientStats(
     val lastDiaryDate: String?,
     val diaryCount: Int,
     val status: String
+)
+
+data class BindClientRequest(
+    val userId: String
 )
