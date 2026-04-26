@@ -114,7 +114,8 @@ class AuthController(
             "firstName" to firstName,
             "lastName" to lastName,
             "licenceNo" to currentUser["licence"]?.toString(),
-            "name" to fullName
+            "name" to fullName,
+            "proId" to currentUser["proId"]?.toString()
         )
     }
 

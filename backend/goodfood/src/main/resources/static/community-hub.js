@@ -536,8 +536,25 @@
     boundExpert = null;
     currentCard = 0;
     saveBound();
+    // Also clear bind requests from localStorage
+    try {
+      var uid = (typeof NW !== 'undefined' && NW.auth) ? NW.auth.userId : '';
+      var all = JSON.parse(localStorage.getItem('nw-bind-requests') || '[]');
+      all = all.filter(function(r) { return r.userId !== uid && r.userId !== ('u-' + uid); });
+      localStorage.setItem('nw-bind-requests', JSON.stringify(all));
+    } catch(e) {}
     renderTab();
     if (typeof showToast === 'function') showToast('Nutritionist unbound', '#b8621f');
+    // Update My Nutritionist page if it exists
+    if (typeof renderMyPro === 'function') renderMyPro();
+  };
+
+  /** Called by dashboard.html _nwUnbind to sync community-hub state */
+  window._chClearBound = function () {
+    boundExpert = null;
+    currentCard = 0;
+    saveBound();
+    renderTab();
   };
 
   window._chResetCards = function () {

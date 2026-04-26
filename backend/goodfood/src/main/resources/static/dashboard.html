@@ -2981,6 +2981,33 @@ function getBoundExpert() {
   } catch(e) { return ""; }
 }
 
+var _backendCheckDone = false;
+
+/** Check backend to see if the pro has accepted our bind request */
+async function _checkBackendBindStatus(boundProId) {
+  if (typeof NW === "undefined" || !NW.getMe) return;
+  try {
+    var me = await fetch('/api/auth/me', {headers: {Authorization: 'Bearer ' + NW.auth.token}}).then(function(r){ return r.json(); });
+    if (me && me.proId) {
+      // Expert has accepted! Update localStorage status
+      var reqs = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
+      var updated = false;
+      reqs = reqs.map(function(r) {
+        if (r.proId === boundProId && r.status === "pending") {
+          r.status = "accepted";
+          r.proUserId = me.proId; // save the pro's backend userId for messaging
+          updated = true;
+        }
+        return r;
+      });
+      if (updated) {
+        localStorage.setItem("nw-bind-requests", JSON.stringify(reqs));
+        renderMyPro(); // re-render with accepted state
+      }
+    }
+  } catch(e) { console.warn("[NW] backend bind check failed:", e); }
+}
+
 function getBindStatus(proId) {
   try {
     var all = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
@@ -2995,6 +3022,12 @@ function renderMyPro() {
   if (!el) return;
 
   var boundId = getBoundExpert();
+
+  // Check backend for real bind status (expert may have accepted since last visit)
+  if (boundId && !_backendCheckDone) {
+    _backendCheckDone = true;
+    _checkBackendBindStatus(boundId);
+  }
 
   // ── NOT BOUND ──
   if (!boundId) {
@@ -3111,17 +3144,24 @@ function renderMyPro() {
 }
 
 // Unbind action
-window._nwUnbind = function() {
+window._nwUnbind = async function() {
   try {
-    var uid = getUserId();
     var u2 = (typeof NW !== "undefined" && NW.auth) ? NW.auth.userId : "";
     var unbindKey = u2 ? "nw-" + u2 + "-community-bound-expert" : "nw-community-bound-expert";
+    var boundProId = localStorage.getItem(unbindKey) || "";
     localStorage.removeItem(unbindKey);
-    // Update bind request status to declined
+    // Update ALL bind requests from this user to declined
     var all = JSON.parse(localStorage.getItem("nw-bind-requests") || "[]");
-    all = all.map(function(r){ return r.userId === ("u-" + uid) ? Object.assign({}, r, {status:"declined"}) : r; });
+    var myId = u2 || "";
+    all = all.filter(function(r) {
+      // Remove requests from this user
+      return r.userId !== myId && r.userId !== ("u-" + myId);
+    });
     localStorage.setItem("nw-bind-requests", JSON.stringify(all));
+    // Notify community-hub.js to clear boundExpert
+    if (window._chClearBound) window._chClearBound();
   } catch(e) {}
+  _backendCheckDone = false;
   renderMyPro();
   if (typeof showToast === "function") showToast("Disconnected from nutritionist");
 };
@@ -3158,7 +3198,7 @@ window._nwSendProMsg = async function() {
 var _origSwitchPagePro = window.switchPage;
 window.switchPage = function(p, el) {
   if (_origSwitchPagePro) _origSwitchPagePro(p, el);
-  if (p === "mypro") { _myProMsgsLoaded = false; setTimeout(renderMyPro, 50); }
+  if (p === "mypro") { _myProMsgsLoaded = false; _backendCheckDone = false; setTimeout(renderMyPro, 50); }
 };
 
 document.addEventListener("DOMContentLoaded", function() {
