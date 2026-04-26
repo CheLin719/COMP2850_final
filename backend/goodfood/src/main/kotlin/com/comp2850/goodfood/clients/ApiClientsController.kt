@@ -48,7 +48,12 @@ class ApiClientsController(
                         lastDiaryDate = lastDiaryDate,
                         diaryCount = diaryCount,
                         status = toStatus(lastDiaryDate, diaryCount)
-                    )
+                    ),
+                    height = client.height,
+                    weight = client.weight,
+                    age = client.age,
+                    targetKcal = client.targetKcal,
+                    goal = client.goal
                 )
             }
     }
@@ -96,7 +101,12 @@ class ApiClientsController(
                 lastDiaryDate = lastDiaryDate,
                 diaryCount = diaryCount,
                 status = toStatus(lastDiaryDate, diaryCount)
-            )
+            ),
+            height = updated.height,
+            weight = updated.weight,
+            age = updated.age,
+            targetKcal = updated.targetKcal,
+            goal = updated.goal
         )
     }
 
@@ -123,14 +133,40 @@ class ApiClientsController(
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "this user is not your client")
         }
 
-        // 发送解绑通知给客户
+        // 通知客户：专家已将其从客户列表移除
         notificationPublisher.publishUserUnbound(
-            userId = currentUser.id,
+            userId = target.id,
             clientId = target.id,
             clientName = target.name
         )
 
         userStore.save(target.copy(proId = null))
+    }
+
+    /**
+     * DELETE /api/clients/self-unbind — subscriber initiates unbind from their pro.
+     * Clears the subscriber's proId and notifies the professional.
+     */
+    @DeleteMapping("/self-unbind")
+    fun selfUnbind(authentication: Authentication) {
+        val currentUser = userStore.findByEmail(authentication.name)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "user not found")
+
+        if (currentUser.role != Role.SUBSCRIBER) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "only subscribers can self-unbind")
+        }
+
+        val proId = currentUser.proId
+            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "not bound to any professional")
+
+        // 通知专家：客户已主动解绑
+        notificationPublisher.publishUserUnbound(
+            userId = proId,
+            clientId = currentUser.id,
+            clientName = currentUser.name
+        )
+
+        userStore.save(currentUser.copy(proId = null))
     }
 
     private fun toStatus(lastDiaryDate: String?, diaryCount: Int): String {
@@ -146,7 +182,12 @@ data class ApiClientResponse(
     val userId: String,
     val name: String,
     val email: String,
-    val stats: ApiClientStats
+    val stats: ApiClientStats,
+    val height: Double? = null,
+    val weight: Double? = null,
+    val age: Int? = null,
+    val targetKcal: Int? = null,
+    val goal: String? = null
 )
 
 data class ApiClientStats(

@@ -3480,11 +3480,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // ── Save Health Profile to backend ──
 window.saveHealthProfile = async function() {
   if (typeof NW === 'undefined' || !NW.auth || !NW.auth.token) return;
-  var height     = parseFloat(document.getElementById('settings-height')?.value || document.getElementById('profileHeight')?.value) || null;
-  var weight     = parseFloat(document.getElementById('settings-weight')?.value || document.getElementById('profileWeight')?.value) || null;
-  var age        = parseInt(document.getElementById('settings-age')?.value || document.getElementById('profileAge')?.value)       || null;
-  var targetKcal = parseInt(document.getElementById('settings-calorie-target')?.value || document.getElementById('profileTargetKcal')?.value) || null;
-  var goal       = document.getElementById('settings-goal')?.value || document.getElementById('profileGoal')?.value || null;
+  var height     = parseFloat(document.getElementById('profileHeight')?.value) || null;
+  var weight     = parseFloat(document.getElementById('profileWeight')?.value) || null;
+  var age        = parseInt(document.getElementById('profileAge')?.value)       || null;
+  var targetKcal = parseInt(document.getElementById('profileTargetKcal')?.value) || null;
+  var goal       = document.getElementById('profileGoal')?.value || null;
   try {
     await fetch('/api/auth/profile', {
       method: 'PUT',

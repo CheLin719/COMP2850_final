@@ -1455,8 +1455,8 @@ async function savePlanEdit(btn) {
         daysJson: JSON.stringify(days),
         targetKcal: c.target_kcal || null,
         targetProtein: c.target_protein || null,
-        targetCarbsPct: c.macros ? (c.macros.carbs.target || null) : null,
-        targetFatPct: c.macros ? (c.macros.fat.target || null) : null,
+        targetCarbsPct: c.macros ? c.macros.carbs : null,
+        targetFatPct: c.macros ? c.macros.fat : null,
         notes: c.notes || null
       };
       await NW.plans.save(apiId, planData);
@@ -2433,50 +2433,37 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <script>
-// ── Load bound clients from API on page load ──
+// ── Load previously accepted bind clients into sidebar on page load ──
 document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(async function() {
+  setTimeout(function() {
     try {
-      if (typeof NW === 'undefined' || !NW.auth || !NW.auth.token) return;
-      var apiClients = await NW.clients.getAll();
-      if (!apiClients || !apiClients.length) return;
+      var accepted = JSON.parse(localStorage.getItem('nw-pro-accepted-clients') || '[]');
+      if (!accepted.length) return;
       var sidebar = document.querySelector('aside');
       if (!sidebar) return;
       var existing = {};
       document.querySelectorAll('.sn-item[data-client]').forEach(function(el) {
-        existing[el.getAttribute('data-client')] = true;
+        var name = (el.querySelector('.sn-name') || {}).textContent || '';
+        existing[name.toLowerCase()] = true;
       });
       var colors = ['#1a7a6a','#7aaad4','#b8621f','#7c3aed','#d4956a','#b5413e'];
-      apiClients.forEach(function(ac, idx) {
+      accepted.forEach(function(ac, idx) {
+        if (existing[(ac.name||'').toLowerCase()]) return;
         var clientKey = 'bind_' + ac.userId;
-        var ini = (ac.name||'').split(' ').map(function(w){return (w[0]||'').toUpperCase();}).join('').substring(0,2) || '??';
         var color = colors[idx % colors.length];
+        var ini = ac.initials || (ac.name||'').split(' ').map(function(w){return (w[0]||'').toUpperCase();}).join('').substring(0,2) || '??';
         if (typeof clients !== 'undefined') {
           clients[clientKey] = {
             name: ac.name || 'Client',
             initials: ini,
             color: color,
-            weight: ac.weight || null,
-            height: ac.height || null,
-            age: ac.age || null,
-            goal: ac.goal || 'General',
-            target_kcal: ac.targetKcal || null,
-            target_protein: 50,
-            stats: {
-              goal: ac.goal || 'General',
-              avg_kcal: 0,
-              protein: 0,
-              exercise_days: 0,
-              streak: 0,
-              status: (ac.stats && ac.stats.status) || 'New'
-            },
+            stats: { goal: ac.goal || 'General', avg_kcal: 0, protein: '—', exercise_days: 0, bmi: '—', score: '—', status: 'New' },
             calorie_trend: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
             messages: [],
             appointments: [],
             _apiId: String(ac.userId)
           };
         }
-        if (existing[clientKey]) return;
         var newItem = document.createElement('a');
         newItem.className = 'sn-item';
         newItem.setAttribute('data-client', clientKey);
@@ -2488,8 +2475,8 @@ document.addEventListener('DOMContentLoaded', function() {
           + '<span class="sn-status ok">✓ New</span>';
         sidebar.appendChild(newItem);
       });
-    } catch(e) { console.warn('[NW] load API clients:', e); }
-  }, 600);
+    } catch(e) { console.warn('[NW] load accepted clients:', e); }
+  }, 500);
 });
 </script>
 </body>

@@ -17,7 +17,7 @@ data class PlanUpdatedEvent(
     val proName: String
 ) : NotificationEvent() {
     override val type: String = "plan_updated"
-    override val message: String = "您的专家更新了${if (planType == "meal") "饮食" else "训练"}计划"
+    override val message: String = "$proName updated your ${if (planType == "meal") "meal" else "training"} plan"
 }
 
 // 消息事件
@@ -38,7 +38,7 @@ data class UserUnboundEvent(
     val clientName: String
 ) : NotificationEvent() {
     override val type: String = "user_unbound"
-    override val message: String = "客户 $clientName 已解绑"
+    override val message: String = "Client $clientName has disconnected"
 }
 
 // 计划删除事件
@@ -49,5 +49,5 @@ data class PlanDeletedEvent(
     val proName: String
 ) : NotificationEvent() {
     override val type: String = "plan_deleted"
-    override val message: String = "您的${if (planType == "meal") "饮食" else "训练"}计划已被删除"
+    override val message: String = "$proName deleted your ${if (planType == "meal") "meal" else "training"} plan"
 }

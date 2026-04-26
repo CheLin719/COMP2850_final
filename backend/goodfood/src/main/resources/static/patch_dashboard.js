@@ -568,3 +568,92 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
+// ══════════════════════════════════════════════════════════════
+// 11. Messages: Load & Send via API
+// ══════════════════════════════════════════════════════════════
+/** Cache for professional/expert info */
+var _userProInfo = null;
+
+/** Override sendMsg to send via API instead of local-only */
+var _origSendMsg = window.sendMsg;
+window.sendMsg = async function() {
+  var inp = document.getElementById('msgInput');
+  var text = (inp ? inp.value : '').trim();
+  if (!text) return;
+
+  try {
+    // Get user's professional ID
+    if (!_userProInfo) {
+      var me = await NW.getMe();
+      _userProInfo = { id: me.id, name: me.name, proId: me.proId };
+    }
+
+    if (!_userProInfo.proId) {
+      console.warn('[NW] User not bound to a professional yet');
+      // Fall back to local-only for now
+      if (_origSendMsg) _origSendMsg();
+      return;
+    }
+
+    // Send message via API
+    var result = await NW.messages.send(_userProInfo.proId, text);
+    console.log('[NW] Message sent:', result);
+
+    // Update UI: add to local messages array and re-render
+    var now = new Date();
+    var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    if (typeof userMsgs !== 'undefined') {
+      userMsgs.push({
+        from: 'user',
+        text: text,
+        time: timeStr,
+        _id: result.id
+      });
+      if (typeof renderMsgs === 'function') renderMsgs();
+    }
+
+    // Clear input
+    if (inp) inp.value = '';
+  } catch (err) {
+    console.error('[NW] Failed to send message:', err);
+    alert('Failed to send message: ' + (err.message || 'Unknown error'));
+  }
+};
+
+/** Load messages from professional on page load */
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(async function() {
+    try {
+      var me = await NW.getMe();
+      if (!me.proId) {
+        console.log('[NW] User not bound to professional, messages not available');
+        return;
+      }
+
+      _userProInfo = { id: me.id, name: me.name, proId: me.proId };
+
+      // Fetch conversation with professional
+      var messages = await NW.messages.get(me.proId);
+      console.log('[NW] Loaded', messages.length, 'messages from professional');
+
+      // Update userMsgs with API messages
+      if (typeof userMsgs !== 'undefined' && messages.length > 0) {
+        userMsgs = messages.map(m => ({
+          from: String(m.senderId) === me.proId ? 'pro' : 'user',
+          text: m.text,
+          time: m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+          _id: m.id,
+          isRead: m.isRead
+        }));
+
+        // Re-render if function exists
+        if (typeof renderMsgs === 'function') {
+          renderMsgs();
+        }
+      }
+    } catch (err) {
+      console.warn('[NW] Failed to load messages:', err);
+    }
+  }, 500);
+});

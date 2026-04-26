@@ -29,7 +29,7 @@ class NotificationPublisher(
         val notification = NotificationEntity(
             userId = userId,
             type = event.type,
-            title = "计划已更新",
+            title = "Plan updated",
             message = event.message,
             relatedId = planId.toString()
         )
@@ -58,7 +58,7 @@ class NotificationPublisher(
         val notification = NotificationEntity(
             userId = userId,
             type = event.type,
-            title = "新消息",
+            title = "New message",
             message = "$senderName: $messageText",
             relatedId = messageId.toString()
         )
@@ -79,7 +79,7 @@ class NotificationPublisher(
         val notification = NotificationEntity(
             userId = userId,
             type = event.type,
-            title = "客户已解绑",
+            title = "Client disconnected",
             message = event.message,
             relatedId = clientId
         )
@@ -106,7 +106,7 @@ class NotificationPublisher(
         val notification = NotificationEntity(
             userId = userId,
             type = event.type,
-            title = "计划已删除",
+            title = "Plan deleted",
             message = event.message,
             relatedId = planId.toString()
         )

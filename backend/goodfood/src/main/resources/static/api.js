@@ -12,7 +12,7 @@
  * ══════════════════════════════════════════════════════════════
  */
 
-const NW = (function () {
+window.NW = (function () {
   // ── 基础配置 ─────────────────────────────────────────────────
   const BASE = '';
 
@@ -256,6 +256,57 @@ const NW = (function () {
   };
 
   // ══════════════════════════════════════════════════════════════
+  // PLANS
+  // ══════════════════════════════════════════════════════════════
+  const plans = {
+    // GET /api/plans/:clientId → [ApiPlanResponse]
+    async get(clientId) {
+      return req('GET', '/api/plans/' + clientId);
+    },
+
+    // PUT /api/plans/:clientId → ApiPlanResponse
+    async save(clientId, data) {
+      return req('PUT', '/api/plans/' + clientId, data);
+    },
+
+    // DELETE /api/plans/:planId → 204
+    async delete(planId) {
+      return req('DELETE', '/api/plans/' + planId);
+    }
+  };
+
+  // ══════════════════════════════════════════════════════════════
+  // NOTIFICATIONS
+  // ══════════════════════════════════════════════════════════════
+  const notifications = {
+    // GET /api/notifications[?unreadOnly=true] → [ApiNotificationResponse]
+    async getAll(unreadOnly) {
+      const qs = unreadOnly ? '?unreadOnly=true' : '';
+      return req('GET', '/api/notifications' + qs);
+    },
+
+    // GET /api/notifications/unread-count → { unreadCount: N }
+    async getUnreadCount() {
+      return req('GET', '/api/notifications/unread-count');
+    },
+
+    // PUT /api/notifications/:id/read → ApiNotificationResponse
+    async markRead(notificationId) {
+      return req('PUT', '/api/notifications/' + notificationId + '/read');
+    },
+
+    // PUT /api/notifications/read-all → { message }
+    async markAllRead() {
+      return req('PUT', '/api/notifications/read-all');
+    },
+
+    // DELETE /api/notifications/:id → { message }
+    async delete(notificationId) {
+      return req('DELETE', '/api/notifications/' + notificationId);
+    }
+  };
+
+  // ══════════════════════════════════════════════════════════════
   // APPOINTMENTS
   // ══════════════════════════════════════════════════════════════
   const appointments = {
@@ -378,6 +429,8 @@ const NW = (function () {
     comments,
     clients,
     messages,
+    plans,
+    notifications,
     appointments,
     // 工具
     mealTypeToKey,
