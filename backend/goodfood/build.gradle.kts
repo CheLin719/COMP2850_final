@@ -22,6 +22,10 @@ repositories {
 }
 
 dependencies {
+    testImplementation("org.springframework:spring-test")
+    testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
