@@ -1,0 +1,276 @@
+=== ALL CONTROLLER ENDPOINTS ===
+
+--- src/main/kotlin/com/comp2850/goodfood/favourites/ApiFavouritesController.kt ---
+22:@RequestMapping("/api/favourites")
+23:class ApiFavouritesController(
+29:    @GetMapping
+47:    @PostMapping
+78:    @DeleteMapping("/{recipeId}")
+117:data class ApiFavouriteCreateRequest(
+122:data class ApiFavouriteResponse(
+127:data class ApiFavouriteRecipeSummary(
+
+--- src/main/kotlin/com/comp2850/goodfood/clients/ApiClientsController.kt ---
+19:@RequestMapping("/api/clients")
+20:class ApiClientsController(
+26:    @GetMapping
+65:    @PostMapping("/bind")
+117:    @DeleteMapping("/{id}/bind")
+150:    @DeleteMapping("/self-unbind")
+181:data class ApiClientResponse(
+193:data class ApiClientStats(
+199:data class BindClientRequest(
+
+--- src/main/kotlin/com/comp2850/goodfood/clients/ApiClientDiaryController.kt ---
+25:@RequestMapping("/api/clients")
+26:class ApiClientDiaryController(
+33:    @GetMapping("/{id}/diary")
+151:data class ApiClientDiaryResponse(
+158:data class ApiClientProfile(
+166:data class ApiClientMealResponse(
+180:data class ApiClientExerciseResponse(
+188:data class ApiClientDiarySummary(
+
+--- src/main/kotlin/com/comp2850/goodfood/nutrition/NutritionController.kt ---
+12:@RequestMapping("/nutrition")
+13:class NutritionController(
+17:    @GetMapping("/guides")
+22:    @GetMapping("/foods")
+29:    @GetMapping("/foods/suggestions")
+36:    @GetMapping("/summary")
+46:    @GetMapping("/feedback")
+54:    @GetMapping("/trends")
+62:    @GetMapping("/status")
+72:    @GetMapping("/status/today")
+
+--- src/main/kotlin/com/comp2850/goodfood/comments/ApiCommentsController.kt ---
+22:@RequestMapping("/api/comments")
+23:class ApiCommentsController(
+29:    @GetMapping
+52:    @PostMapping
+87:data class ApiCommentCreateRequest(
+96:data class ApiCommentResponse(
+
+--- src/main/kotlin/com/comp2850/goodfood/recipes/ApiRecipeController.kt ---
+19:@RequestMapping("/api/recipes")
+20:class ApiRecipeController(
+26:    @GetMapping
+33:    @GetMapping("/search")
+77:    @PostMapping
+155:data class ApiRecipeResponse(
+170:data class ApiRecipeCreateRequest(
+
+--- src/main/kotlin/com/comp2850/goodfood/exercise/ApiExerciseController.kt ---
+25:@RequestMapping("/api/exercise")
+26:class ApiExerciseController(
+31:    @GetMapping
+50:    @PostMapping
+73:    @DeleteMapping("/{id}")
+103:data class ApiExerciseCreateRequest(
+118:data class ApiExerciseResponse(
+
+--- src/main/kotlin/com/comp2850/goodfood/auth/controller/AuthController.kt ---
+18:@RequestMapping
+19:class AuthController(
+27:    @PostMapping("/auth/register")
+32:    @PostMapping("/auth/login")
+37:    @GetMapping("/auth/users")
+42:    @GetMapping("/auth/me")
+51:    @PostMapping("/api/auth/register")
+82:    @PostMapping("/api/auth/login")
+104:    @GetMapping("/api/auth/me")
+128:    @PutMapping("/api/auth/profile")
+181:data class ApiRegisterRequest(
+201:data class ApiLoginRequest(
+
+--- src/main/kotlin/com/comp2850/goodfood/plans/ApiPlansController.kt ---
+16:@RequestMapping("/api/plans")
+17:class ApiPlansController(
+27:    @GetMapping("/{clientId}")
+59:    @PutMapping("/{clientId}")
+121:    @DeleteMapping("/{planId}")
+172:data class ApiPlanSaveRequest(
+186:data class ApiPlanResponse(
+
+--- src/main/kotlin/com/comp2850/goodfood/notifications/ApiNotificationsController.kt ---
+11:@RequestMapping("/api/notifications")
+12:class ApiNotificationsController(
+20:    @GetMapping
+41:    @GetMapping("/unread-count")
+53:    @PutMapping("/{notificationId}/read")
+76:    @PutMapping("/read-all")
+91:    @DeleteMapping("/{notificationId}")
+123:data class ApiNotificationResponse(
+
+--- src/main/kotlin/com/comp2850/goodfood/appointments/ApiAppointmentsController.kt ---
+26:@RequestMapping("/api/appointments")
+27:class ApiAppointmentsController(
+32:    @GetMapping
+45:    @PostMapping
+155:data class ApiAppointmentCreateRequest(
+170:data class ApiAppointmentStatusUpdateRequest(
+175:data class ApiAppointmentResponse(
+
+--- src/main/kotlin/com/comp2850/goodfood/messages/ApiMessagesController.kt ---
+25:@RequestMapping("/api/messages")
+26:class ApiMessagesController(
+33:    @GetMapping("/{clientId}")
+64:    @PostMapping
+136:data class ApiMessageCreateRequest(
+145:data class ApiMessageResponse(
+
+--- src/main/kotlin/com/comp2850/goodfood/diary/DiaryController.kt ---
+18:@RequestMapping("/diary")
+19:class DiaryController(
+23:    @PostMapping
+31:    @GetMapping
+41:    @PutMapping("/{id}")
+50:    @DeleteMapping("/{id}")
+
+--- src/main/kotlin/com/comp2850/goodfood/diary/ApiDiaryController.kt ---
+26:@RequestMapping("/api/diary")
+27:class ApiDiaryController(
+32:    @GetMapping
+69:    @PostMapping
+99:    @DeleteMapping("/{id}")
+121:data class ApiDiaryListResponse(
+125:data class ApiDiaryMealResponse(
+140:data class ApiDiaryCreateRequest(
+
+--- src/main/kotlin/com/comp2850/goodfood/common/HealthController.kt ---
+7:class HealthController {
+9:    @GetMapping("/health")
+
+--- src/main/kotlin/com/comp2850/goodfood/ratings/ApiRatingsController.kt ---
+19:@RequestMapping("/api/ratings")
+20:class ApiRatingsController(
+26:    @PostMapping
+65:data class ApiRatingUpsertRequest(
+
+=== DTO FILES ===
+
+--- src/main/kotlin/com/comp2850/goodfood/nutrition/NutritionTrendsResponse.kt ---
+package com.comp2850.goodfood.nutrition
+
+data class NutritionTrendsResponse(
+    val requestedDays: Int,
+    val analysedDays: Int,
+    val enoughData: Boolean,
+    val message: String?,
+    val trends: List<DailyNutritionTrend>
+)
+--- src/main/kotlin/com/comp2850/goodfood/nutrition/DailyNutritionStatusResponse.kt ---
+package com.comp2850.goodfood.nutrition
+
+import java.time.LocalDate
+
+data class DailyNutritionStatusResponse(
+    val date: LocalDate,
+    val hasData: Boolean,
+    val items: List<NutritionStatusItem>
+)
+--- src/main/kotlin/com/comp2850/goodfood/auth/dto/LoginRequest.kt ---
+package com.comp2850.goodfood.auth.dto
+
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
+
+data class LoginRequest(
+    @field:NotBlank(message = "email cannot be blank")
+    @field:Email(message = "email format is invalid")
+    val email: String,
+
+    @field:NotBlank(message = "password cannot be blank")
+    val password: String
+)
+--- src/main/kotlin/com/comp2850/goodfood/auth/dto/RegisterRequest.kt ---
+package com.comp2850.goodfood.auth.dto
+
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
+
+data class RegisterRequest(
+    @field:NotBlank(message = "name cannot be blank")
+    val name: String,
+
+    @field:NotBlank(message = "email cannot be blank")
+    @field:Email(message = "email format is invalid")
+    val email: String,
+
+    @field:NotBlank(message = "password cannot be blank")
+    val password: String,
+
+    @field:NotBlank(message = "role cannot be blank")
+    val role: String,
+
+    val licence: String? = null,
+    val proId: String? = null
+)
+--- src/main/kotlin/com/comp2850/goodfood/diary/UpdateDiaryRequest.kt ---
+package com.comp2850.goodfood.diary
+
+import com.fasterxml.jackson.annotation.JsonFormat
+import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import java.time.LocalDate
+
+data class UpdateDiaryRequest(
+    @field:NotBlank(message = "foodName cannot be blank")
+    val foodName: String,
+
+    @field:NotBlank(message = "quantity cannot be blank")
+    val quantity: String,
+
+    @field:NotNull(message = "servings is required")
+    @field:DecimalMin(value = "0.1", message = "servings must be at least 0.1")
+    val servings: Double?,
+
+    @field:NotNull(message = "mealType is required")
+    val mealType: MealType?,
+
+    @field:NotNull(message = "diaryDate is required")
+    @field:JsonFormat(pattern = "yyyy-MM-dd")
+    val diaryDate: LocalDate?
+)
+--- src/main/kotlin/com/comp2850/goodfood/diary/DiarySaveResponse.kt ---
+package com.comp2850.goodfood.diary
+
+data class DiarySaveResponse(
+    val entry: DiaryEntry,
+    val nutritionMatched: Boolean,
+    val message: String?
+)
+--- src/main/kotlin/com/comp2850/goodfood/diary/CreateDiaryRequest.kt ---
+package com.comp2850.goodfood.diary
+
+import com.fasterxml.jackson.annotation.JsonFormat
+import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import java.time.LocalDate
+
+data class CreateDiaryRequest(
+    @field:NotBlank(message = "foodName cannot be blank")
+    val foodName: String,
+
+    @field:NotBlank(message = "quantity cannot be blank")
+    val quantity: String,
+
+    @field:NotNull(message = "servings is required")
+    @field:DecimalMin(value = "0.1", message = "servings must be at least 0.1")
+    val servings: Double?,
+
+    @field:NotNull(message = "mealType is required")
+    val mealType: MealType?,
+
+    @field:NotNull(message = "diaryDate is required")
+    @field:JsonFormat(pattern = "yyyy-MM-dd")
+    val diaryDate: LocalDate?,
+
+    val kcal: Int? = null,
+    val protein: Double? = null,
+    val carbs: Double? = null,
+    val fat: Double? = null,
+    val sugar: Double? = null
+)
