@@ -252,6 +252,7 @@
       + '<button class="ch-tab active" onclick="window._chSwitchTab(\'feed\',this)" role="tab" aria-selected="true">💬 Feed</button>'
       + '<button class="ch-tab" onclick="window._chSwitchTab(\'askpro\',this)" role="tab" aria-selected="false">🩺 Ask a Pro</button>'
       + '<button class="ch-tab" onclick="window._chSwitchTab(\'findpro\',this)" role="tab" aria-selected="false">🔍 Find a Pro</button>'
+      + '<button class="ch-tab" onclick="window._chSwitchTab(\'devlog\',this)" role="tab" aria-selected="false">📋 Dev Log</button>'
       + '</div>'
       + '<div id="ch-content"></div>';
     main.appendChild(page);
@@ -409,6 +410,30 @@
     if (activeTab === 'feed') el.innerHTML = renderFeed(false);
     else if (activeTab === 'askpro') el.innerHTML = renderFeed(true);
     else if (activeTab === 'findpro') el.innerHTML = renderFindPro();
+    else if (activeTab === 'devlog') el.innerHTML = renderDevLog();
+  }
+
+  function renderDevLog() {
+    var entries = [
+      { date: '2026-04-28', tag: 'Feature',     tagColor: '#1e6b5e', tagBg: 'var(--teal-lll)', title: 'Real-time Data Sync',            body: 'Expert dashboard now displays live client data — weight, BMI, macro distribution, and exercise activity — synced directly from subscriber profiles in real time.' },
+      { date: '2026-04-25', tag: 'Feature',     tagColor: '#1e6b5e', tagBg: 'var(--teal-lll)', title: 'Export & Reporting',             body: 'Subscribers can now export a weekly CSV report containing full nutrition breakdown (calories, protein, carbs, fat, sugar) and exercise logs to track progress offline.' },
+      { date: '2026-04-22', tag: 'Improvement', tagColor: '#b8621f', tagBg: 'var(--amber-ll)', title: 'Guided Tour System',             body: 'Introduced interactive guided tours for both subscriber and professional dashboards featuring spotlight highlights, smart tooltip positioning, and step-by-step walkthroughs.' },
+      { date: '2026-04-18', tag: 'Feature',     tagColor: '#1e6b5e', tagBg: 'var(--teal-lll)', title: 'Recipe Compare & Meal Planner',  body: 'Launched a side-by-side recipe nutrition comparison tool and a drag-and-drop weekly meal planner to help subscribers plan balanced, nutritious meals.' },
+      { date: '2026-04-14', tag: 'Feature',     tagColor: '#1e6b5e', tagBg: 'var(--teal-lll)', title: 'Professional Dashboard Launch',  body: 'Released the expert dashboard enabling nutritionists to monitor client progress, exchange messages, manage fitness plans, and schedule appointments — all in one place.' }
+    ];
+    var html = '<div style="display:flex;flex-direction:column;gap:16px">';
+    entries.forEach(function (e) {
+      html += '<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(10,20,16,0.04)">'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+        + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.04em">' + e.date + '</span>'
+        + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;padding:2px 8px;border-radius:6px;background:' + e.tagBg + ';color:' + e.tagColor + ';font-weight:600">' + e.tag + '</span>'
+        + '</div>'
+        + '<div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px">' + e.title + '</div>'
+        + '<div style="font-size:13px;color:var(--ink-m);line-height:1.6">' + e.body + '</div>'
+        + '</div>';
+    });
+    html += '</div>';
+    return html;
   }
 
   // ── Actions ────────────────────────────────────────────────────

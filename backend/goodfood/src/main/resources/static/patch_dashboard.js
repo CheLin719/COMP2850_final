@@ -509,6 +509,7 @@ window.deleteEx = async function (idx) {
 
   exLog.splice(idx, 1);
   renderExerciseLog();
+  if (typeof updateExerciseChart === 'function') updateExerciseChart();
 
   if (backendId) {
     try {
@@ -539,7 +540,137 @@ window.loadState = async function () {
     initFavourites(),
     _loadDiaryForDate(currentDiaryDate)
   ]);
+
+  // Load actual 7-day calorie trend and exercise chart data after initial diary is ready
+  _initWeeklyCalorieTrend().catch(function (e) {
+    console.warn('[NW] weekly calorie trend failed:', e);
+  });
+  _initWeeklyExerciseChart().catch(function (e) {
+    console.warn('[NW] weekly exercise chart failed:', e);
+  });
 };
+
+// ══════════════════════════════════════════════════════════════
+// 12. Calorie Trend — load actual 7-day data and fix day index
+// ══════════════════════════════════════════════════════════════
+
+/** Mon–Sun UTC date strings for the current calendar week */
+function _getWeekDates() {
+  var todayStr = new Date().toISOString().split('T')[0];
+  var today = new Date(todayStr + 'T00:00:00Z');
+  var dow = today.getUTCDay(); // 0=Sun, 1=Mon, …, 6=Sat
+  var mondayOffset = dow === 0 ? -6 : 1 - dow;
+  var dates = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(today.getTime() + (mondayOffset + i) * 86400000);
+    dates.push(d.toISOString().split('T')[0]);
+  }
+  return dates;
+}
+
+/** Override updateCalorieTrend to place kcal at the correct Mon–Sun slot */
+var _origUpdateCalorieTrend = window.updateCalorieTrend;
+window.updateCalorieTrend = function () {
+  if (!window._calorieTrendChart) return;
+  var todayKcal = 0;
+  Object.values(mealLog).forEach(function (arr) {
+    arr.forEach(function (e) { todayKcal += e.kcal || 0; });
+  });
+  // Find the correct weekday slot for the currently viewed date
+  var viewDate = currentDiaryDate || new Date().toISOString().split('T')[0];
+  var weekDates = _getWeekDates();
+  var idx = weekDates.indexOf(viewDate);
+  if (idx >= 0) {
+    calorieTrendData[idx] = todayKcal;
+    window._calorieTrendChart.data.datasets[0].data = calorieTrendData.slice();
+    window._calorieTrendChart.update();
+  }
+};
+
+/** Fetch kcal for each day of the current Mon–Sun week and refresh the chart */
+async function _initWeeklyCalorieTrend() {
+  var weekDates = _getWeekDates();
+  var results = await Promise.allSettled(weekDates.map(function (d) {
+    return NW.diary.get(d);
+  }));
+  var newData = [0, 0, 0, 0, 0, 0, 0];
+  results.forEach(function (res, i) {
+    if (res.status === 'fulfilled') {
+      var data = res.value || {};
+      var meals = data.meals || (Array.isArray(data) ? data : []);
+      meals.forEach(function (m) { newData[i] += m.kcal || 0; });
+    }
+  });
+  // Write into the shared array in-place so other functions stay in sync
+  for (var i = 0; i < 7; i++) { calorieTrendData[i] = newData[i]; }
+  if (window._calorieTrendChart) {
+    window._calorieTrendChart.data.datasets[0].data = calorieTrendData.slice();
+    window._calorieTrendChart.update();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 13. Exercise Chart — load actual 7-day data and fix day index
+//     Original updateExerciseChart hardcodes today at index 6 (Sun).
+//     Fix: use the actual Mon–Sun day-of-week index.
+// ══════════════════════════════════════════════════════════════
+
+/** Override updateExerciseChart to place today's kcal at the correct Mon–Sun slot */
+var _origUpdateExerciseChart = window.updateExerciseChart;
+window.updateExerciseChart = function () {
+  if (!exChartInstance) return;  // exChartInstance is `let` — not on window
+  var todayKcal = exLog.reduce(function (s, e) { return s + (e.kcal || 0); }, 0);
+  var viewDate = currentDiaryDate || new Date().toISOString().split('T')[0];
+  var weekDates = _getWeekDates();
+  var idx = weekDates.indexOf(viewDate);
+  if (idx >= 0) {
+    exChartData[idx] = todayKcal;
+  }
+  var barColors = exChartData.map(function (v) {
+    return v === 0 ? '#dce6e0' : v >= EX_TARGET ? '#1e6b5e' : '#2f8f7f';
+  });
+  exChartInstance.data.datasets[0].data = exChartData.slice();
+  exChartInstance.data.datasets[0].backgroundColor = barColors;
+  exChartInstance.update();
+  var daysHit = exChartData.filter(function (v, i) { return i < 6 && v >= EX_TARGET; }).length;
+  var weekSumEl = document.getElementById('weekSummary');
+  if (weekSumEl) weekSumEl.textContent = daysHit + '/6 days on target this week';
+};
+
+/** Load this week's exercise totals from API and populate exLog with today's entries */
+async function _initWeeklyExerciseChart() {
+  try {
+    var allEx = await NW.exercise.get(); // no date → all exercises for this user
+    if (!Array.isArray(allEx)) return;
+    var weekDates = _getWeekDates();
+    var todayDate = new Date().toISOString().split('T')[0];
+    // Reset chart data (replaces static placeholder values)
+    for (var i = 0; i < 7; i++) exChartData[i] = 0;
+    // Rebuild exLog from today's API data on initial load
+    exLog.length = 0;
+    allEx.forEach(function (ex) {
+      var weekIdx = weekDates.indexOf(ex.date);
+      if (weekIdx >= 0) exChartData[weekIdx] += ex.kcal || 0;
+      if (ex.date === todayDate) {
+        exLog.push({ time: '', name: ex.activity, kcal: ex.kcal, _id: ex.id });
+      }
+    });
+    if (typeof renderExerciseLog === 'function') renderExerciseLog();
+    if (exChartInstance) {
+      var barColors = exChartData.map(function (v) {
+        return v === 0 ? '#dce6e0' : v >= EX_TARGET ? '#1e6b5e' : '#2f8f7f';
+      });
+      exChartInstance.data.datasets[0].data = exChartData.slice();
+      exChartInstance.data.datasets[0].backgroundColor = barColors;
+      exChartInstance.update();
+      var daysHit = exChartData.filter(function (v, i) { return i < 6 && v >= EX_TARGET; }).length;
+      var weekSumEl = document.getElementById('weekSummary');
+      if (weekSumEl) weekSumEl.textContent = daysHit + '/6 days on target this week';
+    }
+  } catch (e) {
+    console.warn('[NW] _initWeeklyExerciseChart failed:', e);
+  }
+}
 
 // ══════════════════════════════════════════════════════════════
 // 9. 用户名展示
@@ -657,3 +788,89 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 500);
 });
+
+// ══════════════════════════════════════════════════════════════
+// 14. Export CSV — fetch last 7 days from API (localStorage is no longer written)
+// ══════════════════════════════════════════════════════════════
+window.exportWeeklyReportCSV = async function () {
+  try {
+    showToast('Preparing export…', '#1e6b5e');
+    var dates = [];
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      dates.push(d.toISOString().split('T')[0]);
+    }
+    // Fetch diary + exercise for all 7 days in parallel (14 requests total)
+    var allRequests = dates.map(function (date) { return NW.diary.get(date); })
+      .concat(dates.map(function (date) { return NW.exercise.get(date); }));
+    var results = await Promise.allSettled(allRequests);
+    var diaryResults    = results.slice(0, 7);
+    var exerciseResults = results.slice(7, 14);
+
+    var rows = [['Date', 'Calories', 'Protein (g)', 'Carbs (g)', 'Fat (g)', 'Sugar (g)', 'Exercise (min)', 'Exercise Kcal']];
+    dates.forEach(function (date, i) {
+      // ── Food ──
+      var kcal = 0, protein = 0, carbs = 0, fat = 0, sugar = 0;
+      if (diaryResults[i].status === 'fulfilled') {
+        var data  = diaryResults[i].value || {};
+        var meals = data.meals || (Array.isArray(data) ? data : []);
+        meals.forEach(function (m) {
+          kcal    += m.kcal    || 0;
+          protein += m.protein || 0;
+          carbs   += m.carbs   || 0;
+          fat     += m.fat     || 0;
+          sugar   += m.sugar   || 0;
+        });
+      }
+      // When foods were logged without macro breakdown (only kcal stored),
+      // estimate with the same fixed ratios used in the Macro Distribution display
+      if (kcal > 0 && protein === 0 && carbs === 0 && fat === 0 && sugar === 0) {
+        protein = Math.round(kcal * 0.28 / 4 * 10) / 10;
+        carbs   = Math.round(kcal * 0.42 / 4 * 10) / 10;
+        fat     = Math.round(kcal * 0.18 / 9 * 10) / 10;
+        sugar   = Math.round(kcal * 0.12 / 4 * 10) / 10;
+      }
+      // ── Exercise ──
+      var exMin = 0, exKcal = 0;
+      if (exerciseResults[i].status === 'fulfilled') {
+        var exList = exerciseResults[i].value || [];
+        if (Array.isArray(exList)) {
+          exList.forEach(function (ex) {
+            exMin  += ex.duration || 0;
+            exKcal += ex.kcal     || 0;
+          });
+        }
+      }
+      rows.push([
+        date,
+        kcal    || '',
+        protein ? Math.round(protein * 10) / 10 : '',
+        carbs   ? Math.round(carbs   * 10) / 10 : '',
+        fat     ? Math.round(fat     * 10) / 10 : '',
+        sugar   ? Math.round(sugar   * 10) / 10 : '',
+        exMin   || '',
+        exKcal  || ''
+      ]);
+    });
+    var csv = rows.map(function (r) {
+      return r.map(function (cell) {
+        var s = String(cell);
+        return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      }).join(',');
+    }).join('\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'nourishwell-weekly-report-' + new Date().toISOString().split('T')[0] + '.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.warn('[NW] exportWeeklyReportCSV failed:', e);
+    showToast('Export failed', '#dc2626');
+  }
+};
+
