@@ -161,21 +161,60 @@ async function initProDashboard() {
   }
 }
 
-/** Update overview table with API client data */
+/** Append API-bound clients to the Client Snapshot table (#snapshotTable).
+ *  Static rows (Rose, James, …) are kept; only missing bind_* clients are added. */
 function _updateOverviewStats(list) {
-  var tbody = document.querySelector('#clientsTable tbody, .overview-table tbody');
+  var tbody = document.querySelector('#snapshotTable');
   if (!tbody) return;
-  tbody.innerHTML = list.map(function(c) {
-    var s = c.stats || {};
-    var statusClass = s.status === 'active' ? 'green' : s.status === 'warning' ? 'amber' : 'red';
-    return '<tr onclick="selectClientFromTable(\'' + c.userId + '\')" style="cursor:pointer">'
-      + '<td>' + escapeHtml(c.name) + '</td>'
-      + '<td>' + escapeHtml(c.email) + '</td>'
-      + '<td>' + (s.diaryCount || 0) + ' entries</td>'
-      + '<td>' + (s.lastDiaryDate || '—') + '</td>'
-      + '<td><span class="status-dot ' + statusClass + '"></span> ' + (s.status || 'unknown') + '</td>'
+  var colors = ['#1a7a6a', '#7aaad4', '#b8621f', '#7c3aed', '#d4956a', '#b5413e'];
+  list.forEach(function (ac, idx) {
+    var clientKey = 'bind_' + ac.userId;
+    // Skip if this client's row already exists (prevents duplicates on repeated calls)
+    if (tbody.querySelector('[data-client-key="' + clientKey + '"]')) return;
+    var s = ac.stats || {};
+    var ini = (ac.name || '').split(' ')
+      .map(function (w) { return (w[0] || '').toUpperCase(); }).join('').substring(0, 2) || '??';
+    var color = (clients[clientKey] && clients[clientKey].color) || colors[idx % colors.length];
+    var goal  = ac.goal || '—';
+    var meta  = [ac.weight ? ac.weight + ' kg' : '', ac.age ? '· ' + ac.age : ''].filter(Boolean).join(' ');
+    var statusBg, statusColor, statusText;
+    if (s.status === 'active') {
+      statusBg = 'var(--teal-lll)'; statusColor = 'var(--teal)'; statusText = '✓ Active';
+    } else {
+      statusBg = 'var(--amber-ll)'; statusColor = 'var(--amber)'; statusText = '⚡ Inactive';
+    }
+    var row = '<tr data-client-key="' + clientKey + '" tabindex="0" role="button"'
+      + ' onclick="selectClientFromTable(\'' + clientKey + '\')"'
+      + ' style="cursor:pointer;transition:background .15s"'
+      + ' onmouseover="this.style.background=\'var(--paper)\'"'
+      + ' onmouseout="this.style.background=\'transparent\'">'
+      // Col 1: avatar + name + meta
+      + '<td style="padding:12px 0"><div style="display:flex;align-items:center;gap:10px">'
+      + '<div style="width:32px;height:32px;border-radius:50%;background:' + color
+      + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'
+      + escapeHtml(ini) + '</div>'
+      + '<div><div style="font-size:13px;font-weight:600;color:var(--ink)">' + escapeHtml(ac.name) + '</div>'
+      + (meta ? '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f)">' + escapeHtml(meta) + '</div>' : '')
+      + '</div></div></td>'
+      // Col 2: goal
+      + '<td style="text-align:center;font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--ink-m)">'
+      + escapeHtml(goal) + '</td>'
+      // Col 3: avg kcal — not in getAll(); show diary count instead
+      + '<td style="text-align:center;font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:600;color:var(--ink-f)">'
+      + (s.diaryCount || 0) + ' logs</td>'
+      // Col 4: protein — not in getAll()
+      + '<td style="text-align:center"><span style="font-family:\'JetBrains Mono\',monospace;font-size:10px;'
+      + 'padding:2px 8px;border-radius:8px;background:var(--paper);color:var(--ink-f)">—</span></td>'
+      // Col 5: exercise — not in getAll(); show last diary date
+      + '<td style="text-align:center"><div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--ink-m)">'
+      + (s.lastDiaryDate || '—') + '</div></td>'
+      // Col 6: status
+      + '<td style="text-align:center"><span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;'
+      + 'padding:3px 10px;border-radius:8px;background:' + statusBg + ';color:' + statusColor + '">'
+      + statusText + '</span></td>'
       + '</tr>';
-  }).join('');
+    tbody.insertAdjacentHTML('beforeend', row);
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -189,15 +228,31 @@ window.selectClient = async function (id, el) {
     return;
   }
 
+  // Ensure clients[id] has minimum required fields so original render won't crash
+  if (!clients[id] && id.indexOf('bind_') === 0) {
+    clients[id] = {
+      name: 'Client', initials: '??', color: '#7c3aed',
+      stats: { goal: 'General', avg_kcal: 0, protein: 0, exercise_days: 0, streak: 0, status: 'New' },
+      calorie_trend: [0,0,0,0,0,0,0],
+      messages: [], appointments: [],
+      _apiId: id.replace('bind_', '')
+    };
+  }
+
   // Execute original UI switch (renders with whatever data is already in clients[id])
   if (_origSelectClient) _origSelectClient(id, el);
 
   var c0 = clients[id];
-  // Immediately re-render BMI and header with any profile already applied by initProDashboard
-  if (c0 && (c0.height || c0.weight || c0.target_kcal)) {
-    if (typeof renderBMI          === 'function') renderBMI(c0);
-    if (typeof renderStats        === 'function') renderStats(c0);
-    if (typeof renderClientHeader === 'function') renderClientHeader(c0);
+  if (c0) {
+    // Seed defaults so score ring and exercise chart are never blank before async loads
+    if (!c0.scores)   c0.scores   = { nutrition: 0, consistency: 0, hydration: 70, exercise: 0 };
+    if (!c0.exercise) c0.exercise = [0, 0, 0, 0, 0, 0, 0];
+    // Re-render panels with any profile data already applied by initProDashboard
+    if (typeof renderBMI           === 'function') renderBMI(c0);
+    if (typeof renderStats         === 'function') renderStats(c0);
+    if (typeof renderClientHeader  === 'function') renderClientHeader(c0);
+    if (typeof renderScoreRing     === 'function') renderScoreRing(c0);
+    if (typeof renderExerciseChart === 'function') renderExerciseChart(c0);
   }
 
   // Get API id — works for both static clients and bind_* clients
@@ -205,7 +260,12 @@ window.selectClient = async function (id, el) {
   if (!apiId) return;
 
   var today = new Date().toISOString().split('T')[0];
-  var monthAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().split('T')[0];
+  var monthAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().split('T')[0];
+
+  // Capture the client object reference BEFORE awaiting, so that a concurrent
+  // DOMContentLoaded replacement of clients[id] during the await cannot swap in
+  // a stale object and cause the BMI/weight to flash to old values.
+  var c = clients[id];
 
   var results = await Promise.allSettled([
     NW.messages.get(apiId),
@@ -214,7 +274,6 @@ window.selectClient = async function (id, el) {
     NW.plans.get(apiId)
   ]);
 
-  var c = clients[id];
   var messagesRes    = results[0];
   var appointmentsRes = results[1];
   var diaryRes       = results[2];
@@ -291,7 +350,7 @@ window.selectClient = async function (id, el) {
       if (profile.weight)     c.weight          = profile.weight;
       if (profile.age)        c.age             = profile.age;
       if (profile.goal)       { c.goal = profile.goal; if (!c.stats) c.stats = {}; c.stats.goal = profile.goal; }
-      if (profile.targetKcal && !c.target_kcal) c.target_kcal = profile.targetKcal;
+      if (profile.targetKcal) c.target_kcal = profile.targetKcal;
     }
 
     // ── 2. Stats: averages over logged days ──
@@ -313,11 +372,9 @@ window.selectClient = async function (id, el) {
     }
     c.stats.streak = streak;
 
-    // ── 4. Calorie trend ──
-    if (mealEntries.length > 0) {
-      _buildCalorieTrend(c, mealEntries);
-      if (typeof renderCalorieTrend === 'function') renderCalorieTrend(c);
-    }
+    // ── 4. Calorie trend — always rebuild so chart reflects actual data ──
+    _buildCalorieTrend(c, mealEntries);
+    if (typeof renderCalorieTrend === 'function') renderCalorieTrend(c);
 
     // ── 5. Exercise frequency (weekly kcal per day Mon–Sun) ──
     var weekKcal = [0, 0, 0, 0, 0, 0, 0];
@@ -325,12 +382,12 @@ window.selectClient = async function (id, el) {
       var dow = (new Date(ex.date).getDay() + 6) % 7;
       weekKcal[dow] += ex.kcal || 0;
     });
-    if (data.exercise && data.exercise.length > 0) {
-      c.exercise = weekKcal;
-      if (typeof renderExerciseChart === 'function') renderExerciseChart(c);
-    }
+    // Always update so chart clears stale data when switching clients
+    c.exercise = weekKcal;
+    if (typeof renderExerciseChart === 'function') renderExerciseChart(c);
 
-    // ── 6. Macros (actual from diary; targets from plan or estimate) ──
+    // ── 6. Macros: use actual sums from diary entries ──
+    var loggedDays  = new Set(mealEntries.map(function(m){ return m.date; })).size || 1;
     var avgKcal     = c.stats.avg_kcal || 0;
     var targetKcal  = c.target_kcal  || 2000;
     var targetProt  = c.target_protein || Math.round(targetKcal * 0.30 / 4);
@@ -341,12 +398,23 @@ window.selectClient = async function (id, el) {
     var targetSugar = Math.round(targetKcal * 0.05 / 4);
 
     var actProtein = c.stats.protein || 0;
-    var actSugar   = summary ? Math.round((summary.totalSugar || 0) / (new Set(mealEntries.map(function(m){ return m.date; })).size || 1)) : 0;
-    // Estimate carbs and fat from kcal (carbs≈45%, fat≈25% after protein)
-    var actCarbs   = Math.round((avgKcal * 0.45) / 4);
-    var actFat     = Math.round((avgKcal * 0.25) / 9);
+    var actSugar   = summary ? Math.round((summary.totalSugar || 0) / loggedDays) : 0;
+    var totalCarbs = 0, totalFat = 0;
+    mealEntries.forEach(function(m) { totalCarbs += m.carbs || 0; totalFat += m.fat || 0; });
+    var actCarbs = Math.round(totalCarbs / loggedDays);
+    var actFat   = Math.round(totalFat   / loggedDays);
 
-    if (avgKcal > 0) {
+    // Foods logged via the quick picker are stored with macros=0 (only kcal is sent).
+    // Fall back to the same fixed-ratio estimation the user dashboard uses in updateDonut,
+    // so the expert sees non-zero values consistent with the user's own macro display.
+    if (actCarbs === 0 && actProtein === 0 && actFat === 0 && actSugar === 0 && avgKcal > 0) {
+      actCarbs   = Math.round(avgKcal * 0.42 / 4);
+      actProtein = Math.round(avgKcal * 0.28 / 4);
+      actFat     = Math.round(avgKcal * 0.18 / 9);
+      actSugar   = Math.round(avgKcal * 0.12 / 4);
+    }
+
+    if (avgKcal > 0 || actProtein > 0 || actCarbs > 0 || actFat > 0) {
       c.macros = {
         carbs:   { actual: actCarbs,   target: targetCarbs, color: '#2f8f7f' },
         protein: { actual: actProtein, target: targetProt,  color: '#d4956a' },
@@ -375,15 +443,46 @@ window.selectClient = async function (id, el) {
     if (typeof renderMacros       === 'function') renderMacros(c);
     if (typeof renderScoreRing    === 'function') renderScoreRing(c);
     if (typeof renderClientHeader === 'function') renderClientHeader(c);
+
+    // ── 9. Sync back to clients[id] in case the DOMContentLoaded handler
+    //       (pro_dashboard.html ~line 2455) replaced the object during the await.
+    //       Without this, re-clicking the client would re-read the zeroed copy.
+    var _liveRef = clients[id];
+    if (_liveRef && _liveRef !== c) {
+      _liveRef.stats         = c.stats;
+      _liveRef.weight        = c.weight;
+      _liveRef.height        = c.height;
+      _liveRef.age           = c.age;
+      _liveRef.goal          = c.goal;
+      _liveRef.target_kcal   = c.target_kcal;
+      _liveRef.calorie_trend = c.calorie_trend;
+      _liveRef.exercise      = c.exercise;
+      _liveRef.scores        = c.scores;
+      _liveRef.macros        = c.macros;
+    }
+
+  } else {
+    // Diary fetch failed (e.g. binding not yet confirmed in backend).
+    // Still render panels with defaults so the page isn't blank.
+    // Use the same c reference captured before the await — do NOT re-read clients[id].
+    if (c) {
+      if (!c.scores)   c.scores   = { nutrition: 0, consistency: 0, hydration: 70, exercise: 0 };
+      if (!c.exercise) c.exercise = [0, 0, 0, 0, 0, 0, 0];
+      if (typeof renderStats         === 'function') renderStats(c);
+      if (typeof renderBMI           === 'function') renderBMI(c);
+      if (typeof renderScoreRing     === 'function') renderScoreRing(c);
+      if (typeof renderExerciseChart === 'function') renderExerciseChart(c);
+      if (typeof renderCalorieTrend  === 'function') renderCalorieTrend(c);
+    }
   }
 };
 
-/** Build 30-day calorie trend array from API diary data */
+/** Build 7-day calorie trend array from API diary data */
 function _buildCalorieTrend(c, meals) {
   var kcalByDate = {};
   meals.forEach(function(m) { kcalByDate[m.date] = (kcalByDate[m.date] || 0) + (m.kcal || 0); });
   var trend = [];
-  for (var i = 29; i >= 0; i--) {
+  for (var i = 6; i >= 0; i--) {
     var d = new Date(Date.now() - i * 24 * 3600 * 1000).toISOString().split('T')[0];
     trend.push(kcalByDate[d] || 0);
   }
