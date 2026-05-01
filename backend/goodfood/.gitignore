@@ -38,3 +38,8 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### Node / Playwright ###
+node_modules/
+playwright-report/
+test-results/
