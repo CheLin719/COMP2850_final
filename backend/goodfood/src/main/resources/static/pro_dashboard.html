@@ -38,7 +38,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--paper);color:
 
 /* ── SIDE NAV ── */
 .side-nav{position:fixed;top:60px;left:0;bottom:0;width:220px;background:var(--white);border-right:1px solid var(--border);z-index:998;display:flex;flex-direction:column;overflow-y:auto}
-.sn-section-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.1em;text-transform:uppercase;padding:16px 20px 6px}
+.sn-section-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.1em;text-transform:uppercase;padding:16px 20px 6px;opacity:.7}
 .sn-item{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13px;font-weight:500;color:var(--ink-m);cursor:pointer;border-left:3px solid transparent;text-decoration:none;transition:all .2s;position:relative}
 .sn-item:hover{color:var(--ink);background:var(--paper)}
 .sn-item.active{color:#fff;background:var(--ink);border-left-color:var(--teal)}
@@ -279,7 +279,7 @@ body.dark-mode .qt:hover { background:#1e3028; }
 }
 
 /* ── ACCESSIBILITY ── */
-*:focus-visible { outline:2px solid var(--teal); outline-offset:2px; border-radius:4px; } input:focus-visible, textarea:focus-visible, select:focus-visible { outline:none; box-shadow:0 0 0 2px rgba(30,107,94,0.4); }
+*:focus-visible { outline:2px solid var(--fog); outline-offset:2px; border-radius:4px; } input:focus-visible, textarea:focus-visible, select:focus-visible { outline:none; box-shadow:0 1px 4px rgba(10,20,16,0.08); }
 .skip-link { position:absolute; top:-40px; left:0; background:var(--teal); color:#fff; padding:8px 16px; z-index:99999; font-size:14px; font-weight:600; border-radius:0 0 8px 0; transition:top .2s; }
 .skip-link:focus { top:0; }
 
@@ -426,7 +426,11 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 </style>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to main content</a>
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+
+<a href="#main-content" class="skip-link" style="position:absolute;top:-40px;left:0;background:var(--teal);color:#fff;padding:8px 16px;z-index:99999;font-size:14px;font-weight:600;border-radius:0 0 8px 0;transition:top .2s">Skip to main content</a>
+<style>.skip-link:focus{top:0 !important;}</style>
 <!-- TOP NAV -->
 <nav class="top-nav" role="navigation" aria-label="Main navigation">
   <div class="top-nav-left">
@@ -496,7 +500,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">Rose Campbell</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">62kg · Active</div>
     </div>
-    <span class="sn-status warn" role="button" tabindex="0" onclick="cycleStatus('rose', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();cycleStatus('rose',this)}" aria-label="Client status: Low protein">⚡ Low protein</span>
+    <span class="sn-status warn" onclick="cycleStatus('rose', this)" aria-label="Client status">⚡ Low protein</span>
   </a>
 
   <a class="sn-item" onclick="selectClient('james', this)" data-client="james" href="#">
@@ -505,7 +509,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">James Tang</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">78kg · Bulking</div>
     </div>
-    <span class="sn-status ok" role="button" tabindex="0" onclick="cycleStatus('james', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();cycleStatus('james',this)}" aria-label="Client status: On track">✓ On track</span>
+    <span class="sn-status ok" onclick="cycleStatus('james', this)" aria-label="Client status">✓ On track</span>
   </a>
 
   <a class="sn-item" onclick="selectClient('sara', this)" data-client="sara" href="#">
@@ -514,7 +518,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">Sara Lim</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">55kg · Cut</div>
     </div>
-    <span class="sn-status urgent" role="button" tabindex="0" onclick="cycleStatus('sara', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();cycleStatus('sara',this)}" aria-label="Client status: Missed 3 days">! Missed 3 days</span>
+    <span class="sn-status urgent" onclick="cycleStatus('sara', this)" aria-label="Client status">! Missed 3 days</span>
   </a>
 
   <a class="sn-item" onclick="selectClient('mike', this)" data-client="mike" href="#">
@@ -523,7 +527,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">Mike Walsh</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">90kg · Maintain</div>
     </div>
-    <span class="sn-status ok" role="button" tabindex="0" onclick="cycleStatus('mike', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();cycleStatus('mike',this)}" aria-label="Client status: On track">✓ On track</span>
+    <span class="sn-status ok" onclick="cycleStatus('mike', this)" aria-label="Client status">✓ On track</span>
   </a>
 
   <a class="sn-item" onclick="selectClient('priya', this)" data-client="priya" href="#">
@@ -532,7 +536,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <div class="sn-name">Priya Kapoor</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ink-f)">58kg · Lean gain</div>
     </div>
-    <span class="sn-status warn" role="button" tabindex="0" onclick="cycleStatus('priya', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();cycleStatus('priya',this)}" aria-label="Client status: Review due">⚡ Review due</span>
+    <span class="sn-status warn" onclick="cycleStatus('priya', this)" aria-label="Client status">⚡ Review due</span>
   </a>
 </aside>
 
@@ -680,14 +684,14 @@ body.dark-mode .shortcuts-modal { background: #142420; }
       <!-- Calorie trend + exercise -->
       <div class="chart-row">
         <div class="chart-card">
-          <div class="cc-title">Calorie Intake — 7 Days</div>
+          <div class="cc-title">Calorie Intake — 30 Days</div>
           <div class="cc-sub">vs daily target</div>
           <div style="position:relative;height:160px"><canvas id="calorieTrendChart" aria-label="Client calorie intake trend chart" role="img"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="cc-title">Exercise Frequency</div>
           <div class="cc-sub">Workouts completed this week</div>
-          <div style="position:relative;height:160px"><canvas id="exerciseFreqChart" role="img" aria-label="Client weekly exercise activity chart showing calories burned per day"></canvas></div>
+          <div style="position:relative;height:160px"><canvas id="exerciseFreqChart"></canvas></div>
         </div>
       </div>
 
@@ -716,10 +720,10 @@ body.dark-mode .shortcuts-modal { background: #142420; }
         <div style="margin-bottom:10px">
           <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-f);margin-bottom:6px;letter-spacing:.05em">QUICK SUGGESTIONS</div>
           <div class="quick-tags">
-            <span class="qt" role="button" tabindex="0" onclick="fillMsg('Great progress this week! Keep it up 💪')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillMsg('Great progress this week! Keep it up 💪')}">✓ Great progress</span>
-            <span class="qt" role="button" tabindex="0" onclick="fillMsg('Please try to hit your protein target today — aim for at least 100g.')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillMsg('Please try to hit your protein target today — aim for at least 100g.')}">🥩 Protein reminder</span>
-            <span class="qt" role="button" tabindex="0" onclick="fillMsg('Reminder: we have a check-in scheduled. Let me know if you need to reschedule.')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillMsg('Reminder: we have a check-in scheduled. Let me know if you need to reschedule.')}">📅 Check-in reminder</span>
-            <span class="qt" role="button" tabindex="0" onclick="fillMsg('I have updated your meal plan — please check the Plan tab for the new recommendations.')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillMsg('I have updated your meal plan — please check the Plan tab for the new recommendations.')}">📋 Plan updated</span>
+            <span class="qt" onclick="fillMsg('Great progress this week! Keep it up 💪')">✓ Great progress</span>
+            <span class="qt" onclick="fillMsg('Please try to hit your protein target today — aim for at least 100g.')">🥩 Protein reminder</span>
+            <span class="qt" onclick="fillMsg('Reminder: we have a check-in scheduled. Let me know if you need to reschedule.')">📅 Check-in reminder</span>
+            <span class="qt" onclick="fillMsg('I have updated your meal plan — please check the Plan tab for the new recommendations.')">📋 Plan updated</span>
           </div>
         </div>
         <div class="chat-wrap" id="chatMessages"></div>
@@ -737,7 +741,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
         <div class="plan-block">
           <div class="pb-header">
             <div class="pb-title">🥗 Weekly Meal Plan</div>
-            <span class="pb-edit" role="button" tabindex="0" onclick="openEditPlan(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openEditPlan(this)}">Edit Plan</span>
+            <span class="pb-edit" onclick="openEditPlan(this)">Edit Plan</span>
           </div>
           <div id="mealPlanRows"></div>
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--fog)">
@@ -748,7 +752,7 @@ body.dark-mode .shortcuts-modal { background: #142420; }
         <div class="plan-block">
           <div class="pb-header">
             <div class="pb-title">🏋️ Training Schedule</div>
-            <span class="pb-edit" role="button" tabindex="0" onclick="openEditPlan(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openEditPlan(this)}">Edit Plan</span>
+            <span class="pb-edit" onclick="openEditPlan(this)">Edit Plan</span>
           </div>
           <div id="trainingPlanRows"></div>
           <div style="margin-top:14px;padding:12px;background:var(--teal-lll);border-radius:10px">
@@ -1075,9 +1079,9 @@ function renderMacros(c) {
 function renderCalorieTrend(c) {
   if (!c.calorie_trend || !c.calorie_trend.length) { if(calChart){calChart.destroy();calChart=null;} return; }
   if (calChart) calChart.destroy();
-  const labels = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(); d.setDate(d.getDate() - 6 + i);
-    return ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][d.getDay() === 0 ? 6 : d.getDay() - 1];
+  const labels = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - 29 + i);
+    return d.getDate() + '/' + (d.getMonth() + 1);
   });
   const ctx = document.getElementById('calorieTrendChart').getContext('2d');
   calChart = new Chart(ctx, {
@@ -1085,16 +1089,16 @@ function renderCalorieTrend(c) {
     data: {
       labels,
       datasets: [
-        { label: 'Kcal', data: c.calorie_trend, borderColor: '#1e6b5e', backgroundColor: 'rgba(30,107,94,0.07)', fill: true, tension: 0.3, pointRadius: 3, pointHoverRadius: 4, pointBackgroundColor: '#1e6b5e', borderWidth: 2 },
-        { label: 'Target', data: Array(7).fill(c.target_kcal), borderColor: '#b8621f', borderDash: [4, 3], borderWidth: 1.5, pointRadius: 0, fill: false }
+        { label: 'Kcal', data: c.calorie_trend, borderColor: '#1e6b5e', backgroundColor: 'rgba(30,107,94,0.07)', fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 3, borderWidth: 2 },
+        { label: 'Target', data: Array(30).fill(c.target_kcal), borderColor: '#b8621f', borderDash: [4, 3], borderWidth: 1.5, pointRadius: 0, fill: false }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0a1410', titleColor: 'rgba(255,255,255,0.5)', bodyColor: '#fff', titleFont: { family: "'JetBrains Mono',monospace", size: 9 }, bodyFont: { family: "'JetBrains Mono',monospace", size: 10 }, padding: 8, cornerRadius: 6 } },
       scales: {
-        x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 8 }, color: '#5a7267', maxTicksLimit: 7 } },
-        y: { grid: { color: '#dce6e0', lineWidth: 0.5 }, border: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 8 }, color: '#5a7267' } }
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 8 }, color: '#6b8878', maxTicksLimit: 7 } },
+        y: { grid: { color: '#dce6e0', lineWidth: 0.5 }, border: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 8 }, color: '#6b8878' } }
       }
     }
   });
@@ -1115,8 +1119,8 @@ function renderExerciseChart(c) {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0a1410', bodyFont: { family: "'JetBrains Mono',monospace", size: 10 }, padding: 8, cornerRadius: 6, callbacks: { label: ctx => ctx.parsed.y === 0 ? 'Rest day' : ctx.parsed.y + ' kcal burned' } } },
       scales: {
-        x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 9 }, color: '#5a7267' } },
-        y: { grid: { color: '#dce6e0', lineWidth: 0.5 }, border: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 8 }, color: '#5a7267' } }
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 9 }, color: '#6b8878' } },
+        y: { grid: { color: '#dce6e0', lineWidth: 0.5 }, border: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 8 }, color: '#6b8878' } }
       }
     }
   });
@@ -1268,7 +1272,7 @@ function openMailPanel() {
   const list = document.getElementById('mailList');
   list.innerHTML = Object.entries(mailMessages).map(([id, msgs]) => {
     const m = msgs[msgs.length - 1];
-    return `<div class="mail-msg ${m.unread ? 'unread' : ''}" role="button" tabindex="0" onclick="selectClientFromMail('${id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectClientFromMail('${id}')}" aria-label="Message from ${clientNames[id]}">
+    return `<div class="mail-msg ${m.unread ? 'unread' : ''}" onclick="selectClientFromMail('${id}')">
       <div class="mail-msg-avatar" style="background:${clientColors[id]}">${clientNames[id].split(' ').map(w=>w[0]).join('')}</div>
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -1364,11 +1368,11 @@ function toggleApptStatus(idx) {
 // Override renderAppointments to add toggle + delete
 function renderAppointments(c) {
   document.getElementById('apptList').innerHTML = (c.appointments||[]).map((a, i) =>
-    `<div class="appt-card" role="button" tabindex="0" onclick="toggleApptStatus(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleApptStatus(${i})}" aria-label="${a.type} appointment on ${a.date} at ${a.time}, ${a.status}">
+    `<div class="appt-card" onclick="toggleApptStatus(${i})">
       <div class="appt-time"><div class="at-hour">${a.time}</div><div class="at-label">${a.date}</div></div>
       <div class="appt-info"><div class="ai-name">${c.name}</div><div class="ai-type">${a.type}</div></div>
       <span class="appt-status ${a.status}">${a.status === 'confirmed' ? '✓ Confirmed' : '⏳ Pending'}</span>
-      <span tabindex="0" role="button" aria-label="Delete appointment" onclick="event.stopPropagation();deleteAppt(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.stopPropagation();event.preventDefault();deleteAppt(${i})}" style="font-size:11px;color:var(--ink-f);cursor:pointer;margin-left:6px;opacity:.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">✕</span>
+      <span tabindex="0" role="button" onclick="event.stopPropagation();deleteAppt(${i})" style="font-size:11px;color:var(--ink-f);cursor:pointer;margin-left:6px;opacity:.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">✕</span>
     </div>`).join('');
 
   document.getElementById('sessionHistory').innerHTML = (c.history||[]).map(h =>
@@ -1599,17 +1603,17 @@ function renderScoreRing(c) {
 </script>
 
 <!-- Mail Panel -->
-<div class="mail-panel" id="mailPanel" role="dialog" aria-modal="true" aria-label="Messages">
+<div class="mail-panel" id="mailPanel">
   <div class="mail-header">
     <div class="mail-header-title">Messages</div>
-    <button class="mail-close" onclick="closeMailPanel()" aria-label="Close Messages panel">✕</button>
+    <button class="mail-close" onclick="closeMailPanel()">✕</button>
   </div>
   <div style="flex:1;overflow-y:auto" id="mailList"></div>
 </div>
-<div id="mailDim" onclick="closeMailPanel()" style="display:none;position:fixed;inset:0;z-index:997" aria-hidden="true"></div>
+<div id="mailDim" onclick="closeMailPanel()" style="display:none;position:fixed;inset:0;z-index:997"></div>
 
 <!-- Appointment Modal -->
-<div id="apptModal" role="dialog" aria-modal="true" aria-label="Book Appointment" style="display:none;position:fixed;inset:0;background:rgba(10,20,16,0.4);z-index:2000;align-items:center;justify-content:center">
+<div id="apptModal" style="display:none;position:fixed;inset:0;background:rgba(10,20,16,0.4);z-index:2000;align-items:center;justify-content:center">
   <div style="background:var(--white);border-radius:18px;padding:28px;width:420px;box-shadow:0 24px 60px rgba(10,20,16,0.2)">
     <div style="font-family:'Instrument Serif',serif;font-size:20px;font-style:italic;color:var(--ink);margin-bottom:20px">Book Appointment</div>
     <div style="display:flex;flex-direction:column;gap:14px">
@@ -1641,7 +1645,7 @@ function renderScoreRing(c) {
 
 
 <!-- Toast -->
-<div id="proToast" role="status" aria-live="polite" aria-atomic="true" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;font-family:'Bricolage Grotesque',sans-serif"></div>
+<div id="proToast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;font-family:'Bricolage Grotesque',sans-serif"></div>
 
 <!-- ── Pro Settings Overlays ─────────────────────────────────────────────── -->
 <div id="proSettingsOverlay" style="display:none;position:fixed;inset:0;background:var(--paper);z-index:1500;overflow-y:auto">
@@ -2090,21 +2094,52 @@ function renderProCommunity() {
 
 function renderProDevLog() {
   var entries = [
-    { date: "2026-04-28", tag: "Feature",     tagColor: "#1e6b5e", tagBg: "var(--teal-lll)", title: "Real-time Data Sync",            body: "Expert dashboard now displays live client data — weight, BMI, macro distribution, and exercise activity — synced directly from subscriber profiles in real time." },
-    { date: "2026-04-25", tag: "Feature",     tagColor: "#1e6b5e", tagBg: "var(--teal-lll)", title: "Export & Reporting",             body: "Subscribers can now export a weekly CSV report containing full nutrition breakdown (calories, protein, carbs, fat, sugar) and exercise logs to track progress offline." },
-    { date: "2026-04-22", tag: "Improvement", tagColor: "#b8621f", tagBg: "var(--amber-ll)", title: "Guided Tour System",             body: "Introduced interactive guided tours for both subscriber and professional dashboards featuring spotlight highlights, smart tooltip positioning, and step-by-step walkthroughs." },
-    { date: "2026-04-18", tag: "Feature",     tagColor: "#1e6b5e", tagBg: "var(--teal-lll)", title: "Recipe Compare & Meal Planner",  body: "Launched a side-by-side recipe nutrition comparison tool and a drag-and-drop weekly meal planner to help subscribers plan balanced, nutritious meals." },
-    { date: "2026-04-14", tag: "Feature",     tagColor: "#1e6b5e", tagBg: "var(--teal-lll)", title: "Professional Dashboard Launch",  body: "Released the expert dashboard enabling nutritionists to monitor client progress, exchange messages, manage fitness plans, and schedule appointments — all in one place." }
+    {
+      date: '2026-04-28',
+      tag: 'Feature',
+      tagColor: '#1e6b5e',
+      title: 'Real-time Data Sync',
+      body: 'Expert dashboard now displays live client data — weight, BMI, macro distribution, and exercise activity — synced directly from subscriber profiles in real time. Resolved race condition where DOMContentLoaded handler was overwriting diary API results.'
+    },
+    {
+      date: '2026-04-25',
+      tag: 'Feature',
+      tagColor: '#1e6b5e',
+      title: 'Export & Reporting',
+      body: 'Subscribers can now export a weekly CSV report containing full nutrition breakdown (calories, protein, carbs, fat, sugar) and exercise logs to track progress offline.'
+    },
+    {
+      date: '2026-04-22',
+      tag: 'Improvement',
+      tagColor: '#0369a1',
+      title: 'Guided Tour System',
+      body: 'Introduced interactive guided tours for both subscriber and professional dashboards featuring spotlight highlights, smart tooltip positioning, and step-by-step walkthroughs. Tours now remember per-user completion state.'
+    },
+    {
+      date: '2026-04-18',
+      tag: 'Feature',
+      tagColor: '#1e6b5e',
+      title: 'Recipe Compare & Meal Planner',
+      body: 'Launched a side-by-side recipe nutrition comparison tool supporting up to four recipes, and a drag-and-drop weekly meal planner to help subscribers plan balanced, nutritious meals.'
+    },
+    {
+      date: '2026-04-14',
+      tag: 'Feature',
+      tagColor: '#1e6b5e',
+      title: 'Professional Dashboard Launch',
+      body: 'Released the expert dashboard enabling nutritionists to monitor client progress, exchange messages, manage fitness plans, and schedule appointments — all in one place. Includes real-time WebSocket notifications.'
+    }
   ];
-  var html = '<div style="display:flex;flex-direction:column;gap:16px">';
+
+  var html = '<div style="display:flex;flex-direction:column;gap:16px;padding:4px 0">';
   entries.forEach(function(e) {
-    html += '<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(10,20,16,0.04)">'
-      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
-      + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.04em">' + e.date + '</span>'
-      + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;padding:2px 8px;border-radius:6px;background:' + e.tagBg + ';color:' + e.tagColor + ';font-weight:600">' + e.tag + '</span>'
+    html += '<div style="background:var(--white);border:1px solid rgba(124,58,237,0.15);border-radius:14px;padding:20px 24px;">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
+      + '<span style="background:' + e.tagColor + ';color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em">' + e.tag + '</span>'
+      + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--ink-f)">' + e.date + '</span>'
       + '</div>'
-      + '<div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px">' + e.title + '</div>'
-      + '<div style="font-size:13px;color:var(--ink-m);line-height:1.6">' + e.body + '</div>'
+      + '<div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px">' + e.title + '</div>'
+      + '<div style="font-size:13px;color:var(--ink-f);line-height:1.6">' + e.body + '</div>'
       + '</div>';
   });
   html += '</div>';
@@ -2473,46 +2508,29 @@ document.addEventListener('DOMContentLoaded', function() {
         var ini = (ac.name||'').split(' ').map(function(w){return (w[0]||'').toUpperCase();}).join('').substring(0,2) || '??';
         var color = colors[idx % colors.length];
         if (typeof clients !== 'undefined') {
-          if (!clients[clientKey]) {
-            // First time seeing this client — create the full object
-            clients[clientKey] = {
-              name: ac.name || 'Client',
-              initials: ini,
-              color: color,
-              weight: ac.weight || null,
-              height: ac.height || null,
-              age: ac.age || null,
+          clients[clientKey] = {
+            name: ac.name || 'Client',
+            initials: ini,
+            color: color,
+            weight: ac.weight || null,
+            height: ac.height || null,
+            age: ac.age || null,
+            goal: ac.goal || 'General',
+            target_kcal: ac.targetKcal || null,
+            target_protein: 50,
+            stats: {
               goal: ac.goal || 'General',
-              target_kcal: ac.targetKcal || null,
-              target_protein: 50,
-              stats: {
-                goal: ac.goal || 'General',
-                avg_kcal: 0,
-                protein: 0,
-                exercise_days: 0,
-                streak: 0,
-                status: (ac.stats && ac.stats.status) || 'New'
-              },
-              calorie_trend: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-              messages: [],
-              appointments: [],
-              _apiId: String(ac.userId)
-            };
-          } else {
-            // Object already exists (patch may have loaded diary data into it).
-            // Merge only non-computed identity fields — never reset stats to 0.
-            var _ex = clients[clientKey];
-            if (ac.name) _ex.name = ac.name;
-            _ex.initials = ini;
-            if (!_ex.color) _ex.color = color;
-            if (!_ex._apiId) _ex._apiId = String(ac.userId);
-            if (ac.weight && !_ex.weight) _ex.weight = ac.weight;
-            if (ac.height && !_ex.height) _ex.height = ac.height;
-            if (ac.age    && !_ex.age)    _ex.age    = ac.age;
-            if (ac.goal)  { _ex.goal = ac.goal; if (_ex.stats) _ex.stats.goal = ac.goal; }
-            if (ac.targetKcal) _ex.target_kcal = ac.targetKcal;
-            if (ac.stats && ac.stats.status && _ex.stats) _ex.stats.status = ac.stats.status;
-          }
+              avg_kcal: 0,
+              protein: 0,
+              exercise_days: 0,
+              streak: 0,
+              status: (ac.stats && ac.stats.status) || 'New'
+            },
+            calorie_trend: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            messages: [],
+            appointments: [],
+            _apiId: String(ac.userId)
+          };
         }
         if (existing[clientKey]) return;
         var newItem = document.createElement('a');

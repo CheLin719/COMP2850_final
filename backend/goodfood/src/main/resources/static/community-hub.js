@@ -413,23 +413,55 @@
     else if (activeTab === 'devlog') el.innerHTML = renderDevLog();
   }
 
+  // ── Render: Dev Log ────────────────────────────────────────────
   function renderDevLog() {
     var entries = [
-      { date: '2026-04-28', tag: 'Feature',     tagColor: '#1e6b5e', tagBg: 'var(--teal-lll)', title: 'Real-time Data Sync',            body: 'Expert dashboard now displays live client data — weight, BMI, macro distribution, and exercise activity — synced directly from subscriber profiles in real time.' },
-      { date: '2026-04-25', tag: 'Feature',     tagColor: '#1e6b5e', tagBg: 'var(--teal-lll)', title: 'Export & Reporting',             body: 'Subscribers can now export a weekly CSV report containing full nutrition breakdown (calories, protein, carbs, fat, sugar) and exercise logs to track progress offline.' },
-      { date: '2026-04-22', tag: 'Improvement', tagColor: '#b8621f', tagBg: 'var(--amber-ll)', title: 'Guided Tour System',             body: 'Introduced interactive guided tours for both subscriber and professional dashboards featuring spotlight highlights, smart tooltip positioning, and step-by-step walkthroughs.' },
-      { date: '2026-04-18', tag: 'Feature',     tagColor: '#1e6b5e', tagBg: 'var(--teal-lll)', title: 'Recipe Compare & Meal Planner',  body: 'Launched a side-by-side recipe nutrition comparison tool and a drag-and-drop weekly meal planner to help subscribers plan balanced, nutritious meals.' },
-      { date: '2026-04-14', tag: 'Feature',     tagColor: '#1e6b5e', tagBg: 'var(--teal-lll)', title: 'Professional Dashboard Launch',  body: 'Released the expert dashboard enabling nutritionists to monitor client progress, exchange messages, manage fitness plans, and schedule appointments — all in one place.' }
+      {
+        date: '2026-04-28',
+        tag: 'Feature',
+        tagColor: '#1e6b5e',
+        title: 'Real-time Data Sync',
+        body: 'Expert dashboard now displays live client data — weight, BMI, macro distribution, and exercise activity — synced directly from subscriber profiles in real time. Resolved race condition where DOMContentLoaded handler was overwriting diary API results.'
+      },
+      {
+        date: '2026-04-25',
+        tag: 'Feature',
+        tagColor: '#1e6b5e',
+        title: 'Export & Reporting',
+        body: 'Subscribers can now export a weekly CSV report containing full nutrition breakdown (calories, protein, carbs, fat, sugar) and exercise logs to track progress offline.'
+      },
+      {
+        date: '2026-04-22',
+        tag: 'Improvement',
+        tagColor: '#0369a1',
+        title: 'Guided Tour System',
+        body: 'Introduced interactive guided tours for both subscriber and professional dashboards featuring spotlight highlights, smart tooltip positioning, and step-by-step walkthroughs. Tours now remember per-user completion state.'
+      },
+      {
+        date: '2026-04-18',
+        tag: 'Feature',
+        tagColor: '#1e6b5e',
+        title: 'Recipe Compare & Meal Planner',
+        body: 'Launched a side-by-side recipe nutrition comparison tool supporting up to four recipes, and a drag-and-drop weekly meal planner to help subscribers plan balanced, nutritious meals.'
+      },
+      {
+        date: '2026-04-14',
+        tag: 'Feature',
+        tagColor: '#1e6b5e',
+        title: 'Professional Dashboard Launch',
+        body: 'Released the expert dashboard enabling nutritionists to monitor client progress, exchange messages, manage fitness plans, and schedule appointments — all in one place. Includes real-time WebSocket notifications.'
+      }
     ];
-    var html = '<div style="display:flex;flex-direction:column;gap:16px">';
-    entries.forEach(function (e) {
-      html += '<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(10,20,16,0.04)">'
-        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
-        + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--ink-f);letter-spacing:.04em">' + e.date + '</span>'
-        + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;padding:2px 8px;border-radius:6px;background:' + e.tagBg + ';color:' + e.tagColor + ';font-weight:600">' + e.tag + '</span>'
+
+    var html = '<div style="display:flex;flex-direction:column;gap:16px;padding:4px 0">';
+    entries.forEach(function(e) {
+      html += '<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px 24px;">'
+        + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
+        + '<span style="background:' + e.tagColor + ';color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em">' + e.tag + '</span>'
+        + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--ink-f)">' + e.date + '</span>'
         + '</div>'
-        + '<div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px">' + e.title + '</div>'
-        + '<div style="font-size:13px;color:var(--ink-m);line-height:1.6">' + e.body + '</div>'
+        + '<div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px">' + e.title + '</div>'
+        + '<div style="font-size:13px;color:var(--ink-f);line-height:1.6">' + e.body + '</div>'
         + '</div>';
     });
     html += '</div>';
