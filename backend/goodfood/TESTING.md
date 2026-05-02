@@ -7,8 +7,6 @@ This backend uses automated tests to verify authentication, security, validation
 ```bash
 cd backend/goodfood
 ./gradlew clean test jacocoTestReport
-[200~Test coverage
-
 JaCoCo was added to provide quantitative coverage evidence.
 
 Final backend coverage:
