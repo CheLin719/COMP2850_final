@@ -35,10 +35,10 @@ JaCoCo was added to provide quantitative coverage evidence.
 
 Final backend coverage:
 
-- Line coverage: 64.82%
-- Branch coverage: 29.49%
-- Method coverage: 59.13%
-- Class coverage: 74.40%
+- Line coverage: 74.88%
+- Branch coverage: 39.10%
+- Method coverage: 70.37%
+- Class coverage: 79.20%
 
 The nutrition package improved to 53.86% line coverage after adding controller tests.
 
