@@ -27,3 +27,6 @@ replay_pid*
 .kotlin/.claude/
 .vscode/
 .devcontainer/
+
+backend/goodfood/.gradle-user-home/
+backend/goodfood/data/goodfooddb-local.mv.db
