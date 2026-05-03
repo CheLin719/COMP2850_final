@@ -80,8 +80,8 @@ test.describe('NourishWell index page front-end tests', () => {
           userId: 1,
           token: 'test-token',
           role: 'subscriber',
-          firstName: 'Mingyuan',
-          lastName: 'Xing'
+          firstName: 'Tengchuan',
+          lastName: 'Jiang'
         })
       })
     })
@@ -105,7 +105,7 @@ test.describe('NourishWell index page front-end tests', () => {
     expect(storage.token).toBe('test-token')
     expect(storage.userId).toBe('1')
     expect(storage.role).toBe('subscriber')
-    expect(storage.name).toBe('Mingyuan Xing')
+    expect(storage.name).toBe('Tengchuan Jiang')
   })
 
   test('login should show error when API returns 401', async ({ page }) => {
@@ -154,8 +154,8 @@ test.describe('NourishWell index page front-end tests', () => {
   test('register form should reject weak password', async ({ page }) => {
     await page.locator('.nav-btn-fill').click()
 
-    await page.locator('#reg-first').fill('Mingyuan')
-    await page.locator('#reg-last').fill('Xing')
+    await page.locator('#reg-first').fill('Tengchuan')
+    await page.locator('#reg-last').fill('Jiang')
     await page.locator('#reg-email').fill('mingyuan@example.com')
     await page.locator('#reg-password').fill('password')
     await page.locator('#register-btn').click()
@@ -180,9 +180,9 @@ test.describe('NourishWell index page front-end tests', () => {
     await page.locator('.nav-btn-fill').click()
     await page.locator('#role-pro').click()
 
-    await page.locator('#reg-first').fill('Mingyuan')
-    await page.locator('#reg-last').fill('Xing')
-    await page.locator('#reg-email').fill('mingyuan@example.com')
+    await page.locator('#reg-first').fill('Tengchuan')
+    await page.locator('#reg-last').fill('Jiang')
+    await page.locator('#reg-email').fill('Tengchuan@example.com')
     await page.locator('#reg-password').fill('Password123!')
     await page.locator('#register-btn').click()
 
@@ -199,17 +199,17 @@ test.describe('NourishWell index page front-end tests', () => {
           userId: 2,
           token: 'register-token',
           role: 'subscriber',
-          firstName: 'Mingyuan',
-          lastName: 'Xing'
+          firstName: 'Tengchuan',
+          lastName: 'Jiang'
         })
       })
     })
 
     await page.locator('.nav-btn-fill').click()
 
-    await page.locator('#reg-first').fill('Mingyuan')
-    await page.locator('#reg-last').fill('Xing')
-    await page.locator('#reg-email').fill('mingyuan@example.com')
+    await page.locator('#reg-first').fill('Tengchuan')
+    await page.locator('#reg-last').fill('Jiang')
+    await page.locator('#reg-email').fill('tengchuan@example.com')
     await page.locator('#reg-password').fill('Password123!')
     await page.locator('#register-btn').click()
 
@@ -227,7 +227,7 @@ test.describe('NourishWell index page front-end tests', () => {
     expect(storage.token).toBe('register-token')
     expect(storage.userId).toBe('2')
     expect(storage.role).toBe('subscriber')
-    expect(storage.name).toBe('Mingyuan Xing')
+    expect(storage.name).toBe('Tengchuan Jiang')
   })
 
   test('register should show email error when API returns 409', async ({ page }) => {
@@ -243,8 +243,8 @@ test.describe('NourishWell index page front-end tests', () => {
 
     await page.locator('.nav-btn-fill').click()
 
-    await page.locator('#reg-first').fill('Mingyuan')
-    await page.locator('#reg-last').fill('Xing')
+    await page.locator('#reg-first').fill('Tengchuan')
+    await page.locator('#reg-last').fill('Jiang')
     await page.locator('#reg-email').fill('used@example.com')
     await page.locator('#reg-password').fill('Password123!')
     await page.locator('#register-btn').click()

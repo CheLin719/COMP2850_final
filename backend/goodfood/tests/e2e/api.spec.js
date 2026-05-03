@@ -101,8 +101,8 @@ test.describe('NourishWell API client tests', () => {
           userId: 1,
           token: 'login-token',
           role: 'subscriber',
-          firstName: 'Mingyuan',
-          lastName: 'Xing'
+          firstName: 'Tengchuan',
+          lastName: 'Jiang'
         })
       })
     })
@@ -122,7 +122,7 @@ test.describe('NourishWell API client tests', () => {
     expect(storage.token).toBe('login-token')
     expect(storage.userId).toBe('1')
     expect(storage.role).toBe('subscriber')
-    expect(storage.name).toBe('Mingyuan Xing')
+    expect(storage.name).toBe('Tengchuan Jiang')
   })
 
   test('register should call API and save returned data', async ({ page }) => {
