@@ -11,3 +11,16 @@ class GoodfoodApplicationTests {
 	}
 
 }
+
+@SpringBootTest(
+    properties = [
+        "jwt.secret=test-secret-key-for-ci-only-please-change-in-production-123456789",
+        "jwt.expiration=3600000"
+    ]
+)
+class GoodfoodApplicationTests {
+
+    @Test
+    fun contextLoads() {
+    }
+}
