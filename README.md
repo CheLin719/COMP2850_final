@@ -51,5 +51,5 @@ GitHub was used for version control, code review and project documentation. The 
 The application can be run locally with:
 
 ```bash
-cd backend/goodfood
+cd /workspaces/COMP2850_final/backend/goodfood
 ./gradlew bootRun
