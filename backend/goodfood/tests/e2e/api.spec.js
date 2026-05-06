@@ -22,8 +22,8 @@ test.describe('NourishWell API client tests', () => {
         token: 'test-token',
         userId: 1,
         role: 'subscriber',
-        firstName: 'Mingyuan',
-        lastName: 'Xing'
+        firstName: 'Tengchuan',
+        lastName: 'Jiang'
       })
     })
 
@@ -37,7 +37,7 @@ test.describe('NourishWell API client tests', () => {
     expect(result.token).toBe('test-token')
     expect(result.userId).toBe('1')
     expect(result.role).toBe('subscriber')
-    expect(result.name).toBe('Mingyuan Xing')
+    expect(result.name).toBe('Tengchuan Jiang')
   })
 
   test('auth clear should remove user data', async ({ page }) => {
@@ -101,14 +101,14 @@ test.describe('NourishWell API client tests', () => {
           userId: 1,
           token: 'login-token',
           role: 'subscriber',
-          firstName: 'Mingyuan',
-          lastName: 'Xing'
+          firstName: 'Tengchuan',
+          lastName: 'Jiang'
         })
       })
     })
 
     const result = await page.evaluate(async () => {
-      return await window.NW.login('mingyuan@example.com', 'Password123!')
+      return await window.NW.login('Tengchuan@example.com', 'Password123!')
     })
 
     const storage = await page.evaluate(() => ({
@@ -122,7 +122,7 @@ test.describe('NourishWell API client tests', () => {
     expect(storage.token).toBe('login-token')
     expect(storage.userId).toBe('1')
     expect(storage.role).toBe('subscriber')
-    expect(storage.name).toBe('Mingyuan Xing')
+    expect(storage.name).toBe('Tengchuan Jiang')
   })
 
   test('register should call API and save returned data', async ({ page }) => {
