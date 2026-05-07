@@ -1,7 +1,6 @@
 // 测试 api.js 里的 NW 对象和 API 封装
 // Test the NW object and API encapsulation within api.js
 
-
 const { test, expect } = require('@playwright/test')
 
 test.describe('NourishWell API client tests', () => {
@@ -78,6 +77,15 @@ test.describe('NourishWell API client tests', () => {
     expect(result).toBe(true)
   })
 
+  test('isLoggedIn should return false when no token', async ({ page }) => {
+    const result = await page.evaluate(() => {
+      sessionStorage.clear()
+      return window.NW.auth.isLoggedIn()
+    })
+
+    expect(result).toBe(false)
+  })
+
   test('isPro should return true for professional role', async ({ page }) => {
     const result = await page.evaluate(() => {
       window.NW.auth.save({
@@ -92,6 +100,20 @@ test.describe('NourishWell API client tests', () => {
     expect(result).toBe(true)
   })
 
+  test('isPro should return false for subscriber role', async ({ page }) => {
+    const result = await page.evaluate(() => {
+      window.NW.auth.save({
+        token: 'abc123',
+        userId: 1,
+        role: 'subscriber'
+      })
+
+      return window.NW.auth.isPro()
+    })
+
+    expect(result).toBe(false)
+  })
+
   test('login should call API and save returned data', async ({ page }) => {
     await page.route('**/api/auth/login', async route => {
       await route.fulfill({
@@ -101,8 +123,8 @@ test.describe('NourishWell API client tests', () => {
           userId: 1,
           token: 'login-token',
           role: 'subscriber',
-          firstName: 'Mingyuan',
-          lastName: 'Xing'
+          firstName: 'Tengchuan',
+          lastName: 'Jiang'
         })
       })
     })
@@ -122,7 +144,7 @@ test.describe('NourishWell API client tests', () => {
     expect(storage.token).toBe('login-token')
     expect(storage.userId).toBe('1')
     expect(storage.role).toBe('subscriber')
-    expect(storage.name).toBe('Mingyuan Xing')
+    expect(storage.name).toBe('Tengchuan Jiang')
   })
 
   test('register should call API and save returned data', async ({ page }) => {
@@ -192,6 +214,39 @@ test.describe('NourishWell API client tests', () => {
     expect(result.status).toBe(401)
   })
 
+  test('register should throw error when email already exists (409)', async ({ page }) => {
+    await page.route('**/api/auth/register', async route => {
+      await route.fulfill({
+        status: 409,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          message: 'Email already in use'
+        })
+      })
+    })
+
+    const result = await page.evaluate(async () => {
+      try {
+        await window.NW.register(
+          'Existing',
+          'User',
+          'existing@example.com',
+          'Password123!',
+          'subscriber',
+          ''
+        )
+        return 'success'
+      } catch (err) {
+        return {
+          message: err.message,
+          status: err.status
+        }
+      }
+    })
+
+    expect(result.status).toBe(409)
+  })
+
   test('diary get should send authorization token', async ({ page }) => {
     await page.evaluate(() => {
       window.NW.auth.save({
@@ -234,6 +289,111 @@ test.describe('NourishWell API client tests', () => {
     expect(result.meals[0].foodName).toBe('Oats')
   })
 
+  test('diary add should POST meal with authorization token', async ({ page }) => {
+    await page.evaluate(() => {
+      window.NW.auth.save({
+        token: 'test-token',
+        userId: 1,
+        role: 'subscriber'
+      })
+    })
+
+    let capturedBody = null
+
+    await page.route('**/api/diary', async route => {
+      const headers = route.request().headers()
+      capturedBody = JSON.parse(route.request().postData())
+
+      expect(headers.authorization).toBe('Bearer test-token')
+      expect(route.request().method()).toBe('POST')
+
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ id: 99, ...capturedBody })
+      })
+    })
+
+    const result = await page.evaluate(async () => {
+      return await window.NW.diary.add({
+        date: '2026-04-20',
+        mealType: 'LUNCH',
+        foodName: 'Chicken Salad',
+        kcal: 400,
+        protein: 35,
+        carbs: 20,
+        fat: 10,
+        sugar: 3
+      })
+    })
+
+    expect(result.id).toBe(99)
+    expect(capturedBody.foodName).toBe('Chicken Salad')
+    expect(capturedBody.mealType).toBe('LUNCH')
+  })
+
+  test('diary delete should send DELETE request with authorization token', async ({ page }) => {
+    await page.evaluate(() => {
+      window.NW.auth.save({
+        token: 'test-token',
+        userId: 1,
+        role: 'subscriber'
+      })
+    })
+
+    await page.route('**/api/diary/42', async route => {
+      const headers = route.request().headers()
+
+      expect(headers.authorization).toBe('Bearer test-token')
+      expect(route.request().method()).toBe('DELETE')
+
+      await route.fulfill({
+        status: 204,
+        body: ''
+      })
+    })
+
+    const result = await page.evaluate(async () => {
+      try {
+        await window.NW.diary.delete(42)
+        return 'success'
+      } catch (err) {
+        return 'error'
+      }
+    })
+
+    expect(result).toBe('success')
+  })
+
+  test('diary get should throw error when server returns 500', async ({ page }) => {
+    await page.evaluate(() => {
+      window.NW.auth.save({
+        token: 'test-token',
+        userId: 1,
+        role: 'subscriber'
+      })
+    })
+
+    await page.route('**/api/diary?date=2026-04-21', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Internal server error' })
+      })
+    })
+
+    const result = await page.evaluate(async () => {
+      try {
+        await window.NW.diary.get('2026-04-21')
+        return 'success'
+      } catch (err) {
+        return { status: err.status }
+      }
+    })
+
+    expect(result.status).toBe(500)
+  })
+
   test('parseDiaryToMealLog should convert API meal data', async ({ page }) => {
     const result = await page.evaluate(() => {
       return window.NW.parseDiaryToMealLog([
@@ -266,6 +426,16 @@ test.describe('NourishWell API client tests', () => {
     expect(result.dinner[0].name).toBe('Salmon Rice Bowl')
   })
 
+  test('parseDiaryToMealLog should return empty meal groups for empty input', async ({ page }) => {
+    const result = await page.evaluate(() => {
+      return window.NW.parseDiaryToMealLog([])
+    })
+
+    expect(result.breakfast.length).toBe(0)
+    expect(result.lunch.length).toBe(0)
+    expect(result.dinner.length).toBe(0)
+  })
+
   test('parseRecipes should convert API recipes into front-end format', async ({ page }) => {
     const result = await page.evaluate(() => {
       return window.NW.parseRecipes([
@@ -292,5 +462,51 @@ test.describe('NourishWell API client tests', () => {
     expect(result['10'].cost).toBe('£2.50')
     expect(result['10'].rating).toBe('★★★★☆')
     expect(result['10'].commentCount).toBe(3)
+  })
+
+  test('parseRecipes should show all empty stars when averageRating is 0', async ({ page }) => {
+    const result = await page.evaluate(() => {
+      return window.NW.parseRecipes([
+        {
+          id: 20,
+          name: 'Plain Rice',
+          emoji: '🍚',
+          tag: 'Lunch',
+          kcal: 200,
+          cost: '0.50',
+          timeMin: 15,
+          ingredients: ['Rice'],
+          steps: ['Boil rice'],
+          averageRating: 0,
+          ratingCount: 0,
+          commentCount: 0
+        }
+      ])
+    })
+
+    expect(result['20'].rating).toBe('☆☆☆☆☆')
+  })
+
+  test('parseRecipes should show all filled stars when averageRating is 5', async ({ page }) => {
+    const result = await page.evaluate(() => {
+      return window.NW.parseRecipes([
+        {
+          id: 30,
+          name: 'Perfect Pasta',
+          emoji: '🍝',
+          tag: 'Dinner',
+          kcal: 550,
+          cost: '3.20',
+          timeMin: 25,
+          ingredients: ['Pasta', 'Sauce'],
+          steps: ['Boil pasta', 'Add sauce'],
+          averageRating: 5,
+          ratingCount: 50,
+          commentCount: 10
+        }
+      ])
+    })
+
+    expect(result['30'].rating).toBe('★★★★★')
   })
 })
