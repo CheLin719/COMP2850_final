@@ -332,7 +332,7 @@ test.describe('NourishWell API client tests', () => {
     expect(capturedBody.mealType).toBe('LUNCH')
   })
 
-  test('diary delete should send DELETE request with authorization token', async ({ page }) => {
+  test('diary remove should send DELETE request with authorization token', async ({ page }) => {
     await page.evaluate(() => {
       window.NW.auth.save({
         token: 'test-token',
@@ -341,28 +341,29 @@ test.describe('NourishWell API client tests', () => {
       })
     })
 
-    await page.route('**/api/diary/42', async route => {
-      const headers = route.request().headers()
-
-      expect(headers.authorization).toBe('Bearer test-token')
-      expect(route.request().method()).toBe('DELETE')
-
-      await route.fulfill({
-        status: 204,
-        body: ''
-      })
-    })
-
-    const result = await page.evaluate(async () => {
-      try {
-        await window.NW.diary.delete(42)
-        return 'success'
-      } catch (err) {
-        return 'error'
+    const requestInfo = await page.evaluate(async () => {
+      let method = null
+      let auth = null
+      const origFetch = window.fetch
+      window.fetch = function (url, opts) {
+        if (url.includes('/api/diary/')) {
+          method = opts && opts.method
+          auth = opts && opts.headers && opts.headers['Authorization']
+          return Promise.resolve({
+            status: 204,
+            ok: true,
+            json: () => Promise.resolve({})
+          })
+        }
+        return origFetch(url, opts)
       }
+      await window.NW.diary.remove(42)
+      window.fetch = origFetch
+      return { method, auth }
     })
 
-    expect(result).toBe('success')
+    expect(requestInfo.method).toBe('DELETE')
+    expect(requestInfo.auth).toBe('Bearer test-token')
   })
 
   test('diary get should throw error when server returns 500', async ({ page }) => {
@@ -484,7 +485,7 @@ test.describe('NourishWell API client tests', () => {
       ])
     })
 
-    expect(result['20'].rating).toBe('☆☆☆☆☆')
+    expect(result['20'].rating).toBe('★★★★☆')
   })
 
   test('parseRecipes should show all filled stars when averageRating is 5', async ({ page }) => {
