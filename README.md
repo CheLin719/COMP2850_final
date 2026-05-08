@@ -1,55 +1,247 @@
-# NourishWell Wiki
+# NourishWell - Healthy Eating Web Application
 
-## Overview
+**COMP2850 Software Engineering Group Project**  
+**University of Leeds, School of Computing**  
+**Submission Date:** 8 May 2026
 
-NourishWell is a web-based healthy eating application developed for the COMP2850 Software Engineering group project. The system is designed to help users record meals, understand calorie intake, search for healthy recipes, and receive useful food or meal suggestions.
-
-The project is not only a simple calorie calculator. It is designed as a more complete healthy eating tool. A normal subscriber can use the system to track daily meals, view nutrition information, search for recipes, and manage personal health-related goals. A professional user can support clients through plans, messages, appointments, progress monitoring, and other professional tools.
-
-This Wiki records the main documentation for the project, including planning work, user research, design decisions, meeting notes, testing strategy, diagrams, and development requirements.
-
+---
 
 ## Team Members
 
-Our team has four members:
+- **Che Lin** - Frontend development, documentation, design, and project coordination，Wiki uploads
+- **Tengchuan Jiang** - Frontend testing, Wiki uploads
+- **Chin Pang Chan** - Backend development，Backend Testing
+- **Baiyi He** - Backend development
 
-- Che Lin
-- Tengchuan Jiang
-- Chin Pang Chan
-- Baiyi He
+---
 
-In practice, the work was divided into front-end and back-end areas. Two members mainly focused on the user-facing pages, layout, interface design, and front-end behaviour, while the other two mainly worked on the back-end logic, database, and API development.
+## Project Overview
 
-Although the responsibilities were divided, the two sides still needed to stay connected. The front-end pages depended on the data and API routes provided by the back-end, while the back-end functions needed to support the user journeys shown in the interface.
+NourishWell is a web-based healthy eating application designed to help users:
+- Record daily meals and track nutrition intake
+- Search for healthy recipes and save favourites
+- Plan weekly meals and exercise routines
+- Connect with professional nutritionists for personalized advice
+- Participate in a community forum for peer support
+
+The system supports two user types:
+1. **Subscribers** - Track meals, discover recipes, and manage health goals
+2. **Professionals** - Monitor clients, provide advice, and manage appointments
+
+---
+
+## Technologies
+
+**Frontend:**
+- HTML, CSS, JavaScript
+- Chart.js for data visualization
+
+**Backend:**
+- Kotlin with Spring Boot
+- H2 Database (development)
+- JWT authentication with BCrypt password hashing
+
+**Development Tools:**
+- GitHub for version control
+- GitHub Codespaces for development environment
+- GitHub Actions for CI/CD
+
+---
+
+## Running Instructions
+
+### Prerequisites
+
+- **Java 17 or higher** (for backend)
+- **Python 3** (for frontend local server, optional)
+- **Git** (to clone the repository)
+
+### Option 1: Running on GitHub Codespaces (Recommended)
+
+1. Open the repository in GitHub Codespaces
+2. The environment will automatically configure
+
+**Start the backend:**
+```bash
+cd backend/goodfood
+./gradlew bootRun
+```
+
+The backend API will be available at: `http://localhost:8080`
+
+**Start the frontend:**
+```bash
+cd frontend
+python3 -m http.server 3000
+```
+
+The frontend will be available at: `http://localhost:3000`
+
+---
+
+### Option 2: Running Locally
+
+**Clone the repository:**
+```bash
+git clone https://github.com/yoen-dev/COMP2850_final.git
+cd COMP2850_final
+```
+
+**Start the backend:**
+```bash
+cd backend/goodfood
+./gradlew bootRun
+```
+
+**Start the frontend:**
+
+Open `frontend/index.html` in a web browser, or run a local server:
+
+```bash
+cd frontend
+python3 -m http.server 3000
+```
+
+Then open: `http://localhost:3000`
+
+---
+
+## Demo Accounts
+
+**Subscriber Account:**
+- Email: `alice@example.com`
+- Password: `Abcdef1!`
+
+**Professional Account:**
+- Email: `dr.rivera@example.com`
+- Password: `Abcdef1!`
+
+---
 
 ## Main Features
 
-The main features of NourishWell include:
-
-- Landing page introducing the system
-- User login and registration
-- Subscriber and professional role selection
+### Core Features
+- Landing page with system introduction
+- User registration and login (Subscriber/Professional roles)
 - Food diary and meal logging
 - Calorie and nutrition tracking
-- Recipe browsing and searching
-- Recipe favourites, ratings and comments
+- Recipe browsing, search, and favourites
 - Exercise tracking
-- Meal and exercise plan management
+- Weekly meal and exercise plan management
+
+### Professional Features
 - Professional dashboard for client monitoring
-- Messages and notifications
-- Appointment-related features
-- Dark mode and accessibility-related improvements
+- Client health analytics with charts
+- Messaging system between professionals and clients
+- Appointment management
+- Fitness plan creation for clients
 
-These features were chosen because they support the main user journeys identified during the early planning stage.
+### Extended Features
+- Community Hub with feed, Q&A, and professional directory
+- Subscriber-professional binding system
+- CSV data export for diary tracking
+- Developer changelog (Dev Log)
+- Dark mode support
+- WCAG 2.1 AA accessibility compliance
 
-## Repository and Technologies
+---
 
-The project uses HTML, CSS and JavaScript for the front-end interface. Kotlin and Spring Boot are used for the back-end server and API routes. H2 is used as the development database. Chart.js is used for chart-based visual summaries, and authentication is supported using JWT and BCrypt.
+## Project Structure
 
-GitHub was used for version control, code review and project documentation. The Wiki stores planning and design documentation, while the GitHub Project Board was used to track user stories, tasks, issues and bugs during development.
+```
+COMP2850_final/
+├── frontend/
+│   ├── index.html              # Landing page and authentication
+│   ├── dashboard.html          # Subscriber dashboard
+│   ├── pro_dashboard.html      # Professional dashboard
+│   ├── styles/
+│   │   └── main.css
+│   └── scripts/
+│       └── main.js
+├── backend/
+│   └── goodfood/
+│       ├── src/
+│       │   ├── main/
+│       │   │   ├── kotlin/
+│       │   │   │   └── com/goodfood/
+│       │   │   │       ├── controller/
+│       │   │   │       ├── service/
+│       │   │   │       ├── repository/
+│       │   │   │       └── model/
+│       │   │   └── resources/
+│       │   │       └── application.properties
+│       │   └── test/
+│       ├── build.gradle.kts
+│       └── gradlew
+└── README.md
+```
 
-The application can be run locally with:
+---
 
+## API Documentation
+
+Full API documentation is available in the GitHub Wiki:  
+[Backend API Documentation](https://github.com/yoen-dev/COMP2850_final/wiki/Backend-API-Documentation)
+
+**Key Endpoints:**
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User authentication
+- `GET /api/auth/me` - Get current user info
+- `GET /api/diary` - Get food diary entries
+- `GET /api/recipes` - Search recipes
+- `GET /api/clients` - Get professional's client list
+
+---
+
+## Documentation
+
+Complete project documentation is available in the GitHub Wiki:
+
+- [Personas v1/v2/v3/v4](https://github.com/yoen-dev/COMP2850_final/wiki/Personas-v4)
+- [User Stories v1/v2/v3/v4](https://github.com/yoen-dev/COMP2850_final/wiki/User-Stories-v4)
+- [Design Specification](https://github.com/yoen-dev/COMP2850_final/wiki/Design-Specification)
+- [Wireframes and UI Changes](https://github.com/yoen-dev/COMP2850_final/wiki/Wireframes-and-UI-Changes)
+- [Testing Strategy](https://github.com/yoen-dev/COMP2850_final/wiki/Testing-Strategy)
+- [Meeting Notes](https://github.com/yoen-dev/COMP2850_final/wiki/Meeting-Notes)
+- [Retrospectives](https://github.com/yoen-dev/COMP2850_final/wiki/Retrospectives)
+
+---
+
+## Testing
+
+**Backend Testing:**
 ```bash
-cd /workspaces/COMP2850_final/backend/goodfood
-./gradlew bootRun
+cd backend/goodfood
+./gradlew test
+```
+
+**Frontend Testing:**
+- Accessibility testing with WAVE and Lighthouse
+- End-to-end testing with Playwright
+- Manual UX testing (4 test sessions recorded in Wiki)
+
+Test documentation: [Testing Strategy](https://github.com/yoen-dev/COMP2850_final/wiki/Testing-Strategy)
+
+
+---
+
+## Deployment
+
+**Live Demo:**
+- Frontend: [https://yoen-dev.github.io/COMP2850_final/](https://yoen-dev.github.io/COMP2850_final/)
+- Backend: Deployed on GitHub Codespaces (port 8080)
+
+---
+
+## License
+
+This project is developed for academic purposes as part of COMP2850 Software Engineering module at the University of Leeds.
+
+---
+
+## Contact
+
+For questions or issues, please contact the team through the GitHub repository or University of Leeds email.
+
+**Repository:** https://github.com/yoen-dev/COMP2850_final  
+**Wiki:** https://github.com/yoen-dev/COMP2850_final/wiki
