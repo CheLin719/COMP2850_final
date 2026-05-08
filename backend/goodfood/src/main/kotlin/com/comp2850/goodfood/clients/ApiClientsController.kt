@@ -133,7 +133,7 @@ class ApiClientsController(
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "this user is not your client")
         }
 
-        // 通知客户：专家已将其从客户列表移除
+        // Notify the client that the professional has removed them
         notificationPublisher.publishUserUnbound(
             userId = target.id,
             clientId = target.id,
@@ -159,7 +159,7 @@ class ApiClientsController(
         val proId = currentUser.proId
             ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "not bound to any professional")
 
-        // 通知专家：客户已主动解绑
+        // Notify the professional that the client has voluntarily unbound
         notificationPublisher.publishUserUnbound(
             userId = proId,
             clientId = currentUser.id,

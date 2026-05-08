@@ -10,7 +10,7 @@ import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 
 /**
- * WebSocket处理器 - 管理客户端连接并推送实时通知
+ * WebSocket handler — manages client connections and pushes real-time notifications.
  */
 @Component
 class NotificationWebSocketHandler : TextWebSocketHandler() {
@@ -19,26 +19,26 @@ class NotificationWebSocketHandler : TextWebSocketHandler() {
     private val objectMapper = ObjectMapper()
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
-        // 客户端连接时，从路径参数获取userId
-        // 格式: /ws/notifications?userId=xxx
+        // Extract userId from query parameter when a client connects.
+        // Expected format: /ws/notifications?userId=xxx
         val query = session.uri?.query
         val userId = parseUserId(query)
 
         if (userId != null) {
             sessions[userId] = session
-            println("WebSocket客户端连接: userId=$userId")
+            println("WebSocket client connected: userId=$userId")
         }
     }
 
     override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {
         sessions.entries.find { it.value == session }?.let {
             sessions.remove(it.key)
-            println("WebSocket客户端断开: userId=${it.key}")
+            println("WebSocket client disconnected: userId=${it.key}")
         }
     }
 
     /**
-     * 处理Plan更新事件
+     * Handle plan update events.
      */
     @EventListener
     fun handlePlanUpdate(event: PlanUpdatedEvent) {
@@ -49,13 +49,13 @@ class NotificationWebSocketHandler : TextWebSocketHandler() {
                 "planType" to event.planType,
                 "planId" to event.planId,
                 "message" to event.message,
-                "title" to "计划已更新"
+                "title" to "Plan updated"
             )
         )
     }
 
     /**
-     * 处理消息事件
+     * Handle message received events.
      */
     @EventListener
     fun handleMessageReceived(event: MessageReceivedEvent) {
@@ -67,13 +67,13 @@ class NotificationWebSocketHandler : TextWebSocketHandler() {
                 "senderId" to event.senderId,
                 "senderName" to event.senderName,
                 "message" to event.message,
-                "title" to "新消息"
+                "title" to "New message"
             )
         )
     }
 
     /**
-     * 处理用户解绑事件
+     * Handle user unbound events.
      */
     @EventListener
     fun handleUserUnbound(event: UserUnboundEvent) {
@@ -84,13 +84,13 @@ class NotificationWebSocketHandler : TextWebSocketHandler() {
                 "clientId" to event.clientId,
                 "clientName" to event.clientName,
                 "message" to event.message,
-                "title" to "客户已解绑"
+                "title" to "Client disconnected"
             )
         )
     }
 
     /**
-     * 处理计划删除事件
+     * Handle plan deleted events.
      */
     @EventListener
     fun handlePlanDeleted(event: PlanDeletedEvent) {
@@ -101,7 +101,7 @@ class NotificationWebSocketHandler : TextWebSocketHandler() {
                 "planType" to event.planType,
                 "planId" to event.planId,
                 "message" to event.message,
-                "title" to "计划已删除"
+                "title" to "Plan deleted"
             )
         )
     }
@@ -112,9 +112,9 @@ class NotificationWebSocketHandler : TextWebSocketHandler() {
             try {
                 val jsonMessage = objectMapper.writeValueAsString(data)
                 session.sendMessage(TextMessage(jsonMessage))
-                println("推送通知给 $userId: ${data["message"]}")
+                println("Pushed notification to $userId: ${data["message"]}")
             } catch (e: Exception) {
-                println("推送消息失败: ${e.message}")
+                println("Failed to push notification: ${e.message}")
             }
         }
     }

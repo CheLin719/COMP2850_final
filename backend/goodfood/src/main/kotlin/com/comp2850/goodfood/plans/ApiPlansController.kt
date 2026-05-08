@@ -102,7 +102,7 @@ class ApiPlansController(
 
         val saved = planJpaRepository.save(entity)
 
-        // 发送实时通知
+        // Send real-time notification
         notificationPublisher.publishPlanUpdate(
             userId = client.id,
             planId = saved.id ?: 0L,
@@ -115,7 +115,7 @@ class ApiPlansController(
     }
 
     /**
-     * DELETE /api/plans/{planId} — delete a plan
+     * DELETE /api/plans/{planId} — delete a plan.
      * Only accessible by the assigned professional.
      */
     @DeleteMapping("/{planId}")
@@ -140,7 +140,7 @@ class ApiPlansController(
         val client = userStore.findById(plan.clientId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "client not found")
 
-        // 发送删除通知
+        // Send deletion notification
         notificationPublisher.publishPlanDeleted(
             userId = plan.clientId,
             planId = planId,

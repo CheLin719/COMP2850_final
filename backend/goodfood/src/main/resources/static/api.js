@@ -1,22 +1,22 @@
 /**
  * NourishWell — API Client Layer
  * ══════════════════════════════════════════════════════════════
- * 统一封装所有后端 API 调用。
- * 在所有页面的 <script> 区域最顶部引入本文件：
+ * Centralised wrapper for all backend API calls.
+ * Include this file at the very top of every page's <script> section:
  *   <script src="api.js"></script>
  *
- * 使用方式：
+ * Usage:
  *   await NW.login(email, password)   → { userId, token, role }
  *   await NW.diary.get('2026-04-20')  → { meals: [...] }
- *   NW.auth.token                     → 当前 token 字符串
+ *   NW.auth.token                     → current token string
  * ══════════════════════════════════════════════════════════════
  */
 
 window.NW = (function () {
-  // ── 基础配置 ─────────────────────────────────────────────────
+  // ── Base configuration ────────────────────────────────────────
   const BASE = '';
 
-  // ── Token 持久化（sessionStorage，关闭标签页即清除）──────────
+  // ── Token persistence (sessionStorage — cleared when tab is closed) ──
   const auth = {
     get token() { return sessionStorage.getItem('nw-token') || ''; },
     get userId() { return sessionStorage.getItem('nw-userId') || ''; },
@@ -27,7 +27,7 @@ window.NW = (function () {
       if (data.token)  sessionStorage.setItem('nw-token',  data.token);
       if (data.userId) sessionStorage.setItem('nw-userId', String(data.userId));
       if (data.role)   sessionStorage.setItem('nw-role',   data.role);
-      // name 可能在 me 接口里
+      // name may come from the /me endpoint
       if (data.firstName) {
         sessionStorage.setItem('nw-name', (data.firstName + ' ' + (data.lastName || '')).trim());
       }
@@ -42,7 +42,7 @@ window.NW = (function () {
     isPro() { return this.role === 'professional'; }
   };
 
-  // ── 底层请求封装 ──────────────────────────────────────────────
+  // ── Low-level request wrapper ─────────────────────────────────
   async function req(method, path, body = null, requiresAuth = true) {
     const headers = { 'Content-Type': 'application/json' };
     if (requiresAuth && auth.token) {
@@ -53,10 +53,10 @@ window.NW = (function () {
 
     const res = await fetch(BASE + path, opts);
 
-    // 204 No Content → 直接返回 true
+    // 204 No Content → return true directly
     if (res.status === 204) return true;
 
-    // 401/403 → 清除 token，让页面处理
+    // 401/403 → clear token and let the page handle it
     if (res.status === 401 || res.status === 403) {
       const err = new Error('AUTH_ERROR');
       err.status = res.status;
@@ -327,7 +327,7 @@ window.NW = (function () {
   };
 
   // ══════════════════════════════════════════════════════════════
-  // 工具函数：将 API mealType 字符串映射到前端 key
+  // Utility: map API mealType strings to frontend keys
   // ══════════════════════════════════════════════════════════════
   const MEAL_TYPE_MAP = {
     BREAKFAST:       'breakfast',
@@ -357,7 +357,7 @@ window.NW = (function () {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // 将后端 diary meals 数组转换为前端 mealLog 结构
+  // Convert backend diary meals array to frontend mealLog structure
   // ══════════════════════════════════════════════════════════════
   function parseDiaryToMealLog(apiMeals) {
     const log = {
@@ -368,7 +368,7 @@ window.NW = (function () {
     apiMeals.forEach(m => {
       const key = mealTypeToKey(m.mealType);
       log[key].push({
-        _id:     m.id,          // 保留后端 id 用于删除
+        _id:     m.id,          // retain backend id for deletion
         name:    m.foodName,
         kcal:    m.kcal,
         time:    m.time || '',
@@ -382,7 +382,7 @@ window.NW = (function () {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // 将后端 recipes 数组转换为前端 RECIPES 对象格式
+  // Convert backend recipes array to frontend RECIPES object format
   // ══════════════════════════════════════════════════════════════
   function parseRecipes(apiRecipes) {
     const result = {};
@@ -391,7 +391,7 @@ window.NW = (function () {
       const key = String(r.id);
       result[key] = {
         id:          key,
-        _numericId:  r.id,       // 保留数字 id 用于 API 调用
+        _numericId:  r.id,       // retain numeric id for API calls
         name:        r.name,
         emoji:       r.emoji || '🍽️',
         tag:         r.tag || '',
@@ -413,7 +413,7 @@ window.NW = (function () {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // 公开接口
+  // Public API
   // ══════════════════════════════════════════════════════════════
   return {
     auth,
@@ -432,7 +432,7 @@ window.NW = (function () {
     plans,
     notifications,
     appointments,
-    // 工具
+    // utilities
     mealTypeToKey,
     keyToMealType,
     parseDiaryToMealLog,

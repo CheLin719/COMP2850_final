@@ -1,27 +1,28 @@
 /**
  * NourishWell — index.html API Patch
  * ══════════════════════════════════════════════════════════════
- * 在 index.html 底部 </body> 前引入（api.js 必须先加载）：
+ * Include before </body> in index.html (api.js must be loaded first):
  *   <script src="api.js"></script>
  *   <script src="patch_index.js"></script>
  *
- * 覆盖原来的 handleLogin / handleRegister，替换为真实 API 调用。
- * 原来的表单验证逻辑不变，只替换"提交成功后"的逻辑。
+ * Overrides handleLogin / handleRegister with real API calls.
+ * Original form validation logic is unchanged; only the post-submit
+ * behaviour is replaced.
  * ══════════════════════════════════════════════════════════════
  */
 
-// ── 如果已登录，直接跳转 ──────────────────────────────────────
+// ── Redirect if already logged in ────────────────────────────
 (function () {
 if (NW.auth.isLoggedIn()) {
     NW.getMe().then(me => {
         window.location.replace(me.role === 'professional' ? 'pro_dashboard.html' : 'dashboard.html');
     }).catch(() => {
-        NW.logout(); // token 无效，清掉
+        NW.logout(); // token invalid — clear it
     });
 }
 })();
 
-// ── 注入密码要求清单到注册表单 ─────────────────────────────────
+// ── Inject password requirements checklist into registration form ──
 (function () {
   const pwField = document.getElementById('reg-password');
   if (!pwField) return;
@@ -96,7 +97,7 @@ if (NW.auth.isLoggedIn()) {
     '</div>';
   }
 
-  // Insert after strength-label, or strength-bars, or pw-wrap
+  // Insert after strength-label, strength-bars, or pw-wrap
   const anchor =
     pwField.closest('.field').querySelector('#strength-label') ||
     pwField.closest('.field').querySelector('.strength-bars') ||
@@ -121,7 +122,7 @@ if (NW.auth.isLoggedIn()) {
   }
 })();
 
-// ── 密码前端验证（与后端 PasswordValidator 一致）───────────────
+// ── Frontend password validation (mirrors backend PasswordValidator rules) ──
 /** Validate password meets strength requirements (8+ chars, upper, lower, digit, special) */
 function isPasswordValid(pw) {
   return pw.length >= 8 &&
@@ -131,7 +132,7 @@ function isPasswordValid(pw) {
     /[^A-Za-z0-9]/.test(pw);
 }
 
-// ── 覆盖 handleLogin ──────────────────────────────────────────
+// ── Override handleLogin ──────────────────────────────────────
 /** Handle login form submission via API */
 window.handleLogin = async function () {
   const email = document.getElementById('login-email').value.trim();
@@ -173,7 +174,7 @@ window.handleLogin = async function () {
   }
 };
 
-// ── 覆盖 handleRegister ───────────────────────────────────────
+// ── Override handleRegister ───────────────────────────────────
 /** Handle registration form submission via API */
 window.handleRegister = async function () {
   const first = document.getElementById('reg-first').value.trim();
@@ -193,7 +194,7 @@ window.handleRegister = async function () {
     showErr('reg-licence-err', false); setErr('reg-licence', false);
   }
 
-  // 密码验证（与后端 PasswordValidator 规则一致）
+  // Password validation (matches backend PasswordValidator rules)
   if (!isPasswordValid(pw)) {
     showErr('reg-pw-err', true);
     setErr('reg-password', true);
@@ -247,7 +248,7 @@ window.handleRegister = async function () {
   }
 };
 
-// ── goToDashboard 保持原逻辑（由 success overlay 按钮调用）────
+// ── goToDashboard keeps original logic (called by success overlay button) ──
 /** Redirect to appropriate dashboard after successful auth */
 window.goToDashboard = function () {
   window.location.href = window._redirectTo || 'dashboard.html';

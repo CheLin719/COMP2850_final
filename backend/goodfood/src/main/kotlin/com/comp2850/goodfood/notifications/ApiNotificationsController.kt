@@ -15,7 +15,7 @@ class ApiNotificationsController(
 ) {
 
     /**
-     * GET /api/notifications — 获取当前用户的所有通知
+     * GET /api/notifications — get all notifications for the current user
      */
     @GetMapping
     fun getNotifications(
@@ -36,7 +36,7 @@ class ApiNotificationsController(
     }
 
     /**
-     * GET /api/notifications/unread-count — 获取未读通知数
+     * GET /api/notifications/unread-count — get the number of unread notifications
      */
     @GetMapping("/unread-count")
     fun getUnreadCount(authentication: Authentication): Map<String, Int> {
@@ -48,7 +48,7 @@ class ApiNotificationsController(
     }
 
     /**
-     * PUT /api/notifications/{notificationId}/read — 标记通知为已读
+     * PUT /api/notifications/{notificationId}/read — mark a notification as read
      */
     @PutMapping("/{notificationId}/read")
     fun markAsRead(
@@ -71,7 +71,7 @@ class ApiNotificationsController(
     }
 
     /**
-     * PUT /api/notifications/read-all — 标记所有通知为已读
+     * PUT /api/notifications/read-all — mark all notifications as read
      */
     @PutMapping("/read-all")
     fun markAllAsRead(authentication: Authentication): Map<String, String> {
@@ -86,7 +86,7 @@ class ApiNotificationsController(
     }
 
     /**
-     * DELETE /api/notifications/{notificationId} — 删除通知
+     * DELETE /api/notifications/{notificationId} — delete a notification
      */
     @DeleteMapping("/{notificationId}")
     fun deleteNotification(

@@ -89,7 +89,7 @@ class ApiMessagesController(
             )
         )
 
-        // 发送实时通知
+        // Send real-time notification
         notificationPublisher.publishMessage(
             userId = receiver.id,
             messageId = saved.id ?: 0L,

@@ -1,21 +1,21 @@
 /**
  * NourishWell — dashboard.html API Patch
  * ══════════════════════════════════════════════════════════════
- * 在 dashboard.html 底部 </body> 前引入（api.js 必须先加载）：
+ * Include before </body> in dashboard.html (api.js must be loaded first):
  *   <script src="api.js"></script>
  *   <script src="patch_dashboard.js"></script>
  *
- * 覆盖策略：
- *  - 食谱列表：启动时从 /api/recipes 拉取，合并进 window.RECIPES
- *  - 收藏：从 /api/favourites 初始化 favourites Set；toggleFav 接 API
- *  - 日记：loadDiaryHistory → API；commitFoodEntries → API；deleteMeal → API
- *  - 运动：closeExPanel → API；deleteEx → API
- *  - 评分/评论：submitRating / submitComment → API
- *  - localStorage 的非核心功能（dark mode、fridge、cooked）保留原逻辑
+ * Override strategy:
+ *  - Recipes: fetched from /api/recipes on startup and merged into window.RECIPES
+ *  - Favourites: initialised from /api/favourites; toggleFav wired to API
+ *  - Diary: loadDiaryHistory → API; commitFoodEntries → API; deleteMeal → API
+ *  - Exercise: closeExPanel → API; deleteEx → API
+ *  - Ratings/Comments: submitRating / submitComment → API
+ *  - Non-essential localStorage features (dark mode, fridge, cooked) keep original logic
  * ══════════════════════════════════════════════════════════════
  */
 
-// ── 0. 鉴权守卫：验证 token 有效性，无效则清除并跳回首页 ─────
+// ── 0. Auth guard: validate token, clear and redirect to login if invalid ─
 (async function () {
   if (!NW.auth.isLoggedIn()) {
     window.location.replace('index.html');
@@ -23,19 +23,19 @@
   }
   try {
     const me = await NW.getMe();
-    // token 有效 → 检查角色
-    // Exception: if coming from pro dashboard ("Switch to User View"), allow pro to stay
+    // Token valid → check role.
+    // Exception: if coming from pro dashboard ("Switch to User View"), allow pro to stay.
     var fromPro = false;
     try { fromPro = sessionStorage.getItem('nw-from-pro') === '1'; } catch(e) {}
     if (me.role === 'professional' && !fromPro) {
       window.location.replace('pro_dashboard.html');
       return;
     }
-    // 验证通过，显示页面
+    // Auth passed — show page
     document.body.style.opacity = '1';
     document.body.style.transition = 'opacity 0.2s';
   } catch (e) {
-    // token 无效或过期 → 清除并跳回登录
+    // Token invalid or expired → clear and redirect to login
     NW.logout();
     window.location.replace('index.html');
     return;
@@ -43,7 +43,7 @@
 })();
 
 // ══════════════════════════════════════════════════════════════
-// 1. 食谱：从 API 拉取并合并进 RECIPES
+// 1. Recipes: fetch from API and merge into RECIPES
 // ══════════════════════════════════════════════════════════════
 /** Fetch recipes from API and merge into frontend RECIPES object */
 async function fetchAndMergeRecipes() {
@@ -51,16 +51,16 @@ async function fetchAndMergeRecipes() {
     const apiRecipes = await NW.recipes.getAll();
     const parsed = NW.parseRecipes(apiRecipes);
 
-    // 将后端食谱合并进前端 RECIPES（后端 id 是数字，转成字符串 key）
-    // 前端已有的 6 条静态食谱通过 name 匹配，避免重复
+    // Merge backend recipes into frontend RECIPES (backend ids are numeric, converted to string keys).
+    // Match existing 6 static recipes by name to avoid duplicates.
     const existingNames = new Set(Object.values(window.RECIPES).map(r => r.name.toLowerCase()));
 
     Object.entries(parsed).forEach(([key, recipe]) => {
       if (!existingNames.has(recipe.name.toLowerCase())) {
-        // 全新的后端食谱（用户自定义的），直接加入
+        // Brand-new backend recipe (user-created) — add directly
         window.RECIPES[key] = recipe;
       } else {
-        // 已有的静态食谱：用后端 id 补充，保留前端的 id 字符串 key
+        // Existing static recipe: supplement with backend id, keep frontend string key
         const existingKey = Object.keys(window.RECIPES).find(
           k => window.RECIPES[k].name.toLowerCase() === recipe.name.toLowerCase()
         );
@@ -69,7 +69,7 @@ async function fetchAndMergeRecipes() {
           window.RECIPES[existingKey].averageRating = recipe.averageRating;
           window.RECIPES[existingKey].ratingCount   = recipe.ratingCount;
           window.RECIPES[existingKey].commentCount  = recipe.commentCount;
-          // 更新展示评分
+          // Update displayed rating
           if (recipe.averageRating > 0) {
             const s = Math.round(recipe.averageRating);
             window.RECIPES[existingKey].rating = '★'.repeat(s) + '☆'.repeat(5 - s);
@@ -78,7 +78,7 @@ async function fetchAndMergeRecipes() {
       }
     });
 
-    // 重新渲染食谱页（如果当前在食谱页）
+    // Re-render recipes page if currently active
     if (typeof renderRecipesPage === 'function') renderRecipesPage();
 
   } catch (e) {
@@ -87,17 +87,17 @@ async function fetchAndMergeRecipes() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// 2. 收藏：从 API 初始化，覆盖 toggleFav
+// 2. Favourites: initialise from API, override toggleFav
 // ══════════════════════════════════════════════════════════════
 /** Initialise favourites from API, replacing localStorage data */
 async function initFavourites() {
   try {
     const data = await NW.favourites.get(); // [{ recipeId, recipe }]
-    // 清空旧的，重新以 API 数据为准
-    // favourites 是 dashboard.html 里的全局 Set
+    // Clear old data and repopulate from API
+    // favourites is the global Set defined in dashboard.html
     favourites.clear();
     data.forEach(item => {
-      // 优先匹配前端字符串 key（通过 name 匹配）
+      // Prefer matching the frontend string key (via name lookup)
       const numId = String(item.recipeId);
       const matchKey = Object.keys(window.RECIPES).find(
         k => window.RECIPES[k]._numericId === item.recipeId ||
@@ -112,14 +112,14 @@ async function initFavourites() {
   }
 }
 
-// 覆盖 toggleFav（原函数在 dashboard.html 里定义）
+// Override toggleFav (original defined in dashboard.html)
 var _origToggleFav_api = window.toggleFav;
 /** Toggle recipe favourite status via API with optimistic UI update */
 window.toggleFav = async function (id, heart) {
   const numericId = window.RECIPES[id]?._numericId || parseInt(id, 10);
   const wasOn = favourites.has(id);
 
-  // 乐观更新 UI
+  // Optimistic UI update
   if (wasOn) {
     favourites.delete(id);
     if (heart) heart.textContent = '🤍';
@@ -137,7 +137,7 @@ window.toggleFav = async function (id, heart) {
       await NW.favourites.add(numericId);
     }
   } catch (e) {
-    // 回滚
+    // Roll back on failure
     console.warn('[NW] toggleFav API failed:', e.message);
     if (wasOn) favourites.add(id);
     else favourites.delete(id);
@@ -146,16 +146,16 @@ window.toggleFav = async function (id, heart) {
   }
 };
 
-// toggleFavFromDetail 内部也调用 toggleFav，会自动走新逻辑
+// toggleFavFromDetail calls toggleFav internally, so it automatically uses the new logic
 
 // ══════════════════════════════════════════════════════════════
-// 3. 食谱评分：覆盖 submitRating
+// 3. Recipe ratings: override submitRating
 // ══════════════════════════════════════════════════════════════
-// 找到原评分提交逻辑（dashboard.html 里用 recipeRatings 存 localStorage）
-// 覆盖为 API 调用
-const _nwRatingTarget = null; // 记录当前打分的 recipeId（字符串 key）
+// Original rating submission in dashboard.html uses recipeRatings in localStorage.
+// Override with API call.
+const _nwRatingTarget = null; // tracks the recipeId (string key) currently being rated
 
-// 拦截 setRating 点击（如果 dashboard 用的是全局函数）
+// Intercept setRating click (if dashboard uses a global function)
 var _origSetRating = window.setRating;
 /** Intercept rating click to track target recipe ID */
 window.setRating = function (recipeId, score) {
@@ -163,7 +163,7 @@ window.setRating = function (recipeId, score) {
   if (_origSetRating) _origSetRating(recipeId, score);
 };
 
-// 覆盖评分提交（dashboard 里 submitRating 函数）
+// Override rating submission (submitRating in dashboard)
 var _origSubmitRating = window.submitRating;
 /** Submit recipe rating to API (overrides localStorage version) */
 window.submitRating = async function (recipeId) {
@@ -182,7 +182,7 @@ window.submitRating = async function (recipeId) {
   try {
     await NW.ratings.set(numericId, score);
     showToast('Rating saved ★', '#1e6b5e');
-    // 关闭弹窗（原逻辑）
+    // Close modal (original logic)
     const modal = document.getElementById('ratingModal');
     if (modal) modal.style.display = 'none';
   } catch (e) {
@@ -192,7 +192,7 @@ window.submitRating = async function (recipeId) {
 };
 
 // ══════════════════════════════════════════════════════════════
-// 4. 评论：覆盖 submitComment，loadComments 也从 API 取
+// 4. Comments: override submitComment, load comments from API
 // ══════════════════════════════════════════════════════════════
 var _origSubmitComment = window.submitComment;
 /** Submit recipe comment to API with XSS validation */
@@ -210,7 +210,7 @@ window.submitComment = async function (recipeId) {
   try {
     await NW.comments.add(numericId, text);
     if (input) input.value = '';
-    // 重新加载评论
+    // Reload comments
     await loadCommentsFromAPI(recipeId, numericId);
     showToast('Comment posted', '#1e6b5e');
   } catch (e) {
@@ -226,16 +226,16 @@ window.submitComment = async function (recipeId) {
 async function loadCommentsFromAPI(recipeKey, numericId) {
   try {
     const data = await NW.comments.get(numericId); // [{ id, user, text, createdAt }]
-    // 格式化成 dashboard 内部格式
+    // Normalise to dashboard internal format
     recipeComments[recipeKey] = data.map(c => ({
       author: c.user || c.userName || 'User',
       text:   c.text,
       time:   c.createdAt ? new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''
     }));
-    // 重新渲染评论区（如果有对应函数）
+    // Re-render comment section if the function exists
     if (typeof renderComments === 'function') renderComments(recipeKey);
     else {
-      // 直接找评论容器更新
+      // Directly update the comment container
       const container = document.getElementById('commentsContainer');
       if (container) {
         container.innerHTML = recipeComments[recipeKey].map(c =>
@@ -251,18 +251,18 @@ async function loadCommentsFromAPI(recipeKey, numericId) {
   }
 }
 
-// 拦截 openRecipeDetail，加载评论（不覆盖，用包装避免递归）
+// Wrap openRecipeDetail to also load comments (avoid full override to prevent recursion)
 (function () {
-  // dashboard.html 已经覆盖了一次 openRecipeDetail（加评分+评论UI）
-  // 这里用 _dashOrigOpen 保存当前版本，然后替换为新版本
+  // dashboard.html may have already overridden openRecipeDetail (adds rating+comment UI).
+  // Save current version as _dashOrigOpen, then replace with a wrapper.
   const _dashOrigOpen = window.openRecipeDetail;
   window.openRecipeDetail = async function (id) {
-    // 临时恢复，防止递归
+    // Temporarily restore original to prevent recursion
     window.openRecipeDetail = _dashOrigOpen;
     try {
       _dashOrigOpen(id);
     } finally {
-      // 重新挂载本包装
+      // Re-attach this wrapper
       window.openRecipeDetail = arguments.callee;
     }
     const numericId = window.RECIPES[id]?._numericId;
@@ -273,14 +273,14 @@ async function loadCommentsFromAPI(recipeKey, numericId) {
 })();
 
 // ══════════════════════════════════════════════════════════════
-// 5. 食谱新增：覆盖 saveCustomRecipe
+// 5. Custom recipe creation: override saveCustomRecipe
 // ══════════════════════════════════════════════════════════════
 var _origSaveCustomRecipe = window.saveCustomRecipe;
 window.saveCustomRecipe = async function () {
-  // 先运行原始逻辑（它会把食谱加进 RECIPES 对象）
+  // Run original logic first (it adds the recipe to RECIPES)
   if (_origSaveCustomRecipe) _origSaveCustomRecipe();
 
-  // 找到刚加进去的 custom 食谱（最后一个 custom:true 的）
+  // Find the newly added custom recipe (last entry with custom: true)
   const customEntry = Object.values(window.RECIPES).filter(r => r.custom).pop();
   if (!customEntry) return;
 
@@ -301,33 +301,33 @@ window.saveCustomRecipe = async function () {
     }
   } catch (e) {
     console.warn('[NW] saveCustomRecipe to API failed:', e.message);
-    // 不阻断：食谱已在本地 RECIPES 里，只是没持久化到后端
+    // Non-blocking: recipe is already in local RECIPES, just not persisted to backend
   }
 };
 
 // ══════════════════════════════════════════════════════════════
-// 6. 食物日记：loadDiaryHistory 和 commitFoodEntries 接 API
+// 6. Food diary: loadDiaryHistory and commitFoodEntries via API
 // ══════════════════════════════════════════════════════════════
 
-// 记录每个 entry 的后端 id（用于删除）
-// 结构：_diaryIdMap[date][mealKey][index] = backendId
+// Map each diary entry to its backend id (used for deletion).
+// Structure: _diaryIdMap[date][mealKey][index] = backendId
 const _diaryIdMap = {};
 
-// 覆盖 loadDiaryHistory（原来是从 localStorage 读）
+// Override loadDiaryHistory (originally reads from localStorage)
 window.loadDiaryHistory = async function () {
-  // 不再读 localStorage，直接拉今天的日记
+  // No longer reads localStorage — fetch today's diary directly
   await _loadDiaryForDate(currentDiaryDate);
 };
 
-// 覆盖 loadDateDiary（切换日期时调用）
+// Override loadDateDiary (called when switching dates)
 var _origLoadDateDiary = window.loadDateDiary;
 /** Load food diary for a specific date from API */
 window.loadDateDiary = async function (dateStr) {
-  // 保存当前日期（不再需要 saveDiaryForDate 写 localStorage）
+  // Store current date (no longer needs saveDiaryForDate to write localStorage)
   currentDiaryDate = dateStr;
   await _loadDiaryForDate(dateStr);
 
-  // 更新日期显示（复用原逻辑）
+  // Update date display (reuse original logic)
   const d = new Date(dateStr + 'T12:00:00');
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -337,13 +337,13 @@ window.loadDateDiary = async function (dateStr) {
   if (picker) picker.value = dateStr;
 };
 
-/** Internal: fetch diary entries for date and populate mealLog */
+/** Internal: fetch diary entries for a date and populate mealLog */
 async function _loadDiaryForDate(dateStr) {
   try {
     const data = await NW.diary.get(dateStr);
     const meals = data.meals || data || [];
 
-    // 重置 mealLog
+    // Reset mealLog
     Object.keys(mealLog).forEach(k => { mealLog[k] = []; });
     if (!_diaryIdMap[dateStr]) _diaryIdMap[dateStr] = {};
 
@@ -374,7 +374,7 @@ async function _loadDiaryForDate(dateStr) {
   }
 }
 
-// 覆盖 commitFoodEntries（添加食物）
+// Override commitFoodEntries (add food items)
 var _origCommitFoodEntries_api = window.commitFoodEntries;
 /** Save added food items to API with optimistic UI update */
 window.commitFoodEntries = async function () {
@@ -397,7 +397,7 @@ window.commitFoodEntries = async function () {
   const now = new Date();
   const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
-  // 乐观更新 UI
+  // Optimistic UI update
   foodAdded.forEach(item => mealLog[frontKey].push(item));
   renderMealLog();
   updateDonut(); if(typeof updateCalorieTrend==='function') updateCalorieTrend();
@@ -405,7 +405,7 @@ window.commitFoodEntries = async function () {
   const toPost = [...foodAdded];
   foodAdded = [];
 
-  // 后台批量发送到 API
+  // Batch-send to API in the background
   for (const item of toPost) {
     try {
       const res = await NW.diary.add({
@@ -419,7 +419,7 @@ window.commitFoodEntries = async function () {
         fat:      item.fat      || 0,
         sugar:    item.sugar    || 0
       });
-      // 将后端 id 回填到 mealLog entry
+      // Write backend id back to the mealLog entry
       if (res && res.id) {
         const entry = mealLog[frontKey].find(e => e.name === item.name && !e._id);
         if (entry) entry._id = res.id;
@@ -433,14 +433,14 @@ window.commitFoodEntries = async function () {
   }
 };
 
-// 覆盖 deleteMeal（删除单条日记条目）
+// Override deleteMeal (remove a single diary entry)
 var _origDeleteMeal = window.deleteMeal;
 /** Delete a single diary entry via API with optimistic removal */
 window.deleteMeal = async function (key, idx) {
   const entry = mealLog[key] && mealLog[key][idx];
   const backendId = entry ? entry._id : null;
 
-  // 乐观删除
+  // Optimistic removal
   mealLog[key].splice(idx, 1);
   renderMealLog();
   updateDonut(); if(typeof updateCalorieTrend==='function') updateCalorieTrend();
@@ -455,14 +455,14 @@ window.deleteMeal = async function (key, idx) {
   }
 };
 
-// saveDiaryForDate 不再需要写 localStorage，变为 no-op
+// saveDiaryForDate no longer needs to write localStorage — make it a no-op
 window.saveDiaryForDate = function () {};
 
 // ══════════════════════════════════════════════════════════════
-// 7. 运动日记：closeExPanel 和 deleteEx 接 API
+// 7. Exercise diary: closeExPanel and deleteEx via API
 // ══════════════════════════════════════════════════════════════
 
-// exLog 里每个 entry 保留 _id 字段
+// Each entry in exLog retains a _id field
 var _origCloseExPanel = window.closeExPanel;
 /** Close exercise panel and save exercises to API */
 window.closeExPanel = async function () {
@@ -471,14 +471,14 @@ window.closeExPanel = async function () {
     const ts = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
     const toAdd = [...exAdded];
 
-    // 乐观更新
+    // Optimistic update
     toAdd.forEach(ex => { exLog.push({ time: ts, name: ex.name, kcal: ex.kcalPerHour, _id: null }); });
     renderExerciseLog();
     updateExerciseChart();
     showToast('✓ ' + toAdd.length + ' exercise' + (toAdd.length > 1 ? 's' : '') + ' logged', '#1e6b5e');
     exAdded = [];
 
-    // 后台发送
+    // Send to API in the background
     for (const ex of toAdd) {
       try {
         const res = await NW.exercise.add({
@@ -500,7 +500,7 @@ window.closeExPanel = async function () {
   document.getElementById('exPanel').style.display = 'none';
 };
 
-// 覆盖 deleteEx
+// Override deleteEx
 var _origDeleteEx = window.deleteEx;
 /** Delete a single exercise entry via API */
 window.deleteEx = async function (idx) {
@@ -521,20 +521,20 @@ window.deleteEx = async function (idx) {
 };
 
 // ══════════════════════════════════════════════════════════════
-// 8. 覆盖 loadState：原来读 localStorage，现在改为 API 初始化
+// 8. Override loadState: was reading from localStorage, now initialises from API
 // ══════════════════════════════════════════════════════════════
 var _origLoadState = window.loadState;
 /** Initialise app state from API (recipes, favourites, diary) */
 window.loadState = async function () {
-  // 保留 dark mode（不涉及后端）
+  // Keep dark mode (not backend-related)
   try {
     const f = localStorage.getItem('nw-favourites');
     const c = localStorage.getItem('nw-compare');
     if (c) { compareSelected = new Set(JSON.parse(c)); }
-    // 不再从 localStorage 读 favourites 和 diary —— 由 API 接管
+    // No longer reading favourites or diary from localStorage — handled by API
   } catch (e) {}
 
-  // 并行拉取食谱 + 收藏 + 今日日记
+  // Fetch recipes, favourites and today's diary in parallel
   await Promise.allSettled([
     fetchAndMergeRecipes(),
     initFavourites(),
@@ -673,10 +673,10 @@ async function _initWeeklyExerciseChart() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// 9. 用户名展示
+// 9. Display username
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function () {
-  // 尝试更新页面上的用户名（如果有对应元素）
+  // Update the username element on page if it exists
   const nameEl = document.getElementById('userName') || document.querySelector('.user-name');
   if (nameEl && NW.auth.name) {
     nameEl.textContent = NW.auth.name;
@@ -686,10 +686,10 @@ document.addEventListener('DOMContentLoaded', function () {
 // ══════════════════════════════════════════════════════════════
 // 10. Logout
 // ══════════════════════════════════════════════════════════════
-// 覆盖原来的 logout onclick（直接跳转）
+// Override original logout onclick (which just redirects)
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('a.logout, [onclick*="logout"], [href*="index.html"]').forEach(el => {
-    // 只处理有 logout class 的
+    // Only handle elements with the logout class
     if (el.classList.contains('logout')) {
       el.addEventListener('click', function (e) {
         e.preventDefault();
@@ -873,4 +873,3 @@ window.exportWeeklyReportCSV = async function () {
     showToast('Export failed', '#dc2626');
   }
 };
-

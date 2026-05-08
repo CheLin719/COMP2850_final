@@ -2,21 +2,21 @@
 <!--
 /**
  * NourishWell - Good Food & Healthy Eating Landing Page
- * NourishWell - 健康饮食推广系统首页
+ * NourishWell - Healthy Eating Promotion System — Landing Page
  *
  * @description Main landing page for the NourishWell web application.
  *              Includes hero section with feature previews, and authentication pages (login/register).
- *              NourishWell网页应用的主着陆页。包含带功能预览的主页区域，以及认证页面（登录/注册）。
+ *              Main landing page for the NourishWell web application. Contains a hero section with feature previews and authentication pages (login/register).
  *
  * @project COMP2850 Software Engineering - University of Leeds
  * @version 2.0
  * @date 2026-03-24
  *
  * @structure
- *   - Navigation Bar / 导航栏: Fixed top nav with logo, login and register buttons
- *   - Ticker Tape / 滚动横幅: Scrolling feature keywords below nav
- *   - Hero Section / 主页区域: Title text (left) + feature preview cards (right) + background outline text
- *   - Auth Pages / 认证页面: Login and Register forms with role selection (Subscriber/Professional)
+ *   - Navigation Bar / Navigation bar: Fixed top nav with logo, login and register buttons
+ *   - Ticker Tape / Ticker tape: Scrolling feature keywords below nav
+ *   - Hero Section / Hero section: Title text (left) + feature preview cards (right) + background outline text
+ *   - Auth Pages / Auth pages: Login and Register forms with role selection (Subscriber/Professional)
  *
  * @fonts Bricolage Grotesque (body), Instrument Serif (headings), JetBrains Mono (labels)
  * @palette Teal (#1e6b5e), Amber (#b8621f), Ink (#0a1410), Paper (#f5f7f5)
@@ -33,13 +33,13 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /**
- * CSS Custom Properties / CSS自定义变量
+ * CSS Custom Properties
  * @description Design tokens for consistent theming across the application.
- *              用于整个应用一致主题风格的设计令牌。
- * @property {color} --teal - Primary brand color / 主品牌色
- * @property {color} --amber - Accent/warning color / 强调/警告色
- * @property {color} --ink - Text and dark background color / 文字和深色背景色
- * @property {color} --paper - Page background color / 页面背景色
+ *              Design tokens used for consistent theming across the application.
+ * @property {color} --teal - Primary brand color
+ * @property {color} --amber - Accent/warning color
+ * @property {color} --ink - Text and dark background color
+ * @property {color} --paper - Page background color
  */
 :root {
   --teal:     #1e6b5e;
@@ -71,11 +71,11 @@ body {
 }
 
 /**
- * Navigation Bar / 导航栏
+ * Navigation Bar
  * @description Fixed top navigation with logo, login and register buttons.
- *              固定在顶部的导航栏，包含Logo、登录和注册按钮。
+ *              Fixed top navigation bar containing the logo, login and register buttons.
  *              Uses backdrop blur for frosted glass effect.
- *              使用毛玻璃模糊效果。
+ *              Uses a frosted-glass blur effect.
  */
 /* ── NAV ── */
 nav {
@@ -141,15 +141,15 @@ nav {
 .nav-btn-fill:hover { background: var(--teal); }
 
 /**
- * Hero Section / 主页区域
+ * Hero Section
  * @description Full-viewport hero with two-column grid layout.
  *              Left: title text, subtitle, CTA button.
  *              Right: feature preview cards (trend chart, food card, nutrition donut, recipe/professional previews).
  *              Background: Large outline "NOURISH" text at bottom-left for visual depth.
- *              全视口高度的主页区域，双列网格布局。
- *              左侧：标题文字、副标题、行动按钮。
- *              右侧：功能预览卡片（趋势图、食物卡片、营养环形图、食谱/专业人士预览）。
- *              背景：左下角大号空心"NOURISH"文字，增加视觉层次感。
+ *              Full-viewport-height hero section with a two-column grid layout.
+ *              Left column: headline text, subtitle, and call-to-action buttons.
+ *              Right column: feature preview cards (trend chart, food card, nutrition donut, recipe/professional previews).
+ *              Background: large outlined "NOURISH" text in the bottom-left for visual depth.
  */
 /* ── HERO ── */
 .hero {
@@ -1358,13 +1358,13 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 </div><!-- end page-landing -->
 
 <!-- 
-  Authentication Pages / 认证页面
+  Authentication Pages
   @description Split-screen layout: left panel (branding + features), right panel (login/register forms).
-              分屏布局：左侧面板（品牌+功能介绍），右侧面板（登录/注册表单）。
-  @contains Login form with email/password validation / 登录表单，含邮箱/密码验证
-  @contains Register form with role selection (Subscriber/Professional) / 注册表单，含角色选择（订阅者/专业人士）
-  @contains Password strength indicator / 密码强度指示器
-  @contains Professional licence field (conditional) / 专业执照号输入框（条件显示）
+              Split-screen layout: left panel (brand + feature highlights), right panel (login/register forms).
+  @contains Login form with email/password validation
+  @contains Register form with role selection (Subscriber/Professional)
+  @contains Password strength indicator
+  @contains Professional licence field (conditional)
 -->
 </div><!-- end page-landing -->
 
@@ -1494,16 +1494,16 @@ body.dark-mode .shortcuts-modal { background: #142420; }
 
 <script>
 /**
- * Page Navigation / 页面导航
+ * Page Navigation
  * @description Handles switching between landing page and auth page.
- *              处理着陆页和认证页面之间的切换。
+ *              Handles switching between the landing page and authentication pages.
  */
 
 /**
- * showAuth - Show authentication page / 显示认证页面
- * @param {string} mode - 'login' or 'register' / 登录或注册模式
+ * showAuth - Show authentication page
+ * @param {string} mode - 'login' or 'register'
  * @description Switches view from landing to auth, sets appropriate tab.
- *              从着陆页切换到认证页面，设置对应的标签页。
+ *              Switches from the landing page to the auth page and activates the correct tab.
  */
 function showAuth(mode) {
   switchTab(mode === 'register' ? 'register' : 'login');
@@ -1514,9 +1514,9 @@ function showAuth(mode) {
 }
 
 /**
- * showLanding - Return to landing page / 返回着陆页
+ * showLanding - Return to landing page
  * @description Switches view back to the main landing page.
- *              切换回主着陆页。
+ *              Switches back to the main landing page.
  */
 function showLanding() {
   document.body.classList.remove('show-auth');
@@ -1525,35 +1525,35 @@ function showLanding() {
 }
 
 /**
- * Landing Page Scripts / 着陆页脚本
+ * Landing Page Scripts
  * @description Scroll reveal animations and nav shadow on scroll.
- *              滚动显示动画和导航栏滚动阴影效果。
+ *              Scroll reveal animations and nav bar shadow on scroll.
  */
 
-  /** Scroll reveal observer / 滚动显示观察器 */
+  /** Scroll reveal observer */
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
   }, { threshold: 0.08 });
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-  /** Nav shadow on scroll / 导航栏滚动阴影 */
+  /** Nav shadow on scroll */
   window.addEventListener('scroll', () => {
     document.querySelector('.nav-bg').style.boxShadow = scrollY > 20 ? '0 2px 24px rgba(15,26,20,0.08)' : 'none';
   });
 
 
 /**
- * Authentication Scripts / 认证页面脚本
+ * Authentication Scripts
  * @description Handles login/register form logic, role selection, password visibility,
  *              password strength check, and form validation.
- *              处理登录/注册表单逻辑、角色选择、密码显示切换、密码强度检查和表单验证。
+ *              Handles login/register form logic, role selection, password visibility toggle, password strength check, and form validation.
  */
 
-  /** @type {string} currentRole - Currently selected user role / 当前选择的用户角色 */
+  /** @type {string} currentRole - Currently selected user role */
   let currentRole = 'subscriber';
 
   /**
-   * switchTab - Switch between login and register tabs / 切换登录和注册标签页
+   * switchTab - Switch between login and register tabs
    * @param {string} tab - 'login' or 'register'
    */
   function switchTab(tab) {
@@ -1562,10 +1562,10 @@ function showLanding() {
   }
 
   /**
-   * selectRole - Select user role during registration / 注册时选择用户角色
+   * selectRole - Select user role during registration
    * @param {string} role - 'subscriber' or 'professional'
    * @description Updates UI to reflect selected role. Shows professional licence field if professional.
-   *              更新UI以反映选择的角色。如果选择专业人士则显示执照号码输入框。
+   *              Updates the UI to reflect the selected role. Shows the licence number field if Professional is chosen.
    */
   function selectRole(role) {
     currentRole = role;
@@ -1577,9 +1577,9 @@ function showLanding() {
   }
 
   /**
-   * togglePw - Toggle password visibility / 切换密码可见性
-   * @param {string} id - Input element ID / 输入框元素ID
-   * @param {HTMLElement} btn - Toggle button element / 切换按钮元素
+   * togglePw - Toggle password visibility
+   * @param {string} id - Input element ID
+   * @param {HTMLElement} btn - Toggle button element
    */
   function togglePw(id, btn) {
     const el = document.getElementById(id); const t = el.type === 'text';
@@ -1590,12 +1590,12 @@ function showLanding() {
   }
 
   /**
-   * checkStrength - Check password strength and update UI / 检查密码强度并更新UI
-   * @param {string} val - Password value / 密码值
+   * checkStrength - Check password strength and update UI
+   * @param {string} val - Password value
    * @description Evaluates password based on: length >= 8, uppercase, numbers, special chars.
    *              Updates strength bars (4 levels) and label.
-   *              根据以下条件评估密码：长度>=8、大写字母、数字、特殊字符。
-   *              更新强度指示条（4个等级）和标签。
+   *              Evaluates password against: length>=8, uppercase, digit, special character.
+   *              Updates the strength indicator bars (4 levels) and label.
    */
   function checkStrength(val) {
     let s = 0;
@@ -1608,24 +1608,24 @@ function showLanding() {
   }
 
   /**
-   * showErr - Show or hide a field error message / 显示或隐藏字段错误信息
-   * @param {string} id - Error element ID / 错误元素ID
-   * @param {boolean} show - Whether to show the error / 是否显示错误
+   * showErr - Show or hide a field error message
+   * @param {string} id - Error element ID
+   * @param {boolean} show - Whether to show the error
    */
   function showErr(id, show) { document.getElementById(id).classList.toggle('show', show); }
 
   /**
-   * setErr - Add or remove error styling on an input / 在输入框上添加或移除错误样式
-   * @param {string} id - Input element ID / 输入框元素ID
-   * @param {boolean} show - Whether to show error state / 是否显示错误状态
+   * setErr - Add or remove error styling on an input
+   * @param {string} id - Input element ID
+   * @param {boolean} show - Whether to show error state
    */
   function setErr(id, show) { const el = document.getElementById(id); if (el) { el.classList.toggle('error', show); el.setAttribute('aria-invalid', show ? 'true' : 'false'); } }
 
   /**
-   * handleLogin - Handle login form submission / 处理登录表单提交
+   * handleLogin - Handle login form submission
    * @description Validates email format and password presence.
    *              Shows loading state, then displays success overlay.
-   *              验证邮箱格式和密码是否填写。显示加载状态，然后显示成功界面。
+   *              Validates email format and checks password is provided. Shows loading state then success screen.
    */
   function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
@@ -1648,13 +1648,13 @@ function showLanding() {
   }
 
   /**
-   * handleRegister - Handle registration form submission / 处理注册表单提交
+   * handleRegister - Handle registration form submission
    * @description Validates all fields: first name, last name, email, password (min 8 chars),
    *              and professional licence (if professional role selected).
    *              Shows loading state, then displays success overlay.
-   *              验证所有字段：名、姓、邮箱、密码（最少8位），
-   *              以及专业执照号（如果选择了专业人士角色）。
-   *              显示加载状态，然后显示成功界面。
+   *              Validates all fields: first name, last name, email, password (min 8 chars),
+   *              and professional licence number (if Professional role is selected).
+   *              Shows loading state then success screen.
    */
   function handleRegister() {
     const first = document.getElementById('reg-first').value.trim();
@@ -1682,24 +1682,24 @@ function showLanding() {
   }
 
   /**
-   * goToDashboard - Navigate to dashboard / 跳转到仪表盘
+   * goToDashboard - Navigate to dashboard
    * @description Placeholder function. Currently returns to landing page.
-   *              占位函数。当前返回着陆页。
+   *              Placeholder function. Currently returns to the landing page.
    */
   function goToDashboard() { window.location.href = window._redirectTo || 'dashboard.html'; }
 
   /**
-   * Keyboard event listener / 键盘事件监听
+   * Keyboard event listener
    * @description Submits the active form when Enter key is pressed.
-   *              按下回车键时提交当前活动的表单。
+   *              Submits the currently active form when Enter is pressed.
    */
   /* Enter key handled natively by <form> onsubmit */
 
 
 /**
- * Override goToDashboard / 重写仪表盘跳转
+ * Override goToDashboard
  * @description In demo mode, returns to landing page instead of navigating to dashboard.
- *              演示模式下，返回着陆页而非跳转到仪表盘。
+ *              In demo mode, returns to the landing page instead of navigating to the dashboard.
  */
 function goToDashboard() { window.location.href = window._redirectTo || 'dashboard.html'; }
 </script>

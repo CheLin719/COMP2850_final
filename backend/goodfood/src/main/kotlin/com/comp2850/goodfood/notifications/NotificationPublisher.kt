@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
 /**
- * 通知发布者 - 发布实时通知事件
+ * Notification publisher — publishes real-time notification events.
  */
 @Service
 class NotificationPublisher(
@@ -25,7 +25,7 @@ class NotificationPublisher(
             proName = proName
         )
 
-        // 保存到数据库
+        // Persist to database
         val notification = NotificationEntity(
             userId = userId,
             type = event.type,
@@ -35,7 +35,7 @@ class NotificationPublisher(
         )
         notificationJpaRepository.save(notification)
 
-        // 发送事件
+        // Publish event
         applicationEventPublisher.publishEvent(event)
     }
 
@@ -54,7 +54,7 @@ class NotificationPublisher(
             message = messageText
         )
 
-        // 保存到数据库
+        // Persist to database
         val notification = NotificationEntity(
             userId = userId,
             type = event.type,
@@ -64,7 +64,7 @@ class NotificationPublisher(
         )
         notificationJpaRepository.save(notification)
 
-        // 发送事件
+        // Publish event
         applicationEventPublisher.publishEvent(event)
     }
 
@@ -75,7 +75,7 @@ class NotificationPublisher(
             clientName = clientName
         )
 
-        // 保存到数据库
+        // Persist to database
         val notification = NotificationEntity(
             userId = userId,
             type = event.type,
@@ -85,7 +85,7 @@ class NotificationPublisher(
         )
         notificationJpaRepository.save(notification)
 
-        // 发送事件
+        // Publish event
         applicationEventPublisher.publishEvent(event)
     }
 
@@ -102,7 +102,7 @@ class NotificationPublisher(
             proName = proName
         )
 
-        // 保存到数据库
+        // Persist to database
         val notification = NotificationEntity(
             userId = userId,
             type = event.type,
@@ -112,7 +112,7 @@ class NotificationPublisher(
         )
         notificationJpaRepository.save(notification)
 
-        // 发送事件
+        // Publish event
         applicationEventPublisher.publishEvent(event)
     }
 }

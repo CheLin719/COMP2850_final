@@ -1,7 +1,7 @@
 package com.comp2850.goodfood.notifications
 
 /**
- * 事件对象 - 用于通过事件总线传播实时通知
+ * Event objects used to propagate real-time notifications via the event bus.
  */
 sealed class NotificationEvent {
     abstract val userId: String
@@ -9,7 +9,7 @@ sealed class NotificationEvent {
     abstract val message: String
 }
 
-// Plan 更新事件
+// Plan update event
 data class PlanUpdatedEvent(
     override val userId: String,
     val planId: Long,
@@ -20,7 +20,7 @@ data class PlanUpdatedEvent(
     override val message: String = "$proName updated your ${if (planType == "meal") "meal" else "training"} plan"
 }
 
-// 消息事件
+// Message received event
 data class MessageReceivedEvent(
     override val userId: String,
     val messageId: Long,
@@ -31,7 +31,7 @@ data class MessageReceivedEvent(
     override val type: String = "message_received"
 }
 
-// 用户解绑事件
+// User unbound event
 data class UserUnboundEvent(
     override val userId: String,
     val clientId: String,
@@ -41,7 +41,7 @@ data class UserUnboundEvent(
     override val message: String = "Client $clientName has disconnected"
 }
 
-// 计划删除事件
+// Plan deleted event
 data class PlanDeletedEvent(
     override val userId: String,
     val planId: Long,
