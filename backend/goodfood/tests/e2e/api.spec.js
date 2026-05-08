@@ -1,4 +1,4 @@
-// 测试 api.js 里的 NW 对象和 API 封装
+// Tests for the NW object and API encapsulation in api.js
 // Test the NW object and API encapsulation within api.js
 
 const { test, expect } = require('@playwright/test')
