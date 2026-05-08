@@ -1,14 +1,5 @@
-// 主要测试首页、登录、注册表单交互
+// E2E tests for the landing page, login, and registration form interactions
 // Mainly test the interaction of the homepage, login, and registration forms.
-/*
-1. 登录时是否调用 /api/auth/login
-2. 注册时是否调用 /api/auth/register
-3. 登录成功后是否显示 success overlay
-4. 登录失败时是否显示错误信息
-5. 注册密码是否必须满足强密码规则
-6. Professional 注册是否必须填写 licence number
-7. 注册成功后是否显示 success overlay
-8. api.js 是否正确保存 token / role / userId
 1. Is /api/auth/login called when logging in?
 2. Is /api/auth/register called when registering?
 3. Is a success overlay displayed after successful login?
